@@ -43,6 +43,138 @@ export const PRODUCTS: Product[] = [
     sizes: ['S', 'M', 'L'],
     deliversBy: 'JUNE 24'
   },
+  {
+    id: 'p_ss_blue_polo',
+    name: 'Horizontal Blue Striped Knit Polo',
+    price: 135,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/blue_striped_polo_1781871467033.jpg'],
+    description: 'A luxurious short sleeve knit polo shirt adorned with grey and blue horizontal stripes. Features a sharp dark navy contrast collar and premium lightweight yarn construction.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 24'
+  },
+  {
+    id: 'p_ss_beige_polo',
+    name: 'Beige Striped Knit Polo',
+    price: 135,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/beige_striped_polo_1781871478659.jpg'],
+    description: 'An elegant fine-knit polo shirt styled with subtle beige and tan stripes. Complemented by a solid taupe ribbed collar, presenting a highly sophisticated casual asset.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 25'
+  },
+  {
+    id: 'p_ss_olive_polo',
+    name: 'Olive Striped Knit Polo',
+    price: 135,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/olive_striped_polo_1781871493351.jpg'],
+    description: 'Short sleeve fine-knit polo styled with elegant olive green and charcoal grey horizontal stripes. Complete with an olive ribbed collar and structured fit.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 24'
+  },
+  {
+    id: 'p_ss_grey_white_collar_polo',
+    name: 'Two-Tone Grey Knit Polo',
+    price: 145,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/grey_white_collar_polo_1781871506844.jpg'],
+    description: 'A striking premium knit polo shirt designed with a textured heather-grey body contrasted beautifully by a pristine white collar and modern flat placket.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 24'
+  },
+  {
+    id: 'p_ss_crochet_floral',
+    name: 'Crochet Floral Patchwork Shirt',
+    price: 240,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/crochet_floral_shirt_1781871520491.jpg'],
+    description: 'An editorial masterpiece constructed from handmade colorful crochet sunflower patches. Bold, breathable open-work design finished with a classic camp collar and real wood buttons.',
+    sizes: ['S', 'M', 'L'],
+    deliversBy: 'JUNE 28'
+  },
+  {
+    id: 'p_ss_crochet_diamond',
+    name: 'Black Diamond Crochet Shirt',
+    price: 220,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/black_crochet_diamond_shirt_1781871534787.jpg'],
+    description: 'Artisanal short sleeve resort knit shirt featuring a rich black crochet body highlighted by a high-contrast white diamond-lattice open lace overlay.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 26'
+  },
+  {
+    id: 'p_ss_grey_striped_hanging',
+    name: 'Retro Grey Striped Polo',
+    price: 155,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/grey_striped_polo_hanging_1781871548777.jpg'],
+    description: 'A premium heavy-weighted grey knit polo shirt featuring wide horizontal black stripes and delicate white accent lines. Infuses retro sport aesthetics into modern luxury.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 25'
+  },
+  {
+    id: 'p_ss_black_ribbed_panel',
+    name: 'Ribbed-Panel Black Polo',
+    price: 150,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/black_ribbed_panel_polo_hanging_1781871570414.jpg'],
+    description: 'A sleek black luxury knit polo shirt defined by elegant vertical ribbed columns across the chest, creating high-fashion geometric texture depth.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 24'
+  },
+  {
+    id: 'p_ss_green_patterned',
+    name: 'Patterned Forest Green Polo',
+    price: 160,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/green_patterned_polo_hanging_1781871585512.jpg'],
+    description: 'Rich forest green short sleeve knit polo boasting sophisticated cream horizontal geometric diamond patterns. Perfect blend of heritage golf feel and high street luxury.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 26'
+  },
+  {
+    id: 'p_ss_burgundy_ribbed',
+    name: 'Burgundy Ribbed Knit Polo',
+    price: 140,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/burgundy_ribbed_polo_hanging_1781871599021.jpg'],
+    description: 'Luxury short sleeve polo shirt cut from super soft combed burgundy yarn. Standard ribbed texture throughout delivers highly tactile luxury comfort.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 25'
+  },
+  {
+    id: 'p_ss_ghana_home',
+    name: 'Ghana Federation Home Jersey',
+    price: 110,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/ghana_home_jersey_1781871612980.jpg'],
+    description: 'The official white home jersey for the Ghana national football team. Displays abstract high-contrast line graphical layout in pan-African red, yellow, and green, complete with the iconic bold black star at center.',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    deliversBy: 'JUNE 24'
+  },
+  {
+    id: 'p_ss_ghana_away',
+    name: 'Ghana Federation Away Jersey',
+    price: 110,
+    category: 'SHIRTS',
+    subCategory: 'SHORT SLEEVES',
+    images: ['/src/assets/images/ghana_away_jersey_1781871625604.jpg'],
+    description: 'The spectacular away jersey of the Ghana national team in rich yellow-gold. Styled with traditional woven fabric pattern textures and contrast green collar detailing, centering the Black Star.',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    deliversBy: 'JUNE 24'
+  },
 
   // LONG SLEEVES
   {
@@ -182,6 +314,28 @@ export const PRODUCTS: Product[] = [
     ],
     description: 'Crisp wide-leg pleated shorts crafted from visual structure drill twill. Sharp front creasing ensures an impeccably modern street presence.',
     sizes: ['30', '32', '34', '36'],
+    deliversBy: 'JUNE 24'
+  },
+  {
+    id: 'p_tr_s_chevron',
+    name: 'Dual Chevron Athletic Shorts',
+    price: 95,
+    category: 'TROUSERS',
+    subCategory: 'SHORTS',
+    images: ['/src/assets/images/dual_chevron_shorts_1781871636731.jpg'],
+    description: 'Premium casual training shorts package containing a deep black pair and an off-white cream pair. Finished with a clean contrasting double-chevron logo at left hem.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JUNE 25'
+  },
+  {
+    id: 'p_tr_s_circular',
+    name: 'Circular Patch Sweat Shorts',
+    price: 85,
+    category: 'TROUSERS',
+    subCategory: 'SHORTS',
+    images: ['/src/assets/images/circular_patch_shorts_1781871648872.jpg'],
+    description: 'Ultra cozy sweat shorts crafted in delicate pastel cream-yellow heavy fleece cotton. Featuring a high contrast custom circular branding emblem on left hem.',
+    sizes: ['S', 'M', 'L', 'XL'],
     deliversBy: 'JUNE 24'
   },
 
