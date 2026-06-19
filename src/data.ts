@@ -1,4 +1,5 @@
 import { Product } from './types';
+import { img } from './imageMap';
 
 export const PRODUCTS: Product[] = [
   // ------------------ SHIRTS ------------------

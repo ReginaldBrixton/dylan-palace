@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Rotate3d, ArrowRight } from 'lucide-react';
 import { Screen } from '../types';
+import { img } from '../imageMap';
 import { TrousersInteractive, BagsInteractive, ShoesInteractive } from './AtelierInteractive';
 
 interface HomeScreenProps {
