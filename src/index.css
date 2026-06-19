@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Hanken Grotesk", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  
+  --color-primary: #111111;
+  --color-background-custom: #F9F9F8;
+  --color-surface-custom: #FFFFFF;
+  --color-text-custom: #111111;
+  --color-muted-custom: #8B8B8A;
+  --color-accent-custom: #4A5D23;
+  --color-border-custom: #E5E5E5;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background-custom);
+  color: var(--color-text-custom);
+}
+
+/* Hide scrollbars completely on mobile and tablet touch viewports (<1024px), preserve on desktop */
+@media (max-width: 1024px) {
+  ::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

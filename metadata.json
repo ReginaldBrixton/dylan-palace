@@ -1,0 +1,6 @@
+{
+  "name": "Dylan's Palace",
+  "description": "A premium, distraction-free mobile commerce platform for curated shirts, bags, and shoes.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
