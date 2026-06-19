@@ -33,7 +33,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen1',
     name: 'Minimal Street Sneaker',
     price: 320,
-    image: '/src/assets/images/minimalist_street_sneaker_1781867805261.jpg',
+    image: '/images/minimalist_street_sneaker_1781867805261.jpg',
     description: 'Minimal high-fashion street sneaker with concrete floor studio lighting.',
     subText: 'Futuristic design'
   },
@@ -41,7 +41,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen2',
     name: 'Industrial Leather Boot',
     price: 480,
-    image: '/src/assets/images/brutalist_black_boot_1781867824040.jpg',
+    image: '/images/brutalist_black_boot_1781867824040.jpg',
     description: 'Bold, brutalist heavy-duty platform boot with high-contrast shadows.',
     subText: 'Brutalist high-fashion'
   },
@@ -49,7 +49,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen3',
     name: 'Classic Dark Loafer',
     price: 280,
-    image: '/src/assets/images/elegant_leather_loafer_1781867845008.jpg',
+    image: '/images/elegant_leather_loafer_1781867845008.jpg',
     description: 'Polished modern luxury slipper loafer styled on warm organic linen fabric.',
     subText: 'Minimal modern luxury'
   }
