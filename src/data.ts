@@ -585,51 +585,100 @@ export const PRODUCTS: Product[] = [
   }
 ];
 
-const GENERATED_SHIRTS: Product[] = Array.from({ length: 50 }).map((_, i) => ({
-  id: `gen_shirt_${i}`,
-  name: `Essential ${['Cotton', 'Linen', 'Silk', 'Blend'][i % 4]} ${['T-Shirt', 'Polo', 'Button-up', 'Camp Shirt'][i % 4]} ${i}`,
-  price: 45 + (i * 2),
-  category: 'SHIRTS',
-  subCategory: ['SHORT SLEEVES', 'LONG SLEEVES', 'SINGLETS'][i % 3],
-  gender: ['MALE', 'FEMALE', 'UNISEX'][i % 3] as any,
-  images: [
-    `https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=400&auto=format&fit=crop&sig=${i}`,
-  ],
-  description: 'Premium quality basics carefully constructed for enduring minimalist wear.',
-  sizes: ['S', 'M', 'L', 'XL'],
-  deliversBy: 'JULY 2'
-}));
+const SHIRT_IMAGE_IDS = [
+  'photo-1596755094514-f87e34085b2c', // Patterned t-shirt hanging
+  'photo-1618354691373-d851c5c3a990', // Black minimalist folded tee
+  'photo-1602810318383-e386cc2a3ccf', // Elegant striped dress shirt
+  'photo-1598033129183-c4f50c736f10', // Black linen crop shirt
+  'photo-1620799140408-edc6dcb6d633', // Aesthetic linen shirt hanging
+  'photo-1576566588028-4147f3842f27', // Knit sweater polo
+  'photo-1583743814966-8936f5b7be1a', // Black t-shirt minimal
+  'photo-1618932260643-eee4a2f652a6', // Floral aesthetic summer shirt
+  'photo-1523381210434-271e8be1f52b', // Stack of minimalist tees
+  'photo-1503342217505-b0a15ec3261c', // Textured grey shirt
+];
 
-const GENERATED_TROUSERS: Product[] = Array.from({ length: 40 }).map((_, i) => ({
-  id: `gen_trouser_${i}`,
-  name: `${['Pleated', 'Wide-Leg', 'Slim', 'Relaxed'][i % 4]} ${['Chino', 'Jeans', 'Trouser', 'Cargo'][i % 4]} ${i}`,
-  price: 90 + (i * 3),
-  category: 'TROUSERS',
-  subCategory: ['SHORTS', 'LONG TROUSERS', 'JEANS', 'KHAKI'][i % 4],
-  brand: ['Acne', 'Levis', 'APC', 'Our Legacy'][i % 4],
-  gender: ['MALE', 'FEMALE', 'UNISEX'][i % 3] as any,
-  images: [
-    `https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=400&auto=format&fit=crop&sig=${i}`,
-  ],
-  description: 'A sharp and structural piece suited perfectly for the sophisticated modern wardrobe.',
-  sizes: ['28', '30', '32', '34'],
-  deliversBy: 'JULY 2'
-}));
+const TROUSER_IMAGE_IDS = [
+  'photo-1624378439575-d8705ad7ae80', // Olive green trousers
+  'photo-1542272604-787c3835535d', // Selvedge denim jeans detail
+  'photo-1582562124811-c09040d0a901', // Faded dark grey baggy jeans
+  'photo-1517462964-21fdcec3f25b', // Pressed linen trousers
+  'photo-1473968512647-3e447244af8f', // Khaki chinos in wild environment
+  'photo-1594633312681-425c7b97ccd1', // Minimalist off-white casual pants
+  'photo-1551854838-212c50b4c184', // Textured tweed heavy trousers
+  'photo-1516257984-b1b4d707412e', // Classic tailored grey slacks
+];
 
-const GENERATED_SHOES: Product[] = Array.from({ length: 40 }).map((_, i) => ({
-  id: `gen_shoe_${i}`,
-  name: `${['Leather', 'Suede', 'Canvas', 'Mesh'][i % 4]} ${['Sneaker', 'Oxford', 'Boot', 'Loafer'][i % 4]} ${i}`,
-  price: 150 + (i * 5),
-  category: 'SHOES',
-  brand: ['Nike', 'Allstars', 'Vans', 'Adidas', 'New Balance'][i % 5],
-  subCategory: ['SNEAKERS', 'OXFORDS', 'LOAFERS', 'BOOTS', 'HIGHTOPS'][i % 5],
-  gender: ['MALE', 'FEMALE', 'UNISEX'][i % 3] as any,
-  images: [
-    `https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=400&auto=format&fit=crop&sig=${i}`,
-  ],
-  description: 'Uncompromising craftsmanship meets avant-garde, everyday functional utility design.',
-  sizes: ['8', '9', '10', '11', '12'],
-  deliversBy: 'JULY 2'
-}));
+const SHOE_IMAGE_IDS = [
+  'photo-1549298916-b41d501d3772', // Brown/tan sneaker
+  'photo-1595950653106-6c9ebd614d3a', // Chunky white Nike sneaker
+  'photo-1525966222134-fcfa99b8ae77', // Yellow Vans sneaker
+  'photo-1491553895911-0055eca6402d', // Sleek black tech runner
+  'photo-1608231387042-66d1773070a5', // Cream high-top sneaker
+  'photo-1607522370275-f14206abe5d3', // Red converse sneaker
+  'photo-1533867617858-e7b97e060509', // Classic brown leather derby
+  'photo-1575537302964-96cd47c06b1b', // Premium leather oxford brogues
+  'photo-1614252324478-f94d93026725', // Black chunky lug-sole loafers
+  'photo-1542496658-e33a6d0d50f6', // Premium sand suede boot
+  'photo-1520639888713-7851133b1ed0', // Black leather Chelsea platform boot
+  'photo-1518049360754-ee518a2249e0', // Beige suede wallabee loafer
+  'photo-1531310197839-ccf54634509e', // Brutalist combat boot
+];
+
+const GENERATED_SHIRTS: Product[] = Array.from({ length: 50 }).map((_, i) => {
+  const imgId = SHIRT_IMAGE_IDS[i % SHIRT_IMAGE_IDS.length];
+  return {
+    id: `gen_shirt_${i}`,
+    name: `Essential ${['Cotton', 'Linen', 'Silk', 'Blend'][i % 4]} ${['T-Shirt', 'Polo', 'Button-up', 'Camp Shirt'][i % 4]} ${i}`,
+    price: 45 + (i * 2),
+    category: 'SHIRTS',
+    subCategory: ['SHORT SLEEVES', 'LONG SLEEVES', 'SINGLETS'][i % 3],
+    gender: ['MALE', 'FEMALE', 'UNISEX'][i % 3] as any,
+    images: [
+      `https://images.unsplash.com/${imgId}?q=80&w=600&auto=format&fit=crop`,
+    ],
+    description: 'Premium quality basics carefully constructed for enduring minimalist wear.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    deliversBy: 'JULY 2'
+  };
+});
+
+const GENERATED_TROUSERS: Product[] = Array.from({ length: 40 }).map((_, i) => {
+  const imgId = TROUSER_IMAGE_IDS[i % TROUSER_IMAGE_IDS.length];
+  return {
+    id: `gen_trouser_${i}`,
+    name: `${['Pleated', 'Wide-Leg', 'Slim', 'Relaxed'][i % 4]} ${['Chino', 'Jeans', 'Trouser', 'Cargo'][i % 4]} ${i}`,
+    price: 90 + (i * 3),
+    category: 'TROUSERS',
+    subCategory: ['SHORTS', 'LONG TROUSERS', 'JEANS', 'KHAKI'][i % 4],
+    brand: ['Acne', 'Levis', 'APC', 'Our Legacy'][i % 4],
+    gender: ['MALE', 'FEMALE', 'UNISEX'][i % 3] as any,
+    images: [
+      `https://images.unsplash.com/${imgId}?q=80&w=600&auto=format&fit=crop`,
+    ],
+    description: 'A sharp and structural piece suited perfectly for the sophisticated modern wardrobe.',
+    sizes: ['28', '30', '32', '34'],
+    deliversBy: 'JULY 2'
+  };
+});
+
+const GENERATED_SHOES: Product[] = Array.from({ length: 40 }).map((_, i) => {
+  const imgId = SHOE_IMAGE_IDS[i % SHOE_IMAGE_IDS.length];
+  return {
+    id: `gen_shoe_${i}`,
+    name: `${['Leather', 'Suede', 'Canvas', 'Mesh'][i % 4]} ${['Sneaker', 'Oxford', 'Boot', 'Loafer'][i % 4]} ${i}`,
+    price: 150 + (i * 5),
+    category: 'SHOES',
+    brand: ['Nike', 'Allstars', 'Vans', 'Adidas', 'New Balance'][i % 5],
+    subCategory: ['SNEAKERS', 'OXFORDS', 'LOAFERS', 'BOOTS', 'HIGHTOPS'][i % 5],
+    gender: ['MALE', 'FEMALE', 'UNISEX'][i % 3] as any,
+    images: [
+      `https://images.unsplash.com/${imgId}?q=80&w=600&auto=format&fit=crop`,
+    ],
+    description: 'Uncompromising craftsmanship meets avant-garde, everyday functional utility design.',
+    sizes: ['8', '9', '10', '11', '12'],
+    deliversBy: 'JULY 2'
+  };
+});
 
 PRODUCTS.push(...GENERATED_SHIRTS, ...GENERATED_TROUSERS, ...GENERATED_SHOES);

@@ -248,8 +248,8 @@ export default function ProductListScreen({
       </div>
 
       <main className="w-full border-b border-[#E5E5E5] overflow-hidden">
-        <motion.div layout className="grid grid-cols-2 grid-flow-row-dense w-full bg-[#FFFFFF]">
-          <AnimatePresence mode="popLayout">
+        <div className="grid grid-cols-2 w-full bg-[#FFFFFF]">
+          <AnimatePresence>
             {isLoadingCategory ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <motion.div 
@@ -271,12 +271,10 @@ export default function ProductListScreen({
             ) : filtered.length > 0 ? (
               filtered.slice(0, displayLimit).map((product, index) => (
                 <motion.article 
-                  layout
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "100px" }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.5, type: "spring", bounce: 0 }}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
                   key={product.id}
                   onClick={() => handleProductClick(product)}
                   onMouseDown={() => handlePressStart(product)}
@@ -314,7 +312,6 @@ export default function ProductListScreen({
               ))
             ) : (
               <motion.div 
-                layout
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -327,7 +324,6 @@ export default function ProductListScreen({
 
           {filtered.length > displayLimit && (
             <motion.div
-              layout
               onViewportEnter={() => setDisplayLimit((prev) => prev + 6)}
               className="col-span-2 flex justify-center items-center py-16 bg-[#F9F9F8] border-b border-[#E5E5E5]"
             >
@@ -336,13 +332,13 @@ export default function ProductListScreen({
           )}
 
           {filtered.length > 0 && filtered.length <= displayLimit && (
-            <motion.article layout className="flex flex-col bg-[#FFFFFF] relative w-full items-center justify-center p-12 select-none text-center col-span-2">
+            <article className="flex flex-col bg-[#FFFFFF] relative w-full items-center justify-center p-12 select-none text-center col-span-2">
               <div className="w-1.5 h-1.5 bg-[#111111] rounded-full mb-3" />
               <h3 className="font-sans text-[11px] font-bold text-[#111111] uppercase tracking-widest mb-1.5">END OF RESULTS</h3>
               <p className="text-[11px] text-[#8B8B8A] uppercase tracking-widest">{filtered.length} ITEMS DISPLAYED</p>
-            </motion.article>
+            </article>
           )}
-        </motion.div>
+        </div>
       </main>
 
       {/* Quick View Modal Overlay */}
