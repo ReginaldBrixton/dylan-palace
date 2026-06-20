@@ -34,7 +34,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen1',
     name: 'Minimal Street Sneaker',
     price: 320,
-    image: '/images/minimalist_street_sneaker_1781867805261.jpg',
+    image: img('shoes/minimalist_street_sneaker_1781867805261.jpg'),
     description: 'Minimal high-fashion street sneaker with concrete floor studio lighting.',
     subText: 'Futuristic design'
   },
@@ -42,7 +42,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen2',
     name: 'Industrial Leather Boot',
     price: 480,
-    image: '/images/brutalist_black_boot_1781867824040.jpg',
+    image: img('shoes/brutalist_black_boot_1781867824040.jpg'),
     description: 'Bold, brutalist heavy-duty platform boot with high-contrast shadows.',
     subText: 'Brutalist high-fashion'
   },
@@ -50,7 +50,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen3',
     name: 'Classic Dark Loafer',
     price: 280,
-    image: '/images/elegant_leather_loafer_1781867845008.jpg',
+    image: img('shoes/elegant_leather_loafer_1781867845008.jpg'),
     description: 'Polished modern luxury slipper loafer styled on warm organic linen fabric.',
     subText: 'Minimal modern luxury'
   }
@@ -91,7 +91,7 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
         <ImageWithSkeleton
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none transition-opacity duration-500"
           alt="A striking, high-contrast fashion editorial shot of a person wearing a crisp, minimalist white linen shirt." 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLZ7A2Ypx1aEGs8lL4jnziuXxD9STqCyf4umIECwJKpMNahArA0EIFj-WAOyvzLJo-qU6aFHQ9OJrORD5ncYx8vqKmeApfI0A1CKfqY12r8gxS9_SeMEUzTREUIf8T_ajwcRROZJir60EZSsqkZa_cvxRGRpzLf936PP5dWrtHjr1b88l8uM7YMvjS2RFFbvs5HydAV70va7AyW_2xchebDEw0k3d2V3Jc6H2jbU7GO0hY_gU7jkrFskzKVrO8miu-gqd18inSjME"
+          src={img('shirts/hero_summer_shift.jpg')}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/70 via-[#111111]/20 to-transparent"></div>
         <div className="absolute bottom-0 left-0 p-6 w-full flex flex-col items-start z-10">
@@ -252,7 +252,7 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
               <ImageWithSkeleton
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
                 alt="Wide-leg pleated trousers." 
-                src="https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=600&auto=format&fit=crop"
+                src={img('trousers/wide_leg_pleated_trousers.jpg')}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
@@ -292,7 +292,7 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
               <ImageWithSkeleton
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
                 alt="Minimalist structured black leather bag on pedestal." 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhCPkTEANoVqrHfMlLFn6GppNX_8LVjD7D6PPP1y2uTbcZNvtUEH575OYuNHhq-c_lA8ca0CHdrCeSv2HBskBypGiMSfdsKbKPRomQdRmX_Wrolh6XSnfwm2ymokVy2UUzGQqU-J3Jux-16FU466bskUJ1z1gIjbgcAhbKMtiaV61B0r3EYUisLv0jusQgVV-R5lqrY84_Zgp_OrbKioQnfP4svqao4xBzJGwBSpvbUx9MxqPJqLKiGUK4mxKx0iIZacrlds6bBYo"
+                src={img('bags/sleek_leather_clasp_bag.jpg')}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
@@ -322,7 +322,7 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
               <ImageWithSkeleton
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
                 alt="Avant-garde black leather shoes." 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCy8ACszouEpCdCm0bt-gsmUkauVM0Y8LXxU6U0WAyUrxzOkciewdZhi8lxcRpETwL9dbsotnE42_ESjrpOcfjMRQdSb2a8oW-gtnENPvHNxxreWRTdeTl2HG3X_qMU1cglAjYfZeM5fdah37PIHCvWa_gwIQFjpglL4o3X0I4_xjg21DB3f0kHovLUlubgOrcYwGkCk9lf5rvU2fSVrccRA-8Q0hxu0KGuzCXwdATgoq6qjZ5BKmR_2_UioLQva3rt-JjpYvDWU8"
+                src={img('shoes/avant_garde_oxford.jpg')}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">

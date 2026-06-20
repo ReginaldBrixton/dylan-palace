@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 const imageModules = import.meta.glob('./assets/images/**/*.{jpg,jpeg,png,webp}', {
   eager: true,
   import: 'default',
@@ -11,11 +13,11 @@ Object.entries(imageModules).forEach(([key, value]) => {
   normalizedPaths.set(relativePath, value);
 });
 
-export function img(path: string, fallback?: string): string {
+export function img(path: string): string {
   const resolved = normalizedPaths.get(path);
   if (!resolved) {
-    console.warn(`Missing local image: ${path}`);
-    return fallback || '';
+    console.error(`Missing local image: ${path}`);
+    return '';
   }
   return resolved;
 }

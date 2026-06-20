@@ -1,0 +1,85 @@
+{
+  "shoes": [
+    {
+      "id": "p_sh_sn1",
+      "name": "Monolith Trail Runner",
+      "price": 195,
+      "image": "shoe-p_sh_sn1.jpg",
+      "subCategory": "SNEAKERS",
+      "description": "Tech trail performance runner utilizing highly structured panels, breathable mesh base, and thick vulcanized lug outer grips for maximalist contrast appeal.",
+      "sizes": ["40", "41", "42", "43", "44", "45"]
+    },
+    {
+      "id": "p_sh_sn2",
+      "name": "Off-white Vulc Trainer",
+      "price": 140,
+      "image": "shoe-p_sh_sn2.jpg",
+      "subCategory": "SNEAKERS",
+      "description": "Clean low profile sneakers featuring premium calf leather linings, dual stitched canvas upper panels, and a completely flat vulcanized custom out-sole.",
+      "sizes": ["39", "40", "41", "42", "43", "44"]
+    },
+    {
+      "id": "p9",
+      "name": "Avant-Garde Oxford",
+      "price": 290,
+      "image": "shoe-p9.jpg",
+      "subCategory": "OXFORDS",
+      "description": "Avant-garde black leather lace-ups resting elegantly. Highly detailed seamless crafting, hard polished outer finish, and standard low profile block heel for uncompromised styling.",
+      "sizes": ["39", "40", "41", "42", "43", "44"]
+    },
+    {
+      "id": "p_sh_ox2",
+      "name": "Polished Box-Calf Derbies",
+      "price": 330,
+      "image": "shoe-p_sh_ox2.jpg",
+      "subCategory": "OXFORDS",
+      "description": "Classic derby lace-ups using highly polished glass surface box-calf leather. Structured Goodyear Welt stitch construction guarantees eternal utility.",
+      "sizes": ["40", "41", "42", "43", "44"]
+    },
+    {
+      "id": "p_sh_lo1",
+      "name": "Brutalist Lug Loafer",
+      "price": 360,
+      "image": "shoe-p_sh_lo1.jpg",
+      "subCategory": "LOAFERS",
+      "description": "A heavy, stark lug sole loafer cut from thick oily black saddle leather. Embellished with classic strap styling on a brutal high-profile geometric format.",
+      "sizes": ["40", "41", "42", "43", "44"]
+    },
+    {
+      "id": "p_sh_bo1",
+      "name": "Chelsea Platform Boot",
+      "price": 410,
+      "image": "shoe-p_sh_bo1.jpg",
+      "subCategory": "BOOTS",
+      "description": "Sleek black calf leather ankle chelsea boot utilizing robust side stretch elastic inserts, heavy stack platform outsoles, and direct fit double pull-tabs.",
+      "sizes": ["40", "41", "42", "43", "44", "45"]
+    },
+    {
+      "id": "p_sh_gen1",
+      "name": "Minimal Street Sneaker",
+      "price": 320,
+      "image": "shoe-p_sh_gen1.jpg",
+      "subCategory": "SNEAKERS",
+      "description": "A minimalist, high-fashion street sneaker. Clean lines and a monochromatic cohesive design created for ultimate street presence.",
+      "sizes": ["40", "41", "42", "43", "44", "45"]
+    },
+    {
+      "id": "p_sh_gen2",
+      "name": "Industrial Leather Boot",
+      "price": 480,
+      "image": "shoe-p_sh_gen2.jpg",
+      "subCategory": "BOOTS",
+      "description": "A bold, heavy-duty black leather platform boot with a brutalist high-fashion aesthetic.",
+      "sizes": ["40", "41", "42", "43", "44"]
+    },
+    {
+      "id": "p_sh_gen3",
+      "name": "Classic Dark Loafer",
+      "price": 280,
+      "image": "shoe-p_sh_gen3.jpg",
+      "subCategory": "LOAFERS",
+      "description": "A highly polished, dark brown leather loafer shoe embodying a minimalist modern luxury aesthetic.",
+      "sizes": ["39", "40", "41", "42", "43"]
+    }
+  ]
+}

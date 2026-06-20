@@ -1,0 +1,54 @@
+{
+  "trousers": [
+    {
+      "id": "p_tr_s1",
+      "name": "Brutalist Cargo Shorts",
+      "price": 110,
+      "image": "short-p_tr_s1.jpg",
+      "subCategory": "SHORTS",
+      "gender": "MALE",
+      "description": "Heavy architectural cotton shorts with flat cargo pockets flushed to the side seams. Hidden button flies, zero outward hardware, and clean raw edges.",
+      "sizes": ["28", "30", "32", "34", "36"]
+    },
+    {
+      "id": "p_tr_s2",
+      "name": "Pleated Walk Shorts",
+      "price": 135,
+      "image": "short-p_tr_s2.jpg",
+      "subCategory": "SHORTS",
+      "gender": "MALE",
+      "description": "Crisp wide-leg pleated shorts crafted from visual structure drill twill. Sharp front creasing ensures an impeccably modern street presence.",
+      "sizes": ["30", "32", "34", "36"]
+    },
+    {
+      "id": "p_tr_s_chevron",
+      "name": "Dual Chevron Athletic Shorts",
+      "price": 95,
+      "image": "short-p_tr_s_chevron.jpg",
+      "subCategory": "SHORTS",
+      "gender": "MALE",
+      "description": "Premium casual training shorts package containing a deep black pair and an off-white cream pair. Finished with a clean contrasting double-chevron logo at left hem.",
+      "sizes": ["S", "M", "L", "XL"]
+    },
+    {
+      "id": "p_tr_s_circular",
+      "name": "Circular Patch Sweat Shorts",
+      "price": 85,
+      "image": "short-p_tr_s_circular.jpg",
+      "subCategory": "SHORTS",
+      "gender": "MALE",
+      "description": "Ultra cozy sweat shorts crafted in delicate pastel cream-yellow heavy fleece cotton. Featuring a high contrast custom circular branding emblem on left hem.",
+      "sizes": ["S", "M", "L", "XL"]
+    },
+    {
+      "id": "p_tr_s5",
+      "name": "High-Waisted Denim Shorts",
+      "price": 115,
+      "image": "short-p_tr_s5.jpg",
+      "subCategory": "SHORTS",
+      "gender": "FEMALE",
+      "description": "Relaxed premium high-waisted denim shorts. Authentic wash with raw cuffed hems and traditional five-pocket hardware.",
+      "sizes": ["26", "28", "30", "32"]
+    }
+  ]
+}
