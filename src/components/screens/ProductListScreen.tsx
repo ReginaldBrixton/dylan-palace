@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, SlidersHorizontal, Search, X, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Product, Screen } from '../types';
-import { PRODUCTS } from '../data';
-import ImageWithSkeleton from './ImageWithSkeleton';
+import { Product, Screen, Category } from '../../types';
+import { PRODUCTS } from '../../api/products';
+import ImageWithSkeleton from '../common/ImageWithSkeleton';
 
 interface ProductListScreenProps {
   currentCategory: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS';

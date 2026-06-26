@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Home, ShoppingBag, User } from 'lucide-react';
-import { Screen } from '../types';
+import { Screen } from '../../types';
 
 interface HeaderProps {
   currentScreen: Screen;
@@ -31,21 +31,21 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
 
   // Determine dynamic contrast themes depending on scroll state & current screen
   const isHomeFirstFold = currentScreen === 'home' && !scrolled;
-  const headerBgClass = isHomeFirstFold 
-    ? 'bg-black/15 backdrop-blur-[6px] border-transparent' 
+  const headerBgClass = isHomeFirstFold
+    ? 'bg-black/15 backdrop-blur-[6px] border-transparent'
     : 'bg-white/90 backdrop-blur-2xl backdrop-saturate-[180%] border-b border-[#E5E5E5]/50 shadow-sm';
-  
-  const textIconClass = isHomeFirstFold 
-    ? 'text-white hover:text-white/80' 
+
+  const textIconClass = isHomeFirstFold
+    ? 'text-white hover:text-white/80'
     : 'text-[#111111] hover:opacity-75';
 
   return (
     <header className={`fixed top-0 left-0 w-full h-[52px] z-50 flex items-center justify-between px-4 pl-3 pr-3 flex-shrink-0 transition-all duration-500 ease-out ${headerBgClass}`}>
-      
+
       {/* Left Back/Home Button */}
       <div className="flex items-center justify-start z-10">
         {currentScreen !== 'home' ? (
-          <button 
+          <button
             id="back-button"
             onClick={() => {
               if (isSuccessPage) {
@@ -64,7 +64,7 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
             <ArrowLeft size={18} strokeWidth={2} />
           </button>
         ) : (
-          <button 
+          <button
             id="home-icon"
             onClick={() => onNavigate('home')}
             aria-label="Home"
@@ -76,12 +76,11 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
       </div>
 
       {/* Centered Brand Title */}
-      <h1 
+      <h1
         id="app-branding"
         onClick={() => onNavigate('home')}
-        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-serif text-[16px] md:text-[18px] font-bold tracking-tighter cursor-pointer select-none whitespace-nowrap z-0 pt-0.5 transition-all duration-500 ease-out ${
-          isHomeFirstFold ? 'text-white tracking-[0.05em] scale-102' : 'text-[#111111] tracking-tighter scale-100'
-        }`}
+        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-serif text-[16px] md:text-[18px] font-bold tracking-tighter cursor-pointer select-none whitespace-nowrap z-0 pt-0.5 transition-all duration-500 ease-out ${isHomeFirstFold ? 'text-white tracking-[0.05em] scale-102' : 'text-[#111111] tracking-tighter scale-100'
+          }`}
       >
         DYLAN'S PALACE
       </h1>
@@ -90,7 +89,7 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
       <div className="flex items-center justify-end gap-2 z-10">
         {!isSuccessPage && (
           <>
-            <button 
+            <button
               id="profile-toggle-btn"
               onClick={() => onNavigate('profile')}
               aria-label="Profile"
@@ -98,7 +97,7 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
             >
               <User size={18} strokeWidth={2} />
             </button>
-            <button 
+            <button
               id="cart-toggle-btn"
               onClick={onOpenCart}
               aria-label="Shopping Bag"
@@ -106,11 +105,10 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
             >
               <ShoppingBag size={18} strokeWidth={2} />
               {cartCount > 0 && (
-                <span 
+                <span
                   id="cart-badge"
-                  className={`absolute top-0 right-0 text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-pulse transition-colors duration-500 ${
-                    isHomeFirstFold ? 'bg-white text-black' : 'bg-[#4A5D23] text-white'
-                  }`}
+                  className={`absolute top-0 right-0 text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-pulse transition-colors duration-500 ${isHomeFirstFold ? 'bg-white text-black' : 'bg-[#4A5D23] text-white'
+                    }`}
                 >
                   {cartCount}
                 </span>

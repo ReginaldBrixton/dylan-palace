@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
-import { CartItem, Screen } from '../types';
+import { CartItem, Screen } from '../../types';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -27,18 +27,18 @@ export default function CartDrawer({
   return (
     <div className="fixed inset-0 z-[100] overflow-hidden select-none">
       {/* Background dark modal overlay backdrop with blur */}
-      <div 
+      <div
         id="cart-backdrop"
         onClick={onClose}
         className="absolute inset-0 bg-[#111111]/45 backdrop-blur-xs transition-opacity animate-fade-in"
       />
 
       {/* Cart Container bottom-sheet sheet */}
-      <div 
+      <div
         id="cart-bottom-sheet"
         className="absolute bottom-0 inset-x-0 h-[85vh] w-full flex flex-col bg-white/70 backdrop-blur-2xl backdrop-saturate-[180%] border-t border-[#E5E5E5]/50 transition-transform duration-300 transform translate-y-0 rounded-t-[24px]"
       >
-        
+
         {/* Grab Handle */}
         <div className="w-full flex justify-center pt-4 pb-2 rounded-t-[24px]">
           <div className="w-12 h-1.5 bg-[#E5E5E5] rounded-full"></div>
@@ -49,10 +49,10 @@ export default function CartDrawer({
           <h2 className="font-serif text-[26px] font-bold text-[#111111] uppercase tracking-tighter">
             Your Bag ({totalItemCount})
           </h2>
-          <button 
+          <button
             id="close-cart-btn"
             onClick={onClose}
-            aria-label="Close modal" 
+            aria-label="Close modal"
             className="w-10 h-10 flex items-center justify-end text-[#111111] hover:opacity-70 transition-opacity cursor-pointer"
           >
             <X size={24} />
@@ -65,11 +65,11 @@ export default function CartDrawer({
             cartItems.map((item) => (
               <div key={item.id} className="flex flex-col gap-4">
                 <div className="flex h-[90px] w-full group">
-                  
+
                   {/* Thumbnail Image */}
                   <div className="w-[72px] h-[90px] bg-[#eeeeed] shrink-0 border border-[#E5E5E5] overflow-hidden rounded-md shadow-sm">
-                    <img 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    <img
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       alt={item.product.name}
                       src={item.product.images[0]}
                       referrerPolicy="no-referrer"
@@ -78,7 +78,7 @@ export default function CartDrawer({
 
                   {/* Metadata middle details */}
                   <div className="flex-grow ml-4 flex flex-col justify-between py-0.5">
-                    
+
                     {/* Title & price side-by-side */}
                     <div className="flex justify-between items-start gap-4">
                       <h3 className="text-[13px] font-semibold text-[#111111] uppercase leading-tight line-clamp-2">
@@ -97,7 +97,7 @@ export default function CartDrawer({
 
                       {/* Quantity Modifier controls */}
                       <div className="flex items-center gap-1.5 border border-[#E5E5E5] bg-white p-0.5 rounded-lg shadow-sm">
-                        <button 
+                        <button
                           onClick={() => {
                             if (item.quantity === 1) {
                               onRemoveItem(item.id);
@@ -113,7 +113,7 @@ export default function CartDrawer({
                         <span className="text-[12px] font-bold text-[#111111] w-6 text-center select-none">
                           {item.quantity}
                         </span>
-                        <button 
+                        <button
                           onClick={() => onUpdateQty(item.id, 1)}
                           aria-label="Increase qty"
                           className="w-7 h-7 flex items-center justify-center text-[#111111] hover:bg-[#E5E5E5] active:scale-90 transition-all cursor-pointer rounded-md"
@@ -140,7 +140,7 @@ export default function CartDrawer({
               <p className="text-[13px] text-[#8B8B8A] max-w-[240px] mb-6 leading-relaxed">
                 Fill it with our curated, high-contrast minimal garments.
               </p>
-              <button 
+              <button
                 onClick={onClose}
                 className="px-6 py-3 bg-[#111111] text-white text-[11px] font-semibold uppercase tracking-widest cursor-pointer rounded-lg hover:bg-[#333333] active:scale-95 transition-all shadow-md"
               >
@@ -161,7 +161,7 @@ export default function CartDrawer({
                 GH₵{subtotal}.00
               </span>
             </div>
-            <button 
+            <button
               id="proceed-checkout-btn"
               onClick={onProceedToCheckout}
               className="w-full h-14 bg-[#111111] text-[#FFFFFF] text-[12px] font-semibold uppercase tracking-[0.1em] flex items-center justify-center border border-[#111111] hover:bg-black active:scale-[0.98] transition-all duration-300 cursor-pointer rounded-lg shadow-lg"

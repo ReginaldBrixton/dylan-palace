@@ -1,8 +1,8 @@
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { initGlobalHaptics } from './haptic';
+import { initGlobalHaptics } from './utils/haptic';
 
 // Initialize global premium haptic feedback for phone/tablet clients
 initGlobalHaptics();

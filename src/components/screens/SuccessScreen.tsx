@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Check, Calendar, MapPin, Truck, Award, Package, Clock } from 'lucide-react';
-import { Screen } from '../types';
-import { triggerHaptic } from '../haptic';
+import { Screen } from '../../types';
+import { triggerHaptic } from '../../utils/haptic';
 
 interface SuccessScreenProps {
   orderDetails: {
@@ -19,7 +19,7 @@ interface SuccessScreenProps {
 
 export default function SuccessScreen({ orderDetails, onContinueShopping }: SuccessScreenProps) {
   const randomOrderNo = Math.floor(100000 + Math.random() * 90000).toString();
-  
+
   // Simulate order progression for demo purposes
   const [orderState, setOrderState] = useState<number>(1);
 
@@ -42,7 +42,7 @@ export default function SuccessScreen({ orderDetails, onContinueShopping }: Succ
 
   return (
     <div id="success-screen" className="w-full flex flex-col px-6 py-12 items-center bg-[#F9F9F8] min-h-[70vh] animate-fade-in text-center selection:bg-black selection:text-white pb-32">
-      
+
       {/* Editorial Checked Marker */}
       <div className="w-16 h-16 bg-[#111111] text-white flex items-center justify-center rounded-none mb-6 animate-bounce">
         <Check size={32} strokeWidth={2.5} />
@@ -61,10 +61,10 @@ export default function SuccessScreen({ orderDetails, onContinueShopping }: Succ
         <div className="relative flex justify-between items-center w-full px-2">
           {/* Progress bar background */}
           <div className="absolute top-1/2 left-2 right-2 h-[4px] bg-[#E5E5E5] -translate-y-1/2 z-0 rounded-full" />
-          
+
           {/* Active progress bar */}
-          <div 
-            className="absolute top-1/2 left-2 h-[4px] bg-[#111111] -translate-y-1/2 z-0 transition-all duration-1000 ease-in-out rounded-full" 
+          <div
+            className="absolute top-1/2 left-2 h-[4px] bg-[#111111] -translate-y-1/2 z-0 transition-all duration-1000 ease-in-out rounded-full"
             style={{ width: `calc(${((orderState - 1) / (TrackingSteps.length - 1)) * 100}% - 16px)` }}
           />
 
@@ -96,7 +96,7 @@ export default function SuccessScreen({ orderDetails, onContinueShopping }: Succ
       {/* Summary Box */}
       {orderDetails && (
         <div className="w-full max-w-md bg-white border border-[#E5E5E5] p-6 text-left flex flex-col gap-5 mb-8">
-          
+
           <div className="flex flex-col gap-1">
             <span className="text-[10px] font-bold text-[#8B8B8A] uppercase tracking-wider">DELIVERY RECIPIENT</span>
             <span className="text-[14px] font-bold text-[#111111] uppercase">{orderDetails.fullName}</span>
@@ -143,7 +143,7 @@ export default function SuccessScreen({ orderDetails, onContinueShopping }: Succ
         </div>
       </div>
 
-      <button 
+      <button
         id="continue-shopping-btn"
         onClick={onContinueShopping}
         className="w-full max-w-md bg-[#111111] text-white py-4 font-semibold text-[13px] uppercase tracking-widest hover:bg-black transition-colors rounded-none cursor-pointer"

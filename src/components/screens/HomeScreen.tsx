@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Rotate3d, ArrowRight } from 'lucide-react';
-import { Screen } from '../types';
-import { img } from '../imageMap';
-import { TrousersInteractive, BagsInteractive, ShoesInteractive } from './AtelierInteractive';
-import ImageWithSkeleton from './ImageWithSkeleton';
+import { Screen, Category } from '../../types';
+import { img } from '../../utils/imageMap';
+import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../ui/AtelierInteractive';
+import ImageWithSkeleton from '../common/ImageWithSkeleton';
 
 interface HomeScreenProps {
   onNavigate: (screen: Screen) => void;

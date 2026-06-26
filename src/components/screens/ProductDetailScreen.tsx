@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Truck, Plus, Minus, Info, Heart, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Product } from '../types';
-import { PRODUCTS } from '../data';
-import ImageWithSkeleton from './ImageWithSkeleton';
+import { Product } from '../../types';
+import { getRelatedProducts } from '../../api/products';
+import ImageWithSkeleton from '../common/ImageWithSkeleton';
 
 interface ProductDetailScreenProps {
   product: Product;
@@ -25,9 +25,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   const relatedProducts = useMemo(() => {
-    return PRODUCTS.filter(p => p.category === product.category && p.id !== product.id)
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 3);
+    return getRelatedProducts(product, 3);
   }, [product.id, product.category]);
 
   const toggleSection = (section: string) => {

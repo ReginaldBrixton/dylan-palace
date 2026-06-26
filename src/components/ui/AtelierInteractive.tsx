@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { triggerHaptic } from '../haptic';
+import { triggerHaptic } from '../../utils/haptic';
 import { Eye, Shield, HelpCircle, Layers, Maximize2, Move } from 'lucide-react';
 
 // ============================================================================
@@ -20,7 +20,7 @@ export function ShoesInteractive() {
   };
 
   return (
-    <div 
+    <div
       className="p-6 bg-white border border-[#E5E5E5] rounded-2xl shadow-md h-full flex flex-col justify-between select-none relative overflow-hidden group"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -42,8 +42,8 @@ export function ShoesInteractive() {
 
       {/* Sneaker SVG Chassis */}
       <div className="flex-grow flex items-center justify-center relative min-h-[170px] py-2">
-        <svg 
-          viewBox="0 0 240 160" 
+        <svg
+          viewBox="0 0 240 160"
           className="w-full h-full max-h-[160px] drop-shadow-lg"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -55,35 +55,35 @@ export function ShoesInteractive() {
 
           {/* SNEAKER OUTLINE SHAPE */}
           {/* Sole */}
-          <path 
-            d="M 20,130 C 50,131 90,132 140,132 C 175,132 195,128 220,118 C 220,112 215,108 200,108 L 190,108 Q 110,110 20,118 Z" 
-            fill="#E5E5E5" 
-            stroke="#111111" 
+          <path
+            d="M 20,130 C 50,131 90,132 140,132 C 175,132 195,128 220,118 C 220,112 215,108 200,108 L 190,108 Q 110,110 20,118 Z"
+            fill="#E5E5E5"
+            stroke="#111111"
             strokeWidth="1.5"
             className="transition-colors duration-500"
           />
           {/* Midsole Layer */}
-          <path 
-            d="M 22,122 C 70,123 120,123 170,121 C 190,120 205,116 218,111 L 217,114 C 192,124 172,127 135,127 C 85,127 45,126 22,125 Z" 
-            fill="#FFFFFF" 
-            stroke="#111111" 
-            strokeWidth="1" 
+          <path
+            d="M 22,122 C 70,123 120,123 170,121 C 190,120 205,116 218,111 L 217,114 C 192,124 172,127 135,127 C 85,127 45,126 22,125 Z"
+            fill="#FFFFFF"
+            stroke="#111111"
+            strokeWidth="1"
           />
 
           {/* Upper mesh chassis */}
-          <motion.path 
+          <motion.path
             d="M 24,115 C 38,82 58,58 100,58 C 110,58 118,65 125,75 C 132,85 140,92 165,95 C 185,97 205,101 216,108"
-            fill="none" 
-            stroke="#111111" 
+            fill="none"
+            stroke="#111111"
             strokeWidth="2"
-            animate={{ 
-              d: `M 24,115 C 38,${82 - tension * 0.05} 58,${58 - tension * 0.08} ${100 - tension * 0.05},${58 + tension * 0.05} C ${110 - tension * 0.05},${58 + tension * 0.05} 118,65 125,75 C 132,85 140,92 165,95 C 185,97 205,101 216,108` 
+            animate={{
+              d: `M 24,115 C 38,${82 - tension * 0.05} 58,${58 - tension * 0.08} ${100 - tension * 0.05},${58 + tension * 0.05} C ${110 - tension * 0.05},${58 + tension * 0.05} 118,65 125,75 C 132,85 140,92 165,95 C 185,97 205,101 216,108`
             }}
             transition={{ type: 'spring', stiffness: 120, damping: 15 }}
           />
 
           {/* Heel counter cup & pull tab */}
-          <motion.path 
+          <motion.path
             d="M 24,115 C 14,105 16,75 22,70 C 24,68 28,68 28,73 L 26,90"
             fill="none"
             stroke="#111111"
@@ -116,11 +116,11 @@ export function ShoesInteractive() {
 
           {/* SHOELACES - Dynamically weaving path depending on tension state */}
           {/* Weave Segment 1 */}
-          <motion.line 
-            x1="106" y1="67" 
-            x2="114" y2="74" 
-            stroke="#4A5D23" 
-            strokeWidth="2.5" 
+          <motion.line
+            x1="106" y1="67"
+            x2="114" y2="74"
+            stroke="#4A5D23"
+            strokeWidth="2.5"
             strokeLinecap="round"
             animate={{
               x1: 106 + tension * 0.04,
@@ -131,11 +131,11 @@ export function ShoesInteractive() {
             transition={{ type: 'spring', stiffness: 120, damping: 15 }}
           />
           {/* Weave Segment 2 */}
-          <motion.line 
-            x1="114" y1="74" 
-            x2="122" y2="81" 
-            stroke="#4A5D23" 
-            strokeWidth="2.5" 
+          <motion.line
+            x1="114" y1="74"
+            x2="122" y2="81"
+            stroke="#4A5D23"
+            strokeWidth="2.5"
             strokeLinecap="round"
             animate={{
               x1: 114 + tension * 0.04,
@@ -146,11 +146,11 @@ export function ShoesInteractive() {
             transition={{ type: 'spring', stiffness: 120, damping: 15 }}
           />
           {/* Weave Segment 3 */}
-          <motion.line 
-            x1="122" y1="81" 
-            x2="130" y2="88" 
-            stroke="#4A5D23" 
-            strokeWidth="2.5" 
+          <motion.line
+            x1="122" y1="81"
+            x2="130" y2="88"
+            stroke="#4A5D23"
+            strokeWidth="2.5"
             strokeLinecap="round"
             animate={{
               x1: 122 + tension * 0.04,
@@ -174,7 +174,7 @@ export function ShoesInteractive() {
             }}
             transition={{ type: 'spring', stiffness: 120, damping: 15 }}
           />
-          
+
           <motion.path
             d="M 106,67 Q 100,38 115,44 C 125,50 115,62 106,67"
             fill="none"
@@ -216,10 +216,10 @@ export function ShoesInteractive() {
             {tension > 70 ? 'TACTICAL LOCK' : 'RELAXED FIT'}
           </span>
         </div>
-        <input 
-          type="range" 
-          min="0" 
-          max="100" 
+        <input
+          type="range"
+          min="0"
+          max="100"
           value={tension}
           onChange={(e) => handleTensionChange(Number(e.target.value))}
           className="w-full h-1 bg-[#E5E5E5] rounded-lg appearance-none cursor-ew-resize accent-[#111111]"
@@ -245,7 +245,7 @@ export function TrousersInteractive() {
   };
 
   return (
-    <div 
+    <div
       className="p-6 bg-white border border-[#E5E5E5] rounded-2xl shadow-md h-full flex flex-col justify-between select-none relative overflow-hidden group"
       onMouseEnter={() => setAccent(true)}
       onMouseLeave={() => setAccent(false)}
@@ -267,8 +267,8 @@ export function TrousersInteractive() {
 
       {/* Trouser SVG Outline Chassis */}
       <div className="flex-grow flex items-center justify-center relative min-h-[170px] py-1">
-        <svg 
-          viewBox="0 0 200 170" 
+        <svg
+          viewBox="0 0 200 170"
           className="w-full h-full max-h-[160px] drop-shadow-md"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -280,7 +280,7 @@ export function TrousersInteractive() {
           {/* TROUSER PATH */}
           {/* Left Waist band */}
           <path d="M 70,15 L 130,15 L 132,25 L 68,25 Z" fill="#E5E5E5" stroke="#111111" strokeWidth="1.5" />
-          
+
           {/* Main Trousers Body (morphs based on drapePct) */}
           <motion.path
             d="M 68,25 
@@ -361,10 +361,10 @@ export function TrousersInteractive() {
             {drapePct > 65 ? 'AVANT DRAPE' : 'SLIM CROP'}
           </span>
         </div>
-        <input 
-          type="range" 
-          min="0" 
-          max="100" 
+        <input
+          type="range"
+          min="0"
+          max="100"
           value={drapePct}
           onChange={(e) => handleDrapeChange(Number(e.target.value))}
           className="w-full h-1 bg-[#E5E5E5] rounded-lg appearance-none cursor-ew-resize accent-[#111111]"
@@ -398,7 +398,7 @@ export function BagsInteractive() {
   };
 
   return (
-    <div 
+    <div
       className="p-6 bg-white border border-[#E5E5E5] rounded-2xl shadow-md h-full flex flex-col justify-between select-none relative overflow-hidden group"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -420,8 +420,8 @@ export function BagsInteractive() {
 
       {/* Bag SVG Chassis */}
       <div className="flex-grow flex items-center justify-center relative min-h-[170px] py-1">
-        <svg 
-          viewBox="0 0 200 170" 
+        <svg
+          viewBox="0 0 200 170"
           className="w-full h-full max-h-[160px] drop-shadow-md"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -467,7 +467,7 @@ export function BagsInteractive() {
             stroke="#111111"
             strokeWidth="1.8"
             animate={{
-              d: locked 
+              d: locked
                 ? `M ${50 - stuffing * 0.08},55 L ${150 + stuffing * 0.08},55 L ${140 + stuffing * 0.06},110 L ${60 - stuffing * 0.06},110 Z`
                 : `M ${50 - stuffing * 0.08},55 L ${150 + stuffing * 0.08},55 L ${135 + stuffing * 0.03},80 L ${65 - stuffing * 0.03},80 Z`
             }}
@@ -476,8 +476,8 @@ export function BagsInteractive() {
 
           {/* REVOLVING PREMIUM CLASP BOLT */}
           <motion.g
-            animate={{ 
-              x: 100, 
+            animate={{
+              x: 100,
               y: locked ? 100 : 72
             }}
             transition={{ type: 'spring', stiffness: 120, damping: 14 }}
@@ -485,11 +485,11 @@ export function BagsInteractive() {
             {/* Clasp Plate */}
             <rect x="-10" y="-10" width="20" height="20" rx="4" fill="#FFFFFF" stroke="#111111" strokeWidth="1.5" />
             {/* Locked rotating bar */}
-            <motion.line 
-              x1="-7" y1="0" 
-              x2="7" y2="0" 
-              stroke="#111111" 
-              strokeWidth="3.5" 
+            <motion.line
+              x1="-7" y1="0"
+              x2="7" y2="0"
+              stroke="#111111"
+              strokeWidth="3.5"
               strokeLinecap="round"
               animate={{ rotate: locked ? 0 : 90 }}
               transition={{ type: 'spring', stiffness: 150, damping: 12 }}
@@ -504,7 +504,7 @@ export function BagsInteractive() {
         </svg>
 
         {/* Locked secure status flag overlay */}
-        <button 
+        <button
           onClick={toggleLock}
           className="absolute inset-0 flex items-center justify-center bg-black/5 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"
           aria-label={locked ? "Unlock Clasp" : "Lock Clasp"}
@@ -525,10 +525,10 @@ export function BagsInteractive() {
             {(stuffing).toFixed(0)}% FULL
           </span>
         </div>
-        <input 
-          type="range" 
-          min="0" 
-          max="100" 
+        <input
+          type="range"
+          min="0"
+          max="100"
           value={stuffing}
           onChange={(e) => handleStuffingChange(Number(e.target.value))}
           className="w-full h-1 bg-[#E5E5E5] rounded-lg appearance-none cursor-ew-resize accent-[#111111]"

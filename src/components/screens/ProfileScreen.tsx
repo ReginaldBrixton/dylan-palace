@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import { Order, Product } from '../types';
+import { Order, Product } from '../../types';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Package, 
-  Heart, 
-  ChevronRight, 
-  Download, 
-  Truck, 
-  Clock, 
-  CheckCircle2, 
-  MapPin, 
-  Printer, 
-  ChevronDown, 
+import {
+  Package,
+  Heart,
+  ChevronRight,
+  Download,
+  Truck,
+  Clock,
+  CheckCircle2,
+  MapPin,
+  Printer,
+  ChevronDown,
   ChevronUp,
   FileText,
   Compass
 } from 'lucide-react';
-import { triggerHaptic } from '../haptic';
+import { triggerHaptic } from '../../utils/haptic';
 
 interface ProfileScreenProps {
   pastOrders: Order[];
@@ -47,7 +47,7 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
 
   const handleDownloadReceipt = (order: Order) => {
     triggerHaptic('medium');
-    
+
     // Create an iframe to print cleanly without messing up the main page state
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
@@ -269,7 +269,7 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
 
   const getTrackingMilestones = (status: string, dateStr: string): TrackingMilestone[] => {
     const baseDate = new Date(dateStr);
-    
+
     // Format helpers
     const formatOffset = (days: number, hrs: number) => {
       const d = new Date(baseDate.getTime() + (days * 24 + hrs) * 60 * 60 * 1000);
@@ -413,16 +413,16 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
 
   return (
     <div id="profile-screen" className="w-full flex flex-col pb-32 animate-fade-in bg-transparent min-h-screen pt-2">
-      
+
       {/* Tabs list */}
       <div className="flex border-b border-[#E5E5E5] px-4 pt-1 shrink-0 mt-0">
-        <button 
+        <button
           onClick={() => setActiveTab('ORDERS')}
           className={`flex-1 pb-3 text-[11px] font-bold uppercase tracking-widest text-[#111111] border-b-2 transition-colors ${activeTab === 'ORDERS' ? 'border-[#111111] opacity-100' : 'border-transparent opacity-40'}`}
         >
           ORDERS
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('WISHLIST')}
           className={`flex-1 pb-3 text-[11px] font-bold uppercase tracking-widest text-[#111111] border-b-2 transition-colors flex items-center justify-center gap-1.5 ${activeTab === 'WISHLIST' ? 'border-[#111111] opacity-100' : 'border-transparent opacity-40'}`}
         >
@@ -443,12 +443,12 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
                 {pastOrders.map((order) => {
                   const milestones = getTrackingMilestones(order.status, order.date);
                   const isExpanded = !!expandedTracking[order.id];
-                  
+
                   // Calculate active progress index
                   const completedCount = milestones.filter(m => m.status === 'completed').length;
                   const activeIndex = milestones.findIndex(m => m.status === 'active');
-                  const progressPct = activeIndex !== -1 
-                    ? (activeIndex / (milestones.length - 1)) * 100 
+                  const progressPct = activeIndex !== -1
+                    ? (activeIndex / (milestones.length - 1)) * 100
                     : completedCount === milestones.length ? 100 : 0;
 
                   return (
@@ -468,16 +468,14 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
                             <p className="font-serif text-[15px] font-bold text-[#111111]">
                               GH₵{order.totalAmount.toFixed(2)}
                             </p>
-                            <span className={`inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-widest ${
-                              order.status === 'DELIVERED' 
-                                ? 'bg-[#4A5D23]/10 text-[#4A5D23]' 
-                                : order.status === 'SHIPPED'
+                            <span className={`inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-widest ${order.status === 'DELIVERED'
+                              ? 'bg-[#4A5D23]/10 text-[#4A5D23]'
+                              : order.status === 'SHIPPED'
                                 ? 'bg-blue-50 text-blue-700 border border-blue-100'
                                 : 'bg-amber-50 text-amber-700 border border-amber-100'
-                            }`}>
-                              <span className={`w-1 h-1 rounded-full ${
-                                order.status === 'DELIVERED' ? 'bg-[#4A5D23] animate-pulse' : order.status === 'SHIPPED' ? 'bg-blue-600 animate-ping' : 'bg-amber-600 animate-pulse'
-                              }`} />
+                              }`}>
+                              <span className={`w-1 h-1 rounded-full ${order.status === 'DELIVERED' ? 'bg-[#4A5D23] animate-pulse' : order.status === 'SHIPPED' ? 'bg-blue-600 animate-ping' : 'bg-amber-600 animate-pulse'
+                                }`} />
                               {order.status}
                             </span>
                           </div>
@@ -491,10 +489,10 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
                             <li key={idx} className="flex justify-between items-start text-[12px] gap-4">
                               <div className="flex gap-2.5 items-center min-w-0">
                                 <div className="w-8 h-10 bg-[#FAF9F6] border border-[#E5E5E5] shrink-0 rounded overflow-hidden">
-                                  <img 
-                                    src={item.product.images[0]} 
-                                    alt={item.product.name} 
-                                    className="w-full h-full object-cover" 
+                                  <img
+                                    src={item.product.images[0]}
+                                    alt={item.product.name}
+                                    className="w-full h-full object-cover"
                                   />
                                 </div>
                                 <div className="truncate">
@@ -522,10 +520,10 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
                             {progressPct.toFixed(0)}% route complete
                           </span>
                         </div>
-                        
+
                         {/* Horizontal Custom Timeline Bar */}
                         <div className="relative w-full h-1 bg-[#E5E5E5] rounded-full my-1 overflow-hidden">
-                          <motion.div 
+                          <motion.div
                             className="absolute top-0 left-0 h-full bg-[#4A5D23]"
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPct}%` }}
@@ -563,17 +561,16 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
                                 {milestones.map((m, mIdx) => {
                                   const isCompleted = m.status === 'completed';
                                   const isActive = m.status === 'active';
-                                  
+
                                   return (
                                     <div key={mIdx} className="relative text-left">
                                       {/* Stepper Node dot */}
-                                      <div className={`absolute -left-[31px] top-1 w-4.5 h-4.5 rounded-full flex items-center justify-center border-2 bg-white transition-colors duration-300 ${
-                                        isCompleted 
-                                          ? 'border-[#4A5D23] text-[#4A5D23]' 
-                                          : isActive 
-                                          ? 'border-[#111111] text-[#111111] animate-pulse scale-110' 
+                                      <div className={`absolute -left-[31px] top-1 w-4.5 h-4.5 rounded-full flex items-center justify-center border-2 bg-white transition-colors duration-300 ${isCompleted
+                                        ? 'border-[#4A5D23] text-[#4A5D23]'
+                                        : isActive
+                                          ? 'border-[#111111] text-[#111111] animate-pulse scale-110'
                                           : 'border-[#E5E5E5] text-[#8B8B8A]'
-                                      }`}>
+                                        }`}>
                                         {isCompleted ? (
                                           <CheckCircle2 size={10} className="fill-[#4A5D23] text-white" />
                                         ) : isActive ? (
@@ -632,11 +629,10 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
                         {/* Toggle tracking panel */}
                         <button
                           onClick={() => toggleTracking(order.id)}
-                          className={`flex-1 py-2 px-3 border transition-all rounded-lg flex items-center justify-center gap-1.5 text-[11px] font-bold uppercase tracking-wider cursor-pointer ${
-                            isExpanded 
-                              ? 'bg-[#111111] text-white border-[#111111]' 
-                              : 'bg-white text-[#111111] border-[#E5E5E5] hover:bg-[#FAF9F6]'
-                          }`}
+                          className={`flex-1 py-2 px-3 border transition-all rounded-lg flex items-center justify-center gap-1.5 text-[11px] font-bold uppercase tracking-wider cursor-pointer ${isExpanded
+                            ? 'bg-[#111111] text-white border-[#111111]'
+                            : 'bg-white text-[#111111] border-[#E5E5E5] hover:bg-[#FAF9F6]'
+                            }`}
                         >
                           {isExpanded ? (
                             <>

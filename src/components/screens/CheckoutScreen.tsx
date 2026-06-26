@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldCheck, MapPin, Loader2, Compass } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CartItem, Screen, LocationData } from '../types';
+import { CartItem, Screen, LocationData } from '../../types';
+import { detectLocation, buildMapUrl } from '../../api/geolocation';
+import { SHIPPING } from '../../constants';
+import { calculateSubtotal, calculateShipping, calculateTotal } from '../../utils/format';
 
 interface CheckoutScreenProps {
   cartItems: CartItem[];
@@ -37,7 +40,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
 
   // Debounced address for map iframe to prevent lag
   const [debouncedAddress, setDebouncedAddress] = useState('Accra Ghana');
-  
+
   React.useEffect(() => {
     const timer = setTimeout(() => {
       const query = `${streetAddress} ${city}`.trim();
@@ -46,81 +49,30 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
     return () => clearTimeout(timer);
   }, [streetAddress, city]);
 
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
-  const shippingFee = subtotal >= 100 ? 0 : 15;
-  const totalAmount = subtotal + shippingFee;
+  const subtotal = calculateSubtotal(cartItems);
+  const shippingFee = calculateShipping(subtotal, SHIPPING.FREE_THRESHOLD, SHIPPING.BASE_FEE);
+  const totalAmount = calculateTotal(subtotal, shippingFee);
 
-  // Real Geolocation Reverse Address Lookup
-  const handleDetectLocation = () => {
+  const handleDetectLocation = async () => {
     setIsDetecting(true);
     setDetectionMessage("Accessing system coordinates...");
 
-    if (!navigator.geolocation) {
-      setTimeout(() => {
-        setCity("New York");
-        setStreetAddress("742 Evergreen Terrace");
-        setZip("10001");
-        setIsDetecting(false);
-        setDetectionMessage("Detected: New York, 10001 (Simulated)");
-      }, 1200);
-      return;
+    const result = await detectLocation();
+
+    if (result) {
+      setCity(result.city);
+      setStreetAddress(result.street);
+      setZip(result.zip);
+      setDetectionMessage(`Detected: ${result.city}, ${result.zip}`);
+    } else {
+      setDetectionMessage("Location detection failed. Please enter manually.");
     }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          
-          setDetectionMessage("Reverse-geocoding precise address...");
-          
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`
-          );
-          
-          if (!response.ok) throw new Error("API failed");
-          
-          const data = await response.json();
-          if (data && data.address) {
-            const addr = data.address;
-            const detCity = addr.city || addr.town || addr.suburb || addr.village || "Metropolitan Zone";
-            const detStreet = (addr.road ? addr.road : "") + " " + (addr.house_number ? addr.house_number : "");
-            const detZip = addr.postcode || "94043";
-
-            setCity(detCity);
-            setStreetAddress(detStreet.trim() || "Detected Street Location");
-            setZip(detZip);
-            setDetectionMessage(`Detected: ${detCity}, ${detZip}`);
-          } else {
-            throw new Error("No address details");
-          }
-        } catch (e) {
-          // Robust elegant fallback
-          setCity("San Francisco");
-          setStreetAddress("88 Brutalist Center Dr");
-          setZip("94105");
-          setDetectionMessage("Detected: San Francisco, 94105 (Fallback)");
-        } finally {
-          setIsDetecting(false);
-        }
-      },
-      (error) => {
-        // Fallback for secure sandboxed iframe blocked policy
-        setTimeout(() => {
-          setCity("London");
-          setStreetAddress("10 Downing Street");
-          setZip("SW1A 2AA");
-          setIsDetecting(false);
-          setDetectionMessage("Detected: London, SW1A 2AA (Default Match)");
-        }, 1200);
-      },
-      { timeout: 8000 }
-    );
+    setIsDetecting(false);
   };
 
   const handlePay = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !phone || !fullName || !streetAddress || !city || !zip) {
       alert("Please complete all required shipping fields.");
       return;
@@ -141,7 +93,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
   return (
     <div id="checkout-screen" className="w-full flex flex-col pb-40 animate-fade-in">
       <form onSubmit={handlePay} className="px-6 py-6 flex flex-col gap-10">
-        
+
         {/* Contact info Segment */}
         <section className="flex flex-col gap-4">
           <h2 className="font-serif text-[18px] font-bold text-[#111111] uppercase tracking-wider border-b border-[#E5E5E5] pb-2">
@@ -149,20 +101,20 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
           </h2>
           <div className="flex flex-col gap-4">
             <div className="relative">
-              <input 
+              <input
                 id="checkout-email"
-                type="email" 
+                type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder=" "
                 className="peer w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm"
               />
-              <label 
+              <label
                 htmlFor="checkout-email"
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
               />
-              <label 
+              <label
                 htmlFor="checkout-email"
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
               >
@@ -171,16 +123,16 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
             </div>
 
             <div className="relative">
-              <input 
+              <input
                 id="checkout-phone"
-                type="tel" 
+                type="tel"
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder=" "
                 className="peer w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm"
               />
-              <label 
+              <label
                 htmlFor="checkout-phone"
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
               >
@@ -196,7 +148,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
             <h2 className="font-serif text-[18px] font-bold text-[#111111] uppercase tracking-wider">
               DELIVERY / PICKUP INFO
             </h2>
-            <button 
+            <button
               type="button"
               id="detect-location-btn"
               onClick={handleDetectLocation}
@@ -222,16 +174,16 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
 
           <div className="flex flex-col gap-4">
             <div className="relative">
-              <input 
+              <input
                 id="checkout-name"
-                type="text" 
+                type="text"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder=" "
                 className="peer w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm"
               />
-              <label 
+              <label
                 htmlFor="checkout-name"
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
               >
@@ -240,16 +192,16 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
             </div>
 
             <div className="relative">
-              <input 
+              <input
                 id="checkout-street"
-                type="text" 
+                type="text"
                 required
                 value={streetAddress}
                 onChange={(e) => setStreetAddress(e.target.value)}
                 placeholder=" "
                 className="peer w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm"
               />
-              <label 
+              <label
                 htmlFor="checkout-street"
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
               >
@@ -259,16 +211,16 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
 
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <input 
+                <input
                   id="checkout-city"
-                  type="text" 
+                  type="text"
                   required
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder=" "
                   className="peer w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm"
                 />
-                <label 
+                <label
                   htmlFor="checkout-city"
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
                 >
@@ -277,16 +229,16 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
               </div>
 
               <div className="relative">
-                <input 
+                <input
                   id="checkout-zip"
-                  type="text" 
+                  type="text"
                   required
                   value={zip}
                   onChange={(e) => setZip(e.target.value)}
                   placeholder=" "
                   className="peer w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm"
                 />
-                <label 
+                <label
                   htmlFor="checkout-zip"
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
                 >
@@ -304,7 +256,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
                 frameBorder="0"
                 loading="lazy"
                 style={{ border: 0 }}
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(debouncedAddress)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                src={buildMapUrl(debouncedAddress)}
                 aria-hidden="false"
                 tabIndex={0}
               />
@@ -325,22 +277,20 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
             <button
               type="button"
               onClick={() => setPaymentMethod('MOMO')}
-              className={`py-3.5 border font-semibold text-[11px] uppercase tracking-widest text-center transition-all duration-200 cursor-pointer rounded-lg ${
-                paymentMethod === 'MOMO'
-                  ? 'bg-[#111111] text-white border-[#111111]'
-                  : 'bg-white text-[#111111] border-[#E5E5E5] hover:border-[#111111]'
-              }`}
+              className={`py-3.5 border font-semibold text-[11px] uppercase tracking-widest text-center transition-all duration-200 cursor-pointer rounded-lg ${paymentMethod === 'MOMO'
+                ? 'bg-[#111111] text-white border-[#111111]'
+                : 'bg-white text-[#111111] border-[#E5E5E5] hover:border-[#111111]'
+                }`}
             >
               MOBILE MONEY
             </button>
             <button
               type="button"
               onClick={() => setPaymentMethod('DELIVERY')}
-              className={`py-3.5 border font-semibold text-[11px] uppercase tracking-widest text-center transition-all duration-200 cursor-pointer rounded-lg ${
-                paymentMethod === 'DELIVERY'
-                  ? 'bg-[#111111] text-white border-[#111111]'
-                  : 'bg-white text-[#111111] border-[#E5E5E5] hover:border-[#111111]'
-              }`}
+              className={`py-3.5 border font-semibold text-[11px] uppercase tracking-widest text-center transition-all duration-200 cursor-pointer rounded-lg ${paymentMethod === 'DELIVERY'
+                ? 'bg-[#111111] text-white border-[#111111]'
+                : 'bg-white text-[#111111] border-[#E5E5E5] hover:border-[#111111]'
+                }`}
             >
               ARRIVAL / PICKUP
             </button>
@@ -348,7 +298,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
 
           <AnimatePresence mode="wait">
             {paymentMethod === 'MOMO' ? (
-              <motion.div 
+              <motion.div
                 key="momo"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -357,7 +307,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
                 className="flex flex-col gap-4 mt-2"
               >
                 <div className="relative">
-                  <select 
+                  <select
                     id="checkout-network"
                     value={momoNetwork}
                     onChange={(e) => setMomoNetwork(e.target.value)}
@@ -367,7 +317,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
                     <option value="Vodafone">Telecel Cash</option>
                     <option value="AirtelTigo">AT Money</option>
                   </select>
-                  <label 
+                  <label
                     htmlFor="checkout-network"
                     className="absolute left-3 top-2 text-[10px] text-[#444748] pointer-events-none transition-all duration-200"
                   >
@@ -376,9 +326,9 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
                 </div>
 
                 <div className="relative">
-                  <input 
+                  <input
                     id="checkout-momo-number"
-                    type="tel" 
+                    type="tel"
                     maxLength={10}
                     required={paymentMethod === 'MOMO'}
                     value={momoNumber}
@@ -386,7 +336,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
                     placeholder=" "
                     className="peer w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm"
                   />
-                  <label 
+                  <label
                     htmlFor="checkout-momo-number"
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
                   >
@@ -395,7 +345,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
                 </div>
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 key="delivery"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -437,7 +387,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
 
         {/* Sticky Pay Button */}
         <div className="fixed bottom-0 left-0 w-full bg-white p-4 pb-6 border-t border-[#E5E5E5] z-[39]">
-          <button 
+          <button
             type="submit"
             className="w-full bg-[#111111] text-white py-4 font-semibold text-[13px] uppercase tracking-widest hover:bg-black active:scale-[0.98] transition-all duration-300 cursor-pointer rounded-lg shadow-lg"
           >
