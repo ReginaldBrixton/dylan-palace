@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'motion/react';
 import { Pencil, Trash2, Package } from 'lucide-react';
 import type { Product } from '../../../lib/database.types';
@@ -11,7 +12,7 @@ interface ProductCardProps {
   onDelete: (product: Product) => void;
 }
 
-export default function ProductCard({ product, index, onEdit, onDelete }: ProductCardProps) {
+const ProductCard: React.FC<ProductCardProps> = ({ product, index, onEdit, onDelete }) => {
   return (
     <motion.div
       key={product.id}
@@ -22,7 +23,7 @@ export default function ProductCard({ product, index, onEdit, onDelete }: Produc
     >
       <div className="aspect-square bg-[#F5F5F4] overflow-hidden relative">
         {productImages(product)[0] ? (
-          <img src={productImages(product)[0]} alt={product.name} className="w-full h-full object-cover" />
+          <img src={productImages(product)[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
         ) : (
           <div className="flex items-center justify-center h-full">
             <Package size={24} className="text-[#E5E5E5]" />
@@ -65,3 +66,5 @@ export default function ProductCard({ product, index, onEdit, onDelete }: Produc
     </motion.div>
   );
 }
+
+export default ProductCard;

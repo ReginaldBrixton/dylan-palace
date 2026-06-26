@@ -150,7 +150,18 @@ export default function SellerOrders() {
 
           {/* Orders Table */}
           {loading ? (
-            <div className="text-center py-12 text-sm text-[#8B8B8A]">Loading orders...</div>
+            <div className="flex flex-col gap-3 animate-pulse">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#E5E5E5]/50 rounded-lg" />
+                  <div className="flex-1 flex flex-col gap-2">
+                    <div className="h-3 w-1/4 bg-[#E5E5E5] rounded-full" />
+                    <div className="h-3 w-1/3 bg-[#E5E5E5] rounded-full" />
+                  </div>
+                  <div className="h-6 w-20 bg-[#E5E5E5]/50 rounded-full" />
+                </div>
+              ))}
+            </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingBag size={32} className="text-[#E5E5E5] mx-auto mb-3" />
@@ -252,8 +263,8 @@ export default function SellerOrders() {
                           onClick={() => handleStatusUpdate(selectedOrder.id, s)}
                           disabled={updating}
                           className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 ${selectedOrder.status === s
-                              ? `${cfg.bg} ${cfg.color} ring-2 ring-current`
-                              : 'bg-[#F5F5F4] text-[#8B8B8A] hover:bg-[#E5E5E5]'
+                            ? `${cfg.bg} ${cfg.color} ring-2 ring-current`
+                            : 'bg-[#F5F5F4] text-[#8B8B8A] hover:bg-[#E5E5E5]'
                             }`}
                         >
                           <cfg.icon size={10} />
@@ -307,7 +318,7 @@ export default function SellerOrders() {
                       {orderItems.map((item) => (
                         <div key={item.id} className="flex items-center gap-3">
                           {item.product_image && (
-                            <img src={item.product_image} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                            <img src={item.product_image} alt="" className="w-12 h-12 rounded-lg object-cover" loading="lazy" />
                           )}
                           <div className="flex-1">
                             <p className="text-sm font-medium text-[#111111]">{item.product_name}</p>

@@ -28,7 +28,7 @@ export default function WishlistTab({ wishlist }: WishlistTabProps) {
           onClick={() => navigate(`/product/${product.id}`)}
         >
           <div className="w-16 h-20 bg-[#eeeeed] shrink-0 rounded overflow-hidden">
-            <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
           </div>
           <div className="flex-1 min-w-0 font-sans">
             <p className="text-[9px] font-bold text-[#8B8B8A] uppercase tracking-wider mb-0.5">{product.brand || product.category}</p>

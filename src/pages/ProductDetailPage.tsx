@@ -58,8 +58,27 @@ export default function ProductDetailScreen() {
 
   if (loading || !product) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-[#F9F9F8]">
-        <div className="w-8 h-8 border-2 border-[#E5E5E5] border-t-[#111111] rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#F9F9F8] pt-[52px] animate-pulse select-none">
+        <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-6 p-4">
+          {/* Image carousel skeleton */}
+          <div className="w-full md:w-1/2 aspect-square bg-[#E5E5E5]/50 rounded-2xl" />
+          {/* Details skeleton */}
+          <div className="w-full md:w-1/2 flex flex-col gap-4 pt-2">
+            <div className="h-3 w-24 bg-[#E5E5E5] rounded-full" />
+            <div className="h-7 w-3/4 bg-[#E5E5E5] rounded-full" />
+            <div className="h-6 w-32 bg-[#E5E5E5] rounded-full" />
+            <div className="h-px w-full bg-[#E5E5E5]/50" />
+            <div className="flex gap-2 mt-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="w-12 h-12 bg-[#E5E5E5]/50 rounded-lg" />
+              ))}
+            </div>
+            <div className="h-px w-full bg-[#E5E5E5]/50 mt-2" />
+            <div className="h-4 w-full bg-[#E5E5E5] rounded-full" />
+            <div className="h-4 w-5/6 bg-[#E5E5E5] rounded-full" />
+            <div className="h-4 w-2/3 bg-[#E5E5E5] rounded-full" />
+          </div>
+        </div>
       </div>
     );
   }

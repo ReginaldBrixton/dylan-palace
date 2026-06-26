@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, Package, ArrowLeft, Search } from 'lucide-react';
@@ -263,7 +263,21 @@ export default function SellerProducts() {
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-sm text-[#8B8B8A]">Loading products...</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl border border-[#E5E5E5] overflow-hidden">
+                  <div className="aspect-square bg-[#E5E5E5]/50" />
+                  <div className="p-4 flex flex-col gap-2">
+                    <div className="h-3 w-2/3 bg-[#E5E5E5] rounded-full" />
+                    <div className="h-4 w-1/3 bg-[#E5E5E5] rounded-full" />
+                    <div className="flex gap-2 mt-2">
+                      <div className="h-8 flex-1 bg-[#E5E5E5]/50 rounded-lg" />
+                      <div className="h-8 w-12 bg-[#E5E5E5]/50 rounded-lg" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-12">
               <Package size={32} className="text-[#E5E5E5] mx-auto mb-3" />

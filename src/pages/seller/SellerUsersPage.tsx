@@ -84,7 +84,17 @@ export default function SellerUsers() {
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-sm text-[#8B8B8A]">Loading users...</div>
+            <div className="flex flex-col gap-3 animate-pulse">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 bg-[#E5E5E5]/50 rounded-full" />
+                  <div className="flex-1 flex flex-col gap-2">
+                    <div className="h-3 w-1/3 bg-[#E5E5E5] rounded-full" />
+                    <div className="h-3 w-1/4 bg-[#E5E5E5] rounded-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-12">
               <UsersIcon size={32} className="text-[#E5E5E5] mx-auto mb-3" />

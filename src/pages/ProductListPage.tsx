@@ -368,6 +368,7 @@ export default function ProductListScreen() {
                   src={quickViewProduct.images[0]}
                   alt={quickViewProduct.name}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
             </div>

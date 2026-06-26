@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface ImageWithSkeletonProps {
   src: string;
@@ -19,7 +19,8 @@ export default function ImageWithSkeleton({
   const [error, setError] = useState(false);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative overflow-hidden ${className}`}>
+      {/* Blur skeleton background while loading */}
       {!loaded && !error && (
         <div className="absolute inset-0 bg-[#E5E5E5] animate-pulse z-0 pointer-events-none" />
       )}
@@ -38,7 +39,11 @@ export default function ImageWithSkeleton({
       )}
       <img
         alt={alt}
-        className={`${imgClassName} transition-opacity duration-500 ${loaded && !error ? 'opacity-100' : 'opacity-0'} ${!loaded && !error ? 'absolute' : ''}`}
+        className={`${imgClassName} transition-all duration-700 ${
+          loaded && !error
+            ? 'opacity-100 blur-0 scale-100'
+            : 'opacity-0 blur-xl scale-105'
+        } ${!loaded && !error ? 'absolute' : ''}`}
         src={src}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}

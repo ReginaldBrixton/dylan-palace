@@ -147,7 +147,20 @@ export default function SellerDashboard() {
             </div>
 
             {loading ? (
-              <div className="p-8 text-center text-sm text-[#8B8B8A]">Loading...</div>
+              <div className="divide-y divide-[#E5E5E5]">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 animate-pulse">
+                    <div className="flex flex-col gap-2">
+                      <div className="h-4 w-24 bg-[#E5E5E5] rounded-full" />
+                      <div className="h-3 w-40 bg-[#E5E5E5] rounded-full" />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="h-6 w-16 bg-[#E5E5E5]/50 rounded-full" />
+                      <div className="h-4 w-16 bg-[#E5E5E5] rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : recentOrders.length === 0 ? (
               <div className="p-8 text-center text-sm text-[#8B8B8A]">No orders yet.</div>
             ) : (

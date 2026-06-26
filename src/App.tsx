@@ -5,6 +5,7 @@ import { AppProvider } from './context/AppContext';
 import { SellerAuthProvider } from './context/SellerAuthContext';
 import Layout from './components/common/Layout';
 import ProtectedRoute from './components/seller/ProtectedRoute';
+import PageSkeleton from './components/common/PageSkeleton';
 
 // Code-split screen components for smaller initial bundle
 const Splash = lazy(() => import('./pages/SplashPage'));
@@ -21,14 +22,6 @@ const SellerDashboard = lazy(() => import('./pages/seller/SellerDashboardPage'))
 const SellerProducts = lazy(() => import('./pages/seller/SellerProductsPage'));
 const SellerOrders = lazy(() => import('./pages/seller/SellerOrdersPage'));
 const SellerUsers = lazy(() => import('./pages/seller/SellerUsersPage'));
-
-function ScreenLoader() {
-  return (
-    <div className="flex items-center justify-center min-h-[60vh] w-full">
-      <div className="w-8 h-8 border-2 border-[#E5E5E5] border-t-[#111111] rounded-full animate-spin" />
-    </div>
-  );
-}
 
 function SplashRoute() {
   const navigate = useNavigate();
@@ -95,7 +88,7 @@ export default function App() {
       <SellerAuthProvider>
         <AppProvider>
           <Layout>
-            <Suspense fallback={<ScreenLoader />}>
+            <Suspense fallback={<PageSkeleton />}>
               <AnimatedRoutes />
             </Suspense>
           </Layout>

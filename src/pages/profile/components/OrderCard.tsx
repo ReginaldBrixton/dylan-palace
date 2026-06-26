@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   CheckCircle2,
@@ -19,7 +19,7 @@ interface OrderCardProps {
   order: Order;
 }
 
-export default function OrderCard({ order }: OrderCardProps) {
+const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const milestones = getTrackingMilestones(order.status, order.date);
@@ -81,6 +81,7 @@ export default function OrderCard({ order }: OrderCardProps) {
                     src={item.product.images[0]}
                     alt={item.product.name}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
                 <div className="truncate">
@@ -236,3 +237,5 @@ export default function OrderCard({ order }: OrderCardProps) {
     </div>
   );
 }
+
+export default OrderCard;

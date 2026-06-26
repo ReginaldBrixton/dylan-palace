@@ -2,16 +2,56 @@ import { supabase } from './supabase';
 import type { Product, Order, OrderItem, Profile, ProductCategory, OrderStatus, Category, SubCategory } from './database.types';
 
 // ============================================
+// REQUEST DEDUPLICATION & CACHING UTILITIES
+// ============================================
+
+const inflight = new Map<string, Promise<unknown>>();
+const apiCache = new Map<string, { data: unknown; ts: number }>();
+const API_CACHE_TTL = 60 * 1000; // 1 minute for list endpoints
+
+function dedupe<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inflight.get(key);
+  if (existing) return existing as Promise<T>;
+  const p = fn().finally(() => inflight.delete(key));
+  inflight.set(key, p);
+  return p;
+}
+
+function cached<T>(key: string, fn: () => Promise<T>, ttl = API_CACHE_TTL): Promise<T> {
+  const hit = apiCache.get(key);
+  if (hit && Date.now() - hit.ts < ttl) {
+    return Promise.resolve(hit.data as T);
+  }
+  return dedupe(key, async () => {
+    const data = await fn();
+    apiCache.set(key, { data, ts: Date.now() });
+    return data;
+  });
+}
+
+function invalidateApiCache(prefix?: string) {
+  if (prefix) {
+    for (const key of apiCache.keys()) {
+      if (key.startsWith(prefix)) apiCache.delete(key);
+    }
+  } else {
+    apiCache.clear();
+  }
+}
+
+// ============================================
 // CATEGORIES
 // ============================================
 
 const categoryCache = new Map<string, Category>();
 
 export async function fetchCategories(): Promise<Category[]> {
-  const { data, error } = await supabase.from('categories').select('*').order('name');
-  if (error) throw error;
-  (data || []).forEach((c) => categoryCache.set(c.name, c));
-  return data || [];
+  return cached('categories', async () => {
+    const { data, error } = await supabase.from('categories').select('*').order('name');
+    if (error) throw error;
+    (data || []).forEach((c) => categoryCache.set(c.name, c));
+    return data || [];
+  });
 }
 
 export async function fetchCategoryId(name: ProductCategory): Promise<number | null> {
@@ -21,11 +61,14 @@ export async function fetchCategoryId(name: ProductCategory): Promise<number | n
 }
 
 export async function fetchSubCategories(categoryId?: number): Promise<SubCategory[]> {
-  let query = supabase.from('sub_categories').select('*').order('name');
-  if (categoryId) query = query.eq('category_id', categoryId);
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
+  const cacheKey = `sub_categories:${categoryId ?? 'all'}`;
+  return cached(cacheKey, async () => {
+    let query = supabase.from('sub_categories').select('*').order('name');
+    if (categoryId) query = query.eq('category_id', categoryId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  });
 }
 
 // ============================================
@@ -41,47 +84,56 @@ const PRODUCT_SELECT = `
 ` as const;
 
 export async function fetchProducts(category?: ProductCategory): Promise<Product[]> {
-  let query = supabase.from('products').select(PRODUCT_SELECT).eq('in_stock', true);
-  if (category) {
-    const catId = await fetchCategoryId(category);
-    if (catId) query = query.eq('category_id', catId);
-  }
-  const { data, error } = await query.order('created_at', { ascending: false });
-  if (error) throw error;
-  return (data || []) as unknown as Product[];
+  const cacheKey = `products:${category ?? 'all'}`;
+  return cached(cacheKey, async () => {
+    let query = supabase.from('products').select(PRODUCT_SELECT).eq('in_stock', true);
+    if (category) {
+      const catId = await fetchCategoryId(category);
+      if (catId) query = query.eq('category_id', catId);
+    }
+    const { data, error } = await query.order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []) as unknown as Product[];
+  });
 }
 
 export async function fetchAllProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from('products')
-    .select(PRODUCT_SELECT)
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  return (data || []) as unknown as Product[];
+  return cached('products:all_incl_out', async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select(PRODUCT_SELECT)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []) as unknown as Product[];
+  });
 }
 
 export async function fetchProductById(id: string): Promise<Product | null> {
-  const { data, error } = await supabase
-    .from('products')
-    .select(PRODUCT_SELECT)
-    .eq('id', id)
-    .single();
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw error;
-  }
-  return data as unknown as Product;
+  return dedupe(`product:${id}`, async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select(PRODUCT_SELECT)
+      .eq('id', id)
+      .single();
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data as unknown as Product;
+  });
 }
 
 export async function fetchFeaturedProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from('products')
-    .select(PRODUCT_SELECT)
-    .eq('is_featured', true)
-    .eq('in_stock', true)
-    .limit(6);
-  if (error) throw error;
-  return (data || []) as unknown as Product[];
+  return cached('products:featured', async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select(PRODUCT_SELECT)
+      .eq('is_featured', true)
+      .eq('in_stock', true)
+      .limit(6);
+    if (error) throw error;
+    return (data || []) as unknown as Product[];
+  });
 }
 
 export async function createProduct(
@@ -135,13 +187,15 @@ export async function createProduct(
       tags: product.tags || [],
       colors: product.colors || [],
     })
-    .select('id')
+    .select(PRODUCT_SELECT)
     .single();
   if (prodError) throw prodError;
 
   const productId = prodData.id;
 
-  // Insert images
+  // Parallelize image and size inserts
+  const parallelTasks: Promise<unknown>[] = [];
+
   if (product.images.length > 0) {
     const imageRows = product.images.map((url, i) => ({
       product_id: productId,
@@ -149,22 +203,28 @@ export async function createProduct(
       alt_text: `${product.name} - Image ${i + 1}`,
       position: i,
     }));
-    const { error: imgError } = await supabase.from('product_images').insert(imageRows);
-    if (imgError) throw imgError;
+    parallelTasks.push(Promise.resolve(supabase.from('product_images').insert(imageRows)));
   }
 
-  // Insert sizes
   if (product.sizes.length > 0) {
     const sizeRows = product.sizes.map((size) => ({
       product_id: productId,
       size,
       in_stock: true,
     }));
-    const { error: sizeError } = await supabase.from('product_sizes').insert(sizeRows);
-    if (sizeError) throw sizeError;
+    parallelTasks.push(Promise.resolve(supabase.from('product_sizes').insert(sizeRows)));
   }
 
-  return await fetchProductById(productId) as Product;
+  if (parallelTasks.length > 0) {
+    const results = await Promise.all(parallelTasks);
+    for (const result of results) {
+      const { error } = result as { error: unknown };
+      if (error) throw error;
+    }
+  }
+
+  invalidateApiCache('products:');
+  return prodData as unknown as Product;
 }
 
 export async function updateProduct(id: string, updates: Partial<Product> & {
@@ -191,39 +251,60 @@ export async function updateProduct(id: string, updates: Partial<Product> & {
     .from('products')
     .update(updateData)
     .eq('id', id)
-    .select('id')
+    .select(PRODUCT_SELECT)
     .single();
   if (error) throw error;
 
-  // Update images if provided
+  // Parallelize image and size updates
+  const parallelTasks: Promise<unknown>[] = [];
+
   if (images) {
-    await supabase.from('product_images').delete().eq('product_id', id);
-    if (images.length > 0) {
-      const imageRows = images.map((url, i) => ({
-        product_id: id,
-        url,
-        alt_text: `${updateData.name || 'Product'} - Image ${i + 1}`,
-        position: i,
-      }));
-      await supabase.from('product_images').insert(imageRows);
-    }
+    parallelTasks.push(
+      Promise.resolve(supabase.from('product_images').delete().eq('product_id', id)).then(({ error }) => {
+        if (error) throw error;
+        if (images.length > 0) {
+          const imageRows = images.map((url, i) => ({
+            product_id: id,
+            url,
+            alt_text: `${updateData.name || 'Product'} - Image ${i + 1}`,
+            position: i,
+          }));
+          return Promise.resolve(supabase.from('product_images').insert(imageRows));
+        }
+        return { error: null };
+      })
+    );
   }
 
-  // Update sizes if provided
   if (sizes) {
-    await supabase.from('product_sizes').delete().eq('product_id', id);
-    if (sizes.length > 0) {
-      const sizeRows = sizes.map((size) => ({ product_id: id, size, in_stock: true }));
-      await supabase.from('product_sizes').insert(sizeRows);
+    parallelTasks.push(
+      Promise.resolve(supabase.from('product_sizes').delete().eq('product_id', id)).then(({ error }) => {
+        if (error) throw error;
+        if (sizes.length > 0) {
+          const sizeRows = sizes.map((size) => ({ product_id: id, size, in_stock: true }));
+          return Promise.resolve(supabase.from('product_sizes').insert(sizeRows));
+        }
+        return { error: null };
+      })
+    );
+  }
+
+  if (parallelTasks.length > 0) {
+    const results = await Promise.all(parallelTasks);
+    for (const result of results) {
+      const { error: err } = result as { error: unknown };
+      if (err) throw err;
     }
   }
 
-  return await fetchProductById(id) as Product;
+  invalidateApiCache('products:');
+  return data as unknown as Product;
 }
 
 export async function deleteProduct(id: string): Promise<void> {
   const { error } = await supabase.from('products').delete().eq('id', id);
   if (error) throw error;
+  invalidateApiCache('products:');
 }
 
 // ============================================
@@ -231,39 +312,45 @@ export async function deleteProduct(id: string): Promise<void> {
 // ============================================
 
 export async function fetchOrders(status?: OrderStatus): Promise<Order[]> {
-  let query = supabase.from('orders').select('*');
-  if (status) {
-    query = query.eq('status', status);
-  }
-  const { data, error } = await query.order('created_at', { ascending: false });
-  if (error) throw error;
-  return data || [];
+  const cacheKey = `orders:${status ?? 'all'}`;
+  return cached(cacheKey, async () => {
+    let query = supabase.from('orders').select('*');
+    if (status) {
+      query = query.eq('status', status);
+    }
+    const { data, error } = await query.order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  });
 }
 
 export async function fetchOrderById(id: string): Promise<Order | null> {
-  const { data, error } = await supabase.from('orders').select('*').eq('id', id).single();
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw error;
-  }
-  return data;
+  return dedupe(`order:${id}`, async () => {
+    const { data, error } = await supabase.from('orders').select('*').eq('id', id).single();
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data;
+  });
 }
 
 export async function fetchOrderItems(orderId: string): Promise<OrderItem[]> {
-  const { data, error } = await supabase
-    .from('order_items')
-    .select('*')
-    .eq('order_id', orderId)
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  return data || [];
+  return dedupe(`order_items:${orderId}`, async () => {
+    const { data, error } = await supabase
+      .from('order_items')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  });
 }
 
 export async function createOrder(
   order: Omit<Order, 'id' | 'created_at' | 'updated_at' | 'order_number'>,
   items: Omit<OrderItem, 'id' | 'created_at' | 'order_id'>[]
 ): Promise<Order> {
-  // Generate order number
   const orderNumber = `DP-${Date.now().toString().slice(-8)}`;
 
   const { data: orderData, error: orderError } = await supabase
@@ -281,6 +368,7 @@ export async function createOrder(
   const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
   if (itemsError) throw itemsError;
 
+  invalidateApiCache('orders:');
   return orderData;
 }
 
@@ -294,6 +382,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus, trackin
     .select()
     .single();
   if (error) throw error;
+  invalidateApiCache('orders:');
   return data;
 }
 
@@ -302,18 +391,22 @@ export async function updateOrderStatus(id: string, status: OrderStatus, trackin
 // ============================================
 
 export async function fetchProfiles(): Promise<Profile[]> {
-  const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
-  if (error) throw error;
-  return data || [];
+  return cached('profiles', async () => {
+    const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  });
 }
 
 export async function fetchProfile(id: string): Promise<Profile | null> {
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw error;
-  }
-  return data;
+  return dedupe(`profile:${id}`, async () => {
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data;
+  });
 }
 
 // ============================================
@@ -321,12 +414,14 @@ export async function fetchProfile(id: string): Promise<Profile | null> {
 // ============================================
 
 export async function fetchWishlist(userId: string): Promise<string[]> {
-  const { data, error } = await supabase
-    .from('wishlist')
-    .select('product_id')
-    .eq('user_id', userId);
-  if (error) throw error;
-  return (data || []).map((item) => item.product_id);
+  return dedupe(`wishlist:${userId}`, async () => {
+    const { data, error } = await supabase
+      .from('wishlist')
+      .select('product_id')
+      .eq('user_id', userId);
+    if (error) throw error;
+    return (data || []).map((item) => item.product_id);
+  });
 }
 
 export async function addToWishlist(userId: string, productId: string): Promise<void> {
@@ -334,6 +429,7 @@ export async function addToWishlist(userId: string, productId: string): Promise<
     .from('wishlist')
     .insert({ user_id: userId, product_id: productId });
   if (error) throw error;
+  inflight.delete(`wishlist:${userId}`);
 }
 
 export async function removeFromWishlist(userId: string, productId: string): Promise<void> {
@@ -343,6 +439,7 @@ export async function removeFromWishlist(userId: string, productId: string): Pro
     .eq('user_id', userId)
     .eq('product_id', productId);
   if (error) throw error;
+  inflight.delete(`wishlist:${userId}`);
 }
 
 // ============================================
@@ -350,27 +447,31 @@ export async function removeFromWishlist(userId: string, productId: string): Pro
 // ============================================
 
 export async function fetchDashboardStats() {
-  const [productsResult, ordersResult, pendingOrdersResult, usersResult] = await Promise.all([
-    supabase.from('products').select('id', { count: 'exact', head: true }),
-    supabase.from('orders').select('id', { count: 'exact', head: true }),
-    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }),
-  ]);
+  return cached('dashboard_stats', async () => {
+    const [productsResult, ordersResult, pendingOrdersResult, usersResult] = await Promise.all([
+      supabase.from('products').select('id', { count: 'exact', head: true }),
+      supabase.from('orders').select('id', { count: 'exact', head: true }),
+      supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    ]);
 
-  return {
-    totalProducts: productsResult.count || 0,
-    totalOrders: ordersResult.count || 0,
-    pendingOrders: pendingOrdersResult.count || 0,
-    totalUsers: usersResult.count || 0,
-  };
+    return {
+      totalProducts: productsResult.count || 0,
+      totalOrders: ordersResult.count || 0,
+      pendingOrders: pendingOrdersResult.count || 0,
+      totalUsers: usersResult.count || 0,
+    };
+  });
 }
 
 export async function fetchRecentOrders(limit = 5): Promise<Order[]> {
-  const { data, error } = await supabase
-    .from('orders')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  if (error) throw error;
-  return data || [];
+  return cached(`recent_orders:${limit}`, async () => {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return data || [];
+  });
 }

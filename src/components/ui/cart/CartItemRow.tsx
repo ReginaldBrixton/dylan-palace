@@ -18,6 +18,7 @@ export default function CartItemRow({ item, onUpdateQty, onRemoveItem }: CartIte
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             alt={item.product.name}
             src={item.product.images[0]}
+            loading="lazy"
             referrerPolicy="no-referrer"
           />
         </div>
