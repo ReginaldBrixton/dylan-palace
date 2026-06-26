@@ -56,7 +56,7 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full h-[72px] pb-2 z-50 bg-white/80 backdrop-blur-2xl backdrop-saturate-[180%] border-t border-[#E5E5E5]/50 shadow-[0_-4px_24px_rgba(0,0,0,0.04)] flex justify-around items-center px-2 select-none supports-[backdrop-filter]:bg-white/60">
+    <nav className="fixed bottom-0 left-0 w-full h-[72px] pb-2 z-50 bg-white border-t border-[#E5E5E5]/50 shadow-[0_-4px_24px_rgba(0,0,0,0.04)] flex justify-around items-center px-2 select-none">
       <NavItem to="/shirts" label="SHIRTS" Icon={Shirt} />
       <NavItem to="/trousers" label="TROUSERS" Icon={Layers} />
       <NavItem to="/bags" label="BAGS" Icon={Briefcase} />

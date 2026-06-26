@@ -52,7 +52,7 @@ export default function SellerDashboard() {
 
   const handleSignOut = () => {
     signOut();
-    navigate('/home');
+    navigate('/');
   };
 
   const statCards = [

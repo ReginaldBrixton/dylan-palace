@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Truck, Heart, Share2 } from 'lucide-react';
+import { Truck, Heart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
 import { getCachedProductById, getRelatedProducts } from '../lib/product-cache';
@@ -25,6 +25,9 @@ export default function ProductDetailScreen() {
   // Size guide trigger modal state
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
+  // Carousel ref
+  const carouselRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setLoading(true);
     setActiveImageIndex(0);
@@ -36,7 +39,7 @@ export default function ProductDetailScreen() {
         if (p) {
           setProduct(p);
           setSelectedSize(p.sizes[0] || 'M');
-          getRelatedProducts(p, 3).then(setRelatedProducts);
+          getRelatedProducts(p, 8).then(setRelatedProducts);
         }
         setLoading(false);
       })
@@ -346,15 +349,41 @@ export default function ProductDetailScreen() {
       </section >
 
       {/* Segment 5: You Might Also Like */}
-      < section className="px-6 py-8 bg-[#F9F9F8] border-t border-[#E5E5E5] mb-[60px]" >
-        <h3 className="text-[12px] font-bold text-[#111111] uppercase tracking-wider mb-4 border-b border-[#E5E5E5] pb-2">
-          YOU MIGHT ALSO LIKE
-        </h3>
-        <div className="grid grid-cols-3 gap-3">
+      <section className="px-6 py-8 bg-[#F9F9F8] border-t border-[#E5E5E5] mb-[60px]">
+        <div className="flex items-center justify-between mb-4 border-b border-[#E5E5E5] pb-2">
+          <h3 className="text-[12px] font-bold text-[#111111] uppercase tracking-wider">
+            YOU MIGHT ALSO LIKE
+          </h3>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => {
+                const c = carouselRef.current;
+                if (c) c.scrollBy({ left: -c.clientWidth * 0.8, behavior: 'smooth' });
+              }}
+              className="w-7 h-7 rounded-full border border-[#E5E5E5] flex items-center justify-center text-[#111111] hover:bg-[#111111] hover:text-white transition-colors cursor-pointer"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <button
+              onClick={() => {
+                const c = carouselRef.current;
+                if (c) c.scrollBy({ left: c.clientWidth * 0.8, behavior: 'smooth' });
+              }}
+              className="w-7 h-7 rounded-full border border-[#E5E5E5] flex items-center justify-center text-[#111111] hover:bg-[#111111] hover:text-white transition-colors cursor-pointer"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+        <div
+          ref={carouselRef}
+          className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 -mx-1 px-1"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {relatedProducts.map(related => (
             <div
               key={related.id}
-              className="flex flex-col cursor-pointer bg-white"
+              className="flex flex-col cursor-pointer bg-white shrink-0 w-[120px] sm:w-[160px] snap-start"
               onClick={() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 navigate(`/product/${related.id}`);
@@ -373,7 +402,7 @@ export default function ProductDetailScreen() {
             </div>
           ))}
         </div>
-      </section >
+      </section>
 
       {/* Sticky CTA Footer Button */}
       < div className="fixed bottom-[72px] left-0 w-full bg-white/70 backdrop-blur-2xl border-t border-[#E5E5E5]/50 p-4 z-40 pb-6 supports-[backdrop-filter]:bg-white/60" >

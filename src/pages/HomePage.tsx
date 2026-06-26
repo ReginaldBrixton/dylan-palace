@@ -171,7 +171,7 @@ export default function HomeScreen() {
               <div className="flex-grow flex items-center justify-center relative w-full h-1/2 overflow-hidden py-4">
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={activeShoe.id}
+                    key={activeShoe?.id || 'empty'}
                     initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.85 }}
@@ -181,8 +181,8 @@ export default function HomeScreen() {
                     <ImageWithSkeleton
                       className="w-full h-full"
                       imgClassName="w-full h-full max-h-[160px] object-contain rounded-lg drop-shadow-2xl transition-transform duration-500 hover:scale-105 pointer-events-none"
-                      alt={activeShoe.name}
-                      src={activeShoe?.images[0] || FALLBACK_IMAGE}
+                      alt={activeShoe?.name || ''}
+                      src={activeShoe?.images?.[0] || FALLBACK_IMAGE}
                       loading="eager"
                     />
                   </motion.div>

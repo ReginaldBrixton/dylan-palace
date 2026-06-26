@@ -20,7 +20,10 @@ interface UploadThingFile {
  * Returns the uploaded file URL.
  */
 export async function uploadFile(file: File): Promise<UploadThingFile> {
+  console.log('[UploadThing] Starting upload for:', file.name, `(${file.size} bytes, ${file.type})`);
+
   // Step 1: Request presigned upload URL via v7 prepareUpload
+  console.log('[UploadThing] Requesting presigned URL from v7/prepareUpload...');
   const response = await fetch('https://api.uploadthing.com/v7/prepareUpload', {
     method: 'POST',
     headers: {
@@ -42,12 +45,14 @@ export async function uploadFile(file: File): Promise<UploadThingFile> {
   const data = await response.json();
   const presignedUrl: string = data.url;
   const key: string = data.key;
+  console.log('[UploadThing] Got presigned URL, key:', key);
 
   if (!presignedUrl || !key) {
     throw new Error('UploadThing prepareUpload did not return a valid presigned URL');
   }
 
   // Step 2: PUT the file to the presigned URL using FormData
+  console.log('[UploadThing] Uploading file to presigned URL via PUT...');
   const formData = new FormData();
   formData.append('file', file);
 
@@ -58,11 +63,13 @@ export async function uploadFile(file: File): Promise<UploadThingFile> {
 
   if (!uploadResponse.ok) {
     const text = await uploadResponse.text();
+    console.error('[UploadThing] Upload PUT failed:', uploadResponse.status, text);
     throw new Error(`UploadThing file upload failed: ${uploadResponse.status} ${text}`);
   }
 
   const uploadResult = await uploadResponse.json();
   const fileUrl: string = uploadResult.url || uploadResult.ufsUrl || `https://utfs.io/f/${key}`;
+  console.log('[UploadThing] Upload successful! URL:', fileUrl);
 
   return {
     id: key,
@@ -86,6 +93,7 @@ export async function uploadFiles(files: File[]): Promise<UploadThingFile[]> {
  * Delete a file from UploadThing.
  */
 export async function deleteFile(fileKey: string): Promise<void> {
+  console.log('[UploadThing] Deleting file with key:', fileKey);
   const response = await fetch('https://api.uploadthing.com/v6/deleteFiles', {
     method: 'POST',
     headers: {
@@ -96,8 +104,10 @@ export async function deleteFile(fileKey: string): Promise<void> {
   });
 
   if (!response.ok) {
+    console.error('[UploadThing] Delete failed:', response.status);
     throw new Error(`UploadThing delete failed: ${response.status}`);
   }
+  console.log('[UploadThing] Delete successful for key:', fileKey);
 }
 
 function getApiKey(): string {

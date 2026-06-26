@@ -60,22 +60,29 @@ function writeLocalStorageCache(entry: CacheEntry) {
 export async function getCachedProducts(): Promise<FrontendProduct[]> {
   // Check memory cache
   if (memoryCache && Date.now() - memoryCache.timestamp < CACHE_TTL) {
+    console.log('[ProductCache] Returning products from memory cache');
     return memoryCache.products;
   }
 
   // Check localStorage cache
   const local = readLocalStorageCache();
   if (local) {
+    console.log('[ProductCache] Returning products from localStorage cache');
     memoryCache = local;
     return local.products;
   }
 
   // Deduplicate concurrent fetches
-  if (fetchPromise) return fetchPromise;
+  if (fetchPromise) {
+    console.log('[ProductCache] Fetch already in progress, awaiting...');
+    return fetchPromise;
+  }
 
+  console.log('[ProductCache] Cache miss, fetching from Supabase...');
   fetchPromise = (async () => {
     const dbProducts = await fetchProducts();
     const adapted = dbProducts.map(adaptProduct);
+    console.log('[ProductCache] Fetched', adapted.length, 'products from Supabase');
     const entry: CacheEntry = { timestamp: Date.now(), products: adapted };
     memoryCache = entry;
     writeLocalStorageCache(entry);
@@ -118,6 +125,7 @@ export async function getRelatedProducts(product: FrontendProduct, limit: number
 }
 
 export function invalidateCache() {
+  console.log('[ProductCache] Invalidating cache');
   memoryCache = null;
   try {
     localStorage.removeItem(CACHE_KEY);

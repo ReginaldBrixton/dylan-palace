@@ -137,7 +137,7 @@ export default function SuccessScreen() {
 
       <button
         id="continue-shopping-btn"
-        onClick={() => navigate('/home')}
+        onClick={() => navigate('/')}
         className="w-full max-w-md bg-[#111111] text-white py-4 font-semibold text-[13px] uppercase tracking-widest hover:bg-black transition-colors rounded-none cursor-pointer"
       >
         CONTINUE BY BROWSING

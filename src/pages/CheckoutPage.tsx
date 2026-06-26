@@ -95,7 +95,7 @@ export default function CheckoutScreen() {
           Add items to your bag before proceeding to checkout.
         </p>
         <button
-          onClick={() => navigate('/home')}
+          onClick={() => navigate('/')}
           className="px-6 py-3 bg-[#111111] text-white text-[11px] font-semibold uppercase tracking-widest cursor-pointer rounded-lg hover:bg-[#333333] active:scale-95 transition-all shadow-md"
         >
           BROWSE PRODUCTS

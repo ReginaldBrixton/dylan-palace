@@ -76,7 +76,7 @@ export default function SellerLogin() {
         className="w-full max-w-sm"
       >
         <button
-          onClick={() => navigate('/home')}
+          onClick={() => navigate('/')}
           className="flex items-center gap-1.5 text-[#8B8B8A] hover:text-white transition-colors mb-8 text-xs uppercase tracking-widest"
         >
           <ArrowLeft size={14} /> Back to Store

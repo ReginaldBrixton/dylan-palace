@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, SlidersHorizontal, Search, X, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
@@ -233,17 +234,17 @@ export default function ProductListScreen() {
       </div>
 
       <main className="w-full border-b border-[#E5E5E5] overflow-hidden">
-        <div className="grid grid-cols-2 w-full bg-[#FFFFFF]">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full bg-[#FFFFFF]">
           <AnimatePresence>
             {isLoadingCategory ? (
-              Array.from({ length: 4 }).map((_, i) => (
+              Array.from({ length: 8 }).map((_, i) => (
                 <motion.div
                   key={`skeleton-${i}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className={`flex flex-col group relative ${i % 2 === 0 ? 'border-r border-[#E5E5E5]' : ''} border-b border-[#E5E5E5]`}
+                  className="flex flex-col group relative border-r border-b border-[#E5E5E5]"
                 >
                   <div className="aspect-square w-full bg-[#E5E5E5]/50 animate-pulse"></div>
                   <div className="p-3 md:p-4 flex flex-col gap-1.5 bg-[#FFFFFF]">
@@ -269,7 +270,7 @@ export default function ProductListScreen() {
                   onMouseLeave={handlePressEnd}
                   onTouchStart={() => handlePressStart(product)}
                   onTouchEnd={handlePressEnd}
-                  className="flex flex-col border-r border-b border-[#E5E5E5] odd:border-r even:border-r-0 group cursor-pointer relative bg-[#FFFFFF]"
+                  className="flex flex-col border-r border-b border-[#E5E5E5] group cursor-pointer relative bg-[#FFFFFF]"
                 >
                   {/* Square Aspect Ratio Image container */}
                   <div className="aspect-square w-full bg-[#eeeeed] overflow-hidden relative">
@@ -281,7 +282,7 @@ export default function ProductListScreen() {
                         e.stopPropagation();
                         setQuickViewProduct(product);
                       }}
-                      className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-[#111111] text-[10px] font-bold uppercase tracking-widest w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center shadow-sm pointer-events-auto hover:bg-[#111111] hover:text-white"
+                      className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-[#111111] text-[10px] font-bold uppercase tracking-widest w-8 h-8 rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all flex items-center justify-center shadow-sm pointer-events-auto hover:bg-[#111111] hover:text-white"
                       title="Quick View"
                     >
                       <Eye size={14} />
@@ -329,75 +330,78 @@ export default function ProductListScreen() {
       </main>
 
       {/* Quick View Modal Overlay */}
-      <AnimatePresence>
-        {quickViewProduct && (
+      {quickViewProduct && createPortal(
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-[#111111]/50 backdrop-blur-sm flex items-end sm:items-center sm:justify-center sm:p-6"
+          onClick={() => setQuickViewProduct(null)}
+        >
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111111]/40 backdrop-blur-sm"
-            onClick={() => setQuickViewProduct(null)}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            className="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-2xl max-h-[88vh] overflow-hidden flex flex-col sm:flex-row pointer-events-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white w-full max-w-md overflow-hidden flex flex-col relative pointer-events-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+            <button
+              onClick={() => setQuickViewProduct(null)}
+              className="absolute top-3 right-3 z-10 w-8 h-8 bg-white/95 backdrop-blur text-[#111111] rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors shadow-sm"
             >
-              <button
-                onClick={() => setQuickViewProduct(null)}
-                className="absolute top-4 right-4 z-10 w-8 h-8 bg-white/90 backdrop-blur text-[#111111] rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors"
-              >
-                <X size={16} />
-              </button>
+              <X size={16} />
+            </button>
 
-              <div className="aspect-[4/3] w-full bg-[#eeeeed] relative overflow-hidden">
+            {/* Image section */}
+            <div className="w-full sm:w-[45%] shrink-0 bg-[#eeeeed] relative overflow-hidden">
+              <div className="aspect-[4/3] sm:aspect-auto sm:h-full w-full">
                 <img
                   src={quickViewProduct.images[0]}
                   alt={quickViewProduct.name}
                   className="w-full h-full object-cover"
                 />
               </div>
+            </div>
 
-              <div className="p-6 flex flex-col border-t border-[#E5E5E5] bg-white">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-[#8B8B8A] uppercase tracking-wider mb-1">
-                      {quickViewProduct.brand || quickViewProduct.category}
-                    </span>
-                    <h3 className="font-serif text-[20px] font-bold text-[#111111] leading-tight pr-4">
-                      {quickViewProduct.name}
-                    </h3>
-                  </div>
-                  <span className="font-serif text-[18px] font-bold text-[#111111]">
-                    {CURRENCY}{quickViewProduct.price.toFixed(2)}
+            {/* Details section */}
+            <div className="flex-1 p-4 sm:p-8 flex flex-col overflow-y-auto">
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex flex-col min-w-0 pr-3">
+                  <span className="text-[10px] font-bold text-[#8B8B8A] uppercase tracking-wider mb-1">
+                    {quickViewProduct.brand || quickViewProduct.category}
                   </span>
+                  <h3 className="font-serif text-[18px] sm:text-[24px] font-bold text-[#111111] leading-tight">
+                    {quickViewProduct.name}
+                  </h3>
                 </div>
-
-                <p className="text-[13px] text-[#555555] line-clamp-2 mb-6">
-                  {quickViewProduct.description}
-                </p>
-
-                <div className="flex items-center justify-between border-t border-[#E5E5E5] pt-4 mt-auto">
-                  <span className="text-[10px] text-[#8B8B8A] uppercase tracking-widest font-bold">
-                    {quickViewProduct.sizes.length} SIZES AVAILABLE
-                  </span>
-                  <button
-                    onClick={() => {
-                      setQuickViewProduct(null);
-                      handleProductClick(quickViewProduct);
-                    }}
-                    className="text-[11px] font-bold uppercase tracking-widest text-[#111111] underline decoration-1 underline-offset-4 hover:text-[#4A5D23]"
-                  >
-                    VIEW FULL DETAILS
-                  </button>
-                </div>
+                <span className="font-serif text-[16px] sm:text-[20px] font-bold text-[#111111] shrink-0">
+                  {CURRENCY}{quickViewProduct.price.toFixed(2)}
+                </span>
               </div>
-            </motion.div>
+
+              <p className="text-[13px] sm:text-[14px] text-[#555555] line-clamp-3 sm:line-clamp-4 mb-4 sm:mb-6">
+                {quickViewProduct.description}
+              </p>
+
+              <div className="flex items-center justify-between border-t border-[#E5E5E5] pt-3 mt-auto">
+                <span className="text-[10px] text-[#8B8B8A] uppercase tracking-widest font-bold">
+                  {quickViewProduct.sizes.length} SIZES AVAILABLE
+                </span>
+                <button
+                  onClick={() => {
+                    setQuickViewProduct(null);
+                    handleProductClick(quickViewProduct);
+                  }}
+                  className="text-[11px] font-bold uppercase tracking-widest text-[#111111] underline decoration-1 underline-offset-4 hover:text-[#4A5D23]"
+                >
+                  VIEW FULL DETAILS
+                </button>
+              </div>
+            </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </motion.div>,
+        document.body
+      )}
     </div>
   );
 }

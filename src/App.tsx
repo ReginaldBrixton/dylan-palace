@@ -32,7 +32,7 @@ function ScreenLoader() {
 
 function SplashRoute() {
   const navigate = useNavigate();
-  return <Splash onComplete={() => navigate('/home')} />;
+  return <Splash onComplete={() => navigate('/')} />;
 }
 
 const pageVariants = {
@@ -57,8 +57,8 @@ function AnimatedRoutes() {
         className="w-full"
       >
         <Routes location={location}>
-          <Route path="/" element={<SplashRoute />} />
-          <Route path="/home" element={<HomeScreen />} />
+          <Route path="/" element={<HomeScreen />} />
+          <Route path="/splash" element={<SplashRoute />} />
           <Route path="/shirts" element={<ProductListScreen />} />
           <Route path="/trousers" element={<ProductListScreen />} />
           <Route path="/bags" element={<ProductListScreen />} />
@@ -73,7 +73,7 @@ function AnimatedRoutes() {
           <Route path="/seller/products" element={<ProtectedRoute><SellerProducts /></ProtectedRoute>} />
           <Route path="/seller/orders" element={<ProtectedRoute><SellerOrders /></ProtectedRoute>} />
           <Route path="/seller/users" element={<ProtectedRoute><SellerUsers /></ProtectedRoute>} />
-          <Route path="*" element={<Navigate to="/home" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </motion.div>
     </AnimatePresence>

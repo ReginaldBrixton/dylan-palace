@@ -13,7 +13,7 @@ export default function Header({ cartCount, onOpenCart }: HeaderProps) {
   const navigate = useNavigate();
 
   const pathname = location.pathname;
-  const isHomePage = pathname === '/home';
+  const isHomePage = pathname === '/';
   const isProductPage = pathname.startsWith('/product/');
   const isCheckoutPage = pathname === '/checkout';
   const isSuccessPage = pathname === '/success';
@@ -53,13 +53,13 @@ export default function Header({ cartCount, onOpenCart }: HeaderProps) {
             id="back-button"
             onClick={() => {
               if (isSuccessPage) {
-                navigate('/home');
+                navigate('/');
               } else if (isCheckoutPage) {
                 navigate(-1);
               } else if (isProductPage) {
                 navigate(-1);
               } else {
-                navigate('/home');
+                navigate('/');
               }
             }}
             aria-label="Go back"
@@ -70,7 +70,7 @@ export default function Header({ cartCount, onOpenCart }: HeaderProps) {
         ) : (
           <button
             id="home-icon"
-            onClick={() => navigate('/home')}
+            onClick={() => navigate('/')}
             aria-label="Home"
             className={`transition-all active:scale-95 cursor-pointer p-1 ${textIconClass}`}
           >
@@ -82,7 +82,7 @@ export default function Header({ cartCount, onOpenCart }: HeaderProps) {
       {/* Centered Brand Title */}
       <h1
         id="app-branding"
-        onClick={() => navigate('/home')}
+        onClick={() => navigate('/')}
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-serif text-[16px] md:text-[18px] font-bold tracking-tighter cursor-pointer select-none whitespace-nowrap z-0 pt-0.5 transition-all duration-500 ease-out ${isHomeFirstFold ? 'text-white tracking-[0.05em] scale-102' : 'text-[#111111] tracking-tighter scale-100'
           }`}
       >

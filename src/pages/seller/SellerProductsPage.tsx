@@ -135,10 +135,12 @@ export default function SellerProducts() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    console.log('[SellerProducts] Files selected:', files.length, 'files');
     const newPending = Array.from(files).map((file: File) => ({
       file,
       previewUrl: URL.createObjectURL(file),
     }));
+    console.log('[SellerProducts] Added pending files, total pending:', pendingFiles.length + newPending.length);
     setPendingFiles((prev) => [...prev, ...newPending]);
     e.target.value = '';
   };
@@ -149,6 +151,7 @@ export default function SellerProducts() {
       return;
     }
 
+    console.log('[SellerProducts] Starting AI analysis...');
     setAiLoading(true);
     setError('');
     try {
@@ -168,6 +171,7 @@ export default function SellerProducts() {
         colors: suggestion.colors,
       }));
     } catch (err: any) {
+      console.error('[SellerProducts] AI analysis failed:', err);
       setError(`AI analysis failed: ${err.message}`);
     } finally {
       setAiLoading(false);
@@ -180,18 +184,21 @@ export default function SellerProducts() {
       return;
     }
 
+    console.log('[SellerProducts] Save clicked. Pending files:', pendingFiles.length, 'Existing images:', form.images.length);
     setSaving(true);
     setError('');
     try {
       // Upload pending files first
       const uploadedUrls: string[] = [];
       for (const pf of pendingFiles) {
+        console.log('[SellerProducts] Uploading pending file:', pf.file.name);
         const result = await uploadFile(pf.file);
         uploadedUrls.push(result.url);
         URL.revokeObjectURL(pf.previewUrl);
       }
 
       const allImages = [...form.images, ...uploadedUrls];
+      console.log('[SellerProducts] All images for product:', allImages.length, allImages);
       const productData = {
         name: form.name,
         brand: form.brand || null,
@@ -208,16 +215,20 @@ export default function SellerProducts() {
       };
 
       if (editingId) {
+        console.log('[SellerProducts] Updating product:', editingId);
         await updateProduct(editingId, productData);
       } else {
+        console.log('[SellerProducts] Creating new product');
         await createProduct(productData);
       }
 
+      console.log('[SellerProducts] Save successful!');
       invalidateCache();
       setShowModal(false);
       setPendingFiles([]);
       await load();
     } catch (err: any) {
+      console.error('[SellerProducts] Save failed:', err);
       setError(`Save failed: ${err.message}`);
     } finally {
       setSaving(false);
@@ -226,6 +237,7 @@ export default function SellerProducts() {
 
   const handleDelete = async (product: Product) => {
     if (!confirm(`Delete "${product.name}"? This will also delete all associated images from UploadThing.`)) return;
+    console.log('[SellerProducts] Deleting product:', product.id, product.name);
     try {
       // Delete associated images from UploadThing
       const images = productImages(product);
@@ -251,6 +263,7 @@ export default function SellerProducts() {
     if (idx < form.images.length) {
       // Remove an existing uploaded image
       const imgUrl = form.images[idx];
+      console.log('[SellerProducts] Removing existing image:', imgUrl);
       try {
         const urlParts = imgUrl.split('/');
         const fileKey = urlParts[urlParts.length - 1].split('.')[0];
@@ -262,6 +275,7 @@ export default function SellerProducts() {
     } else {
       // Remove a pending file (not yet uploaded)
       const pendingIdx = idx - form.images.length;
+      console.log('[SellerProducts] Removing pending file at index:', pendingIdx);
       setPendingFiles((prev) => {
         const item = prev[pendingIdx];
         if (item) URL.revokeObjectURL(item.previewUrl);

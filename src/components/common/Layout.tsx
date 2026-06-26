@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     totalCartUnits,
   } = useApp();
 
-  const isSplash = location.pathname === '/';
+  const isSplash = location.pathname === '/splash';
   const isSellerRoute = location.pathname.startsWith('/seller');
   const isCheckout = location.pathname === '/checkout';
   const isSuccess = location.pathname === '/success';
@@ -33,7 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         onOpenCart={() => setIsCartOpen(true)}
       />
 
-      <main className={`flex-grow pb-[80px] ${location.pathname === '/home' ? 'pt-0' : 'pt-[52px]'}`}>
+      <main className={`flex-grow pb-[120px] ${location.pathname === '/' ? 'pt-0' : 'pt-[52px]'}`}>
         {children}
       </main>
 

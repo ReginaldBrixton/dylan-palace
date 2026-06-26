@@ -60,10 +60,13 @@ export async function analyzeProductImage(imageUrl: string): Promise<AIProductSu
     throw new Error('Missing VITE_GEMINI_API_KEY. Add at least one key to .env.local');
   }
 
+  console.log('[AI] Analyzing product image from URL:', imageUrl);
+
   // Fetch the image and convert to base64
   const response = await fetch(imageUrl);
   const blob = await response.blob();
   const base64 = await blobToBase64(blob);
+  console.log('[AI] Image fetched, size:', blob.size, 'bytes, type:', blob.type);
 
   const prompt = `You are a fashion product analyst. Analyze this product image and provide structured details for an e-commerce listing.
 
@@ -80,16 +83,14 @@ Return ONLY a JSON object with this exact structure:
 Analyze the image carefully and provide accurate fashion-specific details.`;
 
   const text = await callGemini(base64, blob.type, prompt);
-
-  // Extract JSON from the response
+  console.log('[AI] Gemini response received, parsing JSON...');
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     throw new Error('AI did not return valid JSON: ' + text.slice(0, 200));
   }
 
   const suggestion = JSON.parse(jsonMatch[0]) as AIProductSuggestion;
-
-  // Validate category
+  console.log('[AI] Parsed suggestion:', suggestion.name, '|', suggestion.brand, '|', suggestion.category);
   const validCategories = ['SHIRTS', 'TROUSERS', 'SHOES', 'BAGS'];
   if (!validCategories.includes(suggestion.category)) {
     suggestion.category = 'SHIRTS';
@@ -103,7 +104,10 @@ export async function analyzeProductFile(file: File): Promise<AIProductSuggestio
     throw new Error('Missing VITE_GEMINI_API_KEY. Add at least one key to .env.local');
   }
 
+  console.log('[AI] Analyzing product from local file:', file.name, `(${file.size} bytes)`);
+
   const base64 = await blobToBase64(file);
+  console.log('[AI] File converted to base64, calling Gemini...');
 
   const prompt = `You are a fashion product analyst. Analyze this product image and provide structured details for an e-commerce listing.
 
@@ -120,6 +124,7 @@ Return ONLY a JSON object with this exact structure:
 Analyze the image carefully and provide accurate fashion-specific details.`;
 
   const text = await callGemini(base64, file.type, prompt);
+  console.log('[AI] Gemini response received, parsing JSON...');
 
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
@@ -127,7 +132,7 @@ Analyze the image carefully and provide accurate fashion-specific details.`;
   }
 
   const suggestion = JSON.parse(jsonMatch[0]) as AIProductSuggestion;
-
+  console.log('[AI] Parsed suggestion:', suggestion.name, '|', suggestion.brand, '|', suggestion.category);
   const validCategories = ['SHIRTS', 'TROUSERS', 'SHOES', 'BAGS'];
   if (!validCategories.includes(suggestion.category)) {
     suggestion.category = 'SHIRTS';
