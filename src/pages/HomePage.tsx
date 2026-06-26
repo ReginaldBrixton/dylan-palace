@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Rotate3d, ArrowRight } from 'lucide-react';
 import { CURRENCY } from '../constants';
-import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../components/ui/AtelierInteractive';
+import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../components/ui';
 import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { getCachedFeaturedProducts, getCachedProducts } from '../lib/product-cache';

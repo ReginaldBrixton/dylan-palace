@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
-import { X, Plus, Minus, Trash2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { X } from 'lucide-react';
 import { CartItem } from '../../types';
-import { CURRENCY } from '../../constants';
+import CartItemRow from './cart/CartItemRow';
+import CartEmptyState from './cart/CartEmptyState';
+import CartFooter from './cart/CartFooter';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -79,111 +81,21 @@ export default function CartDrawer({
           {cartItems.length > 0 ? (
             cartItems.map((item) => (
               <div key={item.id} className="flex flex-col gap-4">
-                <div className="flex h-[72px] w-full group">
-
-                  {/* Thumbnail Image */}
-                  <div className="w-[56px] h-[72px] bg-[#eeeeed] shrink-0 border border-[#E5E5E5] overflow-hidden rounded-md shadow-sm">
-                    <img
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      alt={item.product.name}
-                      src={item.product.images[0]}
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Metadata middle details */}
-                  <div className="flex-grow ml-3 flex flex-col justify-between py-0.5">
-
-                    {/* Title & price side-by-side */}
-                    <div className="flex justify-between items-start gap-2">
-                      <h3 className="text-[11px] sm:text-[12px] font-semibold text-[#111111] uppercase leading-tight line-clamp-2">
-                        {item.product.name}
-                      </h3>
-                      <span className="text-[12px] sm:text-[13px] font-bold text-[#111111] shrink-0">
-                        {CURRENCY}{(item.product.price * item.quantity).toFixed(2)}
-                      </span>
-                    </div>
-
-                    {/* Sizing & custom controls row */}
-                    <div className="flex justify-between items-center mt-1">
-                      <span className="text-[10px] font-medium text-[#8B8B8A] uppercase tracking-widest pl-0.5">
-                        SIZE: {item.selectedSize}
-                      </span>
-
-                      {/* Quantity Modifier controls */}
-                      <div className="flex items-center gap-1 border border-[#E5E5E5] bg-white p-0.5 rounded-lg shadow-sm">
-                        <button
-                          onClick={() => {
-                            if (item.quantity === 1) {
-                              onRemoveItem(item.id);
-                            } else {
-                              onUpdateQty(item.id, -1);
-                            }
-                          }}
-                          aria-label="Decrease qty"
-                          className="w-6 h-6 flex items-center justify-center text-[#111111] hover:bg-[#E5E5E5] active:scale-90 transition-all cursor-pointer rounded-md"
-                        >
-                          <Minus size={11} strokeWidth={2.5} />
-                        </button>
-                        <span className="text-[11px] font-bold text-[#111111] w-5 text-center select-none">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => onUpdateQty(item.id, 1)}
-                          aria-label="Increase qty"
-                          className="w-6 h-6 flex items-center justify-center text-[#111111] hover:bg-[#E5E5E5] active:scale-90 transition-all cursor-pointer rounded-md"
-                        >
-                          <Plus size={11} strokeWidth={2.5} />
-                        </button>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-                {/* Thin border divider */}
-                <div className="w-full h-px bg-[#E5E5E5]" />
+                <CartItemRow
+                  item={item}
+                  onUpdateQty={onUpdateQty}
+                  onRemoveItem={onRemoveItem}
+                />
               </div>
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center flex-grow">
-              <div className="w-14 h-14 border-2 border-dashed border-[#E5E5E5] flex items-center justify-center mb-3 text-[#8B8B8A] text-[22px]">
-                👜
-              </div>
-              <h3 className="font-serif text-[16px] font-bold text-[#111111] uppercase tracking-tight mb-2">
-                Your bag is empty
-              </h3>
-              <p className="text-[12px] text-[#8B8B8A] max-w-[220px] mb-5 leading-relaxed">
-                Fill it with our curated, high-contrast minimal garments.
-              </p>
-              <button
-                onClick={onClose}
-                className="px-6 py-3 bg-[#111111] text-white text-[11px] font-semibold uppercase tracking-widest cursor-pointer rounded-lg hover:bg-[#333333] active:scale-95 transition-all shadow-md"
-              >
-                KEEP BROWSING
-              </button>
-            </div>
+            <CartEmptyState onClose={onClose} />
           )}
         </div>
 
         {/* Total Calculations & Proceed CTA button */}
         {cartItems.length > 0 && (
-          <div className="border-t border-[#E5E5E5]/50 px-5 py-3 pb-10 z-10">
-            <div className="flex justify-between items-end mb-3 pr-1">
-              <span className="text-[10px] font-semibold text-[#8B8B8A] uppercase tracking-widest">
-                Subtotal
-              </span>
-              <span className="font-serif text-[18px] sm:text-[22px] font-bold text-[#111111] tracking-tighter leading-none">
-                {CURRENCY}{subtotal.toFixed(2)}
-              </span>
-            </div>
-            <button
-              id="proceed-checkout-btn"
-              onClick={onProceedToCheckout}
-              className="w-full h-11 sm:h-13 bg-[#111111] text-[#FFFFFF] text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.1em] flex items-center justify-center border border-[#111111] hover:bg-black active:scale-[0.98] transition-all duration-300 cursor-pointer rounded-lg shadow-lg"
-            >
-              PROCEED TO CHECKOUT
-            </button>
-          </div>
+          <CartFooter subtotal={subtotal} onProceedToCheckout={onProceedToCheckout} />
         )}
 
       </div>

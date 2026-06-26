@@ -1,18 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  X,
-  Upload,
-  Sparkles,
-  Loader2,
-  Package,
-  ArrowLeft,
-  Search,
-} from 'lucide-react';
+import { Plus, Package, ArrowLeft, Search } from 'lucide-react';
 import {
   fetchAllProducts,
   createProduct,
@@ -22,53 +11,16 @@ import {
 import { uploadFile, deleteFile } from '../../lib/uploadthing';
 import { analyzeProductImage, analyzeProductFile, type AIProductSuggestion } from '../../lib/ai';
 import type { Product, ProductCategory } from '../../lib/database.types';
-import { CURRENCY } from '../../constants';
 import { invalidateCache } from '../../lib/product-cache';
-
-const CATEGORIES: ProductCategory[] = ['SHIRTS', 'TROUSERS', 'SHOES', 'BAGS'];
-
-// Helpers to normalize joined DB product to flat form fields
-function productImages(p: Product): string[] {
-  return (p.product_images || []).sort((a, b) => a.position - b.position).map((img) => img.url);
-}
-
-function productSizes(p: Product): string[] {
-  return (p.product_sizes || []).map((s) => s.size);
-}
-
-function productCategoryName(p: Product): ProductCategory {
-  return (p.category?.name || 'SHIRTS') as ProductCategory;
-}
-
-interface ProductForm {
-  name: string;
-  brand: string;
-  category: ProductCategory;
-  price: string;
-  description: string;
-  images: string[];
-  sizes: string[];
-  colors: string[];
-  in_stock: boolean;
-  stock_quantity: string;
-  is_featured: boolean;
-  tags: string[];
-}
-
-const emptyForm: ProductForm = {
-  name: '',
-  brand: '',
-  category: 'SHIRTS',
-  price: '',
-  description: '',
-  images: [],
-  sizes: [],
-  colors: [],
-  in_stock: true,
-  stock_quantity: '0',
-  is_featured: false,
-  tags: [],
-};
+import {
+  productImages,
+  productCategoryName,
+  productToForm,
+  emptyForm,
+  type ProductForm,
+} from './utils/productHelpers';
+import ProductCard from './components/ProductCard';
+import ProductFormModal from './components/ProductFormModal';
 
 export default function SellerProducts() {
   const navigate = useNavigate();
@@ -85,7 +37,6 @@ export default function SellerProducts() {
 
   const load = useCallback(async () => {
     try {
-      // Fetch all products (including out of stock) - seller view
       const data = await fetchAllProducts();
       setProducts(data);
     } catch (err) {
@@ -112,20 +63,7 @@ export default function SellerProducts() {
   };
 
   const handleOpenEdit = (product: Product) => {
-    setForm({
-      name: product.name,
-      brand: product.brand || '',
-      category: productCategoryName(product),
-      price: product.price.toString(),
-      description: product.description || '',
-      images: productImages(product),
-      sizes: productSizes(product),
-      colors: product.colors || [],
-      in_stock: product.in_stock,
-      stock_quantity: product.stock_quantity.toString(),
-      is_featured: product.is_featured,
-      tags: product.tags || [],
-    });
+    setForm(productToForm(product));
     setEditingId(product.id);
     setPendingFiles([]);
     setShowModal(true);
@@ -135,12 +73,10 @@ export default function SellerProducts() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    console.log('[SellerProducts] Files selected:', files.length, 'files');
     const newPending = Array.from(files).map((file: File) => ({
       file,
       previewUrl: URL.createObjectURL(file),
     }));
-    console.log('[SellerProducts] Added pending files, total pending:', pendingFiles.length + newPending.length);
     setPendingFiles((prev) => [...prev, ...newPending]);
     e.target.value = '';
   };
@@ -151,7 +87,6 @@ export default function SellerProducts() {
       return;
     }
 
-    console.log('[SellerProducts] Starting AI analysis...');
     setAiLoading(true);
     setError('');
     try {
@@ -184,21 +119,17 @@ export default function SellerProducts() {
       return;
     }
 
-    console.log('[SellerProducts] Save clicked. Pending files:', pendingFiles.length, 'Existing images:', form.images.length);
     setSaving(true);
     setError('');
     try {
-      // Upload pending files first
       const uploadedUrls: string[] = [];
       for (const pf of pendingFiles) {
-        console.log('[SellerProducts] Uploading pending file:', pf.file.name);
         const result = await uploadFile(pf.file);
         uploadedUrls.push(result.url);
         URL.revokeObjectURL(pf.previewUrl);
       }
 
       const allImages = [...form.images, ...uploadedUrls];
-      console.log('[SellerProducts] All images for product:', allImages.length, allImages);
       const productData = {
         name: form.name,
         brand: form.brand || null,
@@ -215,14 +146,11 @@ export default function SellerProducts() {
       };
 
       if (editingId) {
-        console.log('[SellerProducts] Updating product:', editingId);
         await updateProduct(editingId, productData);
       } else {
-        console.log('[SellerProducts] Creating new product');
         await createProduct(productData);
       }
 
-      console.log('[SellerProducts] Save successful!');
       invalidateCache();
       setShowModal(false);
       setPendingFiles([]);
@@ -237,13 +165,10 @@ export default function SellerProducts() {
 
   const handleDelete = async (product: Product) => {
     if (!confirm(`Delete "${product.name}"? This will also delete all associated images from UploadThing.`)) return;
-    console.log('[SellerProducts] Deleting product:', product.id, product.name);
     try {
-      // Delete associated images from UploadThing
       const images = productImages(product);
       for (const imgUrl of images) {
         try {
-          // Extract file key from URL (UploadThing URLs contain the key)
           const urlParts = imgUrl.split('/');
           const fileKey = urlParts[urlParts.length - 1].split('.')[0];
           if (fileKey) await deleteFile(fileKey);
@@ -261,9 +186,7 @@ export default function SellerProducts() {
 
   const removeImage = (idx: number) => {
     if (idx < form.images.length) {
-      // Remove an existing uploaded image
       const imgUrl = form.images[idx];
-      console.log('[SellerProducts] Removing existing image:', imgUrl);
       try {
         const urlParts = imgUrl.split('/');
         const fileKey = urlParts[urlParts.length - 1].split('.')[0];
@@ -273,9 +196,7 @@ export default function SellerProducts() {
       }
       setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
     } else {
-      // Remove a pending file (not yet uploaded)
       const pendingIdx = idx - form.images.length;
-      console.log('[SellerProducts] Removing pending file at index:', pendingIdx);
       setPendingFiles((prev) => {
         const item = prev[pendingIdx];
         if (item) URL.revokeObjectURL(item.previewUrl);
@@ -351,56 +272,13 @@ export default function SellerProducts() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filtered.map((product, i) => (
-                <motion.div
+                <ProductCard
                   key={product.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="bg-white rounded-xl border border-[#E5E5E5] overflow-hidden group"
-                >
-                  <div className="aspect-square bg-[#F5F5F4] overflow-hidden relative">
-                    {productImages(product)[0] ? (
-                      <img src={productImages(product)[0]} alt={product.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <Package size={24} className="text-[#E5E5E5]" />
-                      </div>
-                    )}
-                    {!product.in_stock && (
-                      <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-bold uppercase px-2 py-1 rounded-full">
-                        Out of Stock
-                      </div>
-                    )}
-                    {product.is_featured && (
-                      <div className="absolute top-2 right-2 bg-yellow-400 text-black text-[9px] font-bold uppercase px-2 py-1 rounded-full">
-                        Featured
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <p className="text-[9px] font-bold text-[#8B8B8A] uppercase tracking-wider mb-0.5">
-                      {productCategoryName(product)}
-                    </p>
-                    <h3 className="text-sm font-bold text-[#111111] truncate mb-1">{product.name}</h3>
-                    <p className="font-serif text-lg font-bold text-[#111111] mb-3">
-                      {CURRENCY}{product.price.toFixed(2)}
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleOpenEdit(product)}
-                        className="flex-1 flex items-center justify-center gap-1.5 bg-[#F5F5F4] text-[#111111] py-2 rounded-lg text-xs font-semibold hover:bg-[#E5E5E5] transition-colors cursor-pointer"
-                      >
-                        <Pencil size={12} /> Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product)}
-                        className="flex items-center justify-center gap-1.5 bg-red-50 text-red-600 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-red-100 transition-colors cursor-pointer"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                  product={product}
+                  index={i}
+                  onEdit={handleOpenEdit}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           )}
@@ -410,247 +288,20 @@ export default function SellerProducts() {
       {/* Add/Edit Modal */}
       <AnimatePresence>
         {showModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-            >
-              <div className="flex items-center justify-between p-5 border-b border-[#E5E5E5] sticky top-0 bg-white z-10">
-                <h3 className="font-bold text-base uppercase tracking-wider text-[#111111]">
-                  {editingId ? 'Edit Product' : 'Add Product'}
-                </h3>
-                <button onClick={() => setShowModal(false)} className="text-[#8B8B8A] hover:text-[#111111] cursor-pointer">
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="p-5 flex flex-col gap-4">
-                {error && (
-                  <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
-                )}
-
-                {/* Image Upload */}
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
-                    Product Images
-                  </label>
-                  <div className="flex gap-3 flex-wrap">
-                    {form.images.map((img, idx) => (
-                      <div key={`img-${idx}`} className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#E5E5E5]">
-                        <img src={img} alt="" className="w-full h-full object-cover" />
-                        <button
-                          onClick={() => removeImage(idx)}
-                          className="absolute top-0 right-0 bg-black/60 text-white p-0.5 rounded-bl-lg cursor-pointer"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    ))}
-                    {pendingFiles.map((pf, idx) => (
-                      <div key={`pending-${idx}`} className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#E5E5E5]">
-                        <img src={pf.previewUrl} alt="" className="w-full h-full object-cover" />
-                        <button
-                          onClick={() => removeImage(form.images.length + idx)}
-                          className="absolute top-0 right-0 bg-black/60 text-white p-0.5 rounded-bl-lg cursor-pointer"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    ))}
-                    <label className="w-20 h-20 rounded-lg border-2 border-dashed border-[#E5E5E5] flex items-center justify-center cursor-pointer hover:border-[#111111] transition-colors">
-                      <Upload size={18} className="text-[#8B8B8A]" />
-                      <input type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
-                    </label>
-                  </div>
-                </div>
-
-                {/* AI Auto-fill Button */}
-                {(form.images.length > 0 || pendingFiles.length > 0) && (
-                  <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    onClick={handleAIAnalyze}
-                    disabled={aiLoading || saving}
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3.5 rounded-xl text-sm font-semibold uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 shadow-md"
-                  >
-                    {aiLoading ? (
-                      <><Loader2 size={14} className="animate-spin" /> AI Analyzing...</>
-                    ) : (
-                      <><Sparkles size={14} /> AI Auto-Fill from Image</>
-                    )}
-                  </motion.button>
-                )}
-
-                {/* Name */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Name</label>
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Product name"
-                    className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
-                  />
-                </div>
-
-                {/* Brand & Category */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Brand</label>
-                    <input
-                      type="text"
-                      value={form.brand}
-                      onChange={(e) => setForm({ ...form, brand: e.target.value })}
-                      placeholder="Brand"
-                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Category</label>
-                    <select
-                      value={form.category}
-                      onChange={(e) => setForm({ ...form, category: e.target.value as ProductCategory })}
-                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all cursor-pointer"
-                    >
-                      {CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Price & Stock */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
-                      Price ({CURRENCY})
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={form.price}
-                      onChange={(e) => setForm({ ...form, price: e.target.value })}
-                      placeholder="0.00"
-                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Stock Qty</label>
-                    <input
-                      type="number"
-                      value={form.stock_quantity}
-                      onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })}
-                      placeholder="0"
-                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Description</label>
-                  <textarea
-                    value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    placeholder="Product description"
-                    rows={3}
-                    className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all resize-none"
-                  />
-                </div>
-
-                {/* Sizes & Colors */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
-                      Sizes (comma-separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={form.sizes.join(', ')}
-                      onChange={(e) => setForm({ ...form, sizes: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-                      placeholder="S, M, L, XL"
-                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
-                      Colors (comma-separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={form.colors.join(', ')}
-                      onChange={(e) => setForm({ ...form, colors: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-                      placeholder="Black, White"
-                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
-                    Tags (comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={form.tags.join(', ')}
-                    onChange={(e) => setForm({ ...form, tags: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-                    placeholder="minimal, luxury, summer"
-                    className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
-                  />
-                </div>
-
-                {/* Checkboxes */}
-                <div className="flex gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={form.in_stock}
-                      onChange={(e) => setForm({ ...form, in_stock: e.target.checked })}
-                      className="w-4 h-4 cursor-pointer"
-                    />
-                    <span className="text-base text-[#111111]">In Stock</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={form.is_featured}
-                      onChange={(e) => setForm({ ...form, is_featured: e.target.checked })}
-                      className="w-4 h-4 cursor-pointer"
-                    />
-                    <span className="text-base text-[#111111]">Featured</span>
-                  </label>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="flex-1 bg-[#F5F5F4] text-[#111111] py-3.5 rounded-xl text-sm font-semibold uppercase tracking-widest hover:bg-[#E5E5E5] transition-colors cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <motion.button
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="flex-1 bg-[#111111] text-white py-3.5 rounded-xl text-sm font-semibold uppercase tracking-widest hover:bg-[#333] transition-colors cursor-pointer disabled:opacity-50 shadow-lg"
-                  >
-                    {saving ? 'Saving...' : 'Save Product'}
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+          <ProductFormModal
+            editingId={editingId}
+            form={form}
+            setForm={setForm}
+            error={error}
+            saving={saving}
+            aiLoading={aiLoading}
+            pendingFiles={pendingFiles}
+            onClose={() => setShowModal(false)}
+            onSave={handleSave}
+            onFileUpload={handleFileUpload}
+            onAIAnalyze={handleAIAnalyze}
+            onRemoveImage={removeImage}
+          />
         )}
       </AnimatePresence>
     </div>

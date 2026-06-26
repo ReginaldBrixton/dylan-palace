@@ -21,6 +21,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isSellerRoute = location.pathname.startsWith('/seller');
   const isCheckout = location.pathname === '/checkout';
   const isSuccess = location.pathname === '/success';
+  const isHomePage = location.pathname === '/';
+  const showBottomNav = !isCheckout && !isSuccess && !isHomePage;
 
   if (isSplash || isSellerRoute) {
     return <>{children}</>;
@@ -33,7 +35,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         onOpenCart={() => setIsCartOpen(true)}
       />
 
-      <main className={`flex-grow pb-[120px] ${location.pathname === '/' ? 'pt-0' : 'pt-[52px]'}`}>
+      <main className={`flex-grow ${showBottomNav ? 'pb-[120px]' : ''} ${isHomePage ? 'pt-0' : 'pt-[52px]'}`}>
         {children}
       </main>
 
@@ -49,7 +51,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }}
       />
 
-      {!isCheckout && !isSuccess && <BottomNav />}
+      {showBottomNav && <BottomNav />}
     </div>
   );
 }
