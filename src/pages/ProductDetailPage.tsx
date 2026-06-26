@@ -2,11 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Truck, Heart, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Product } from '../../types';
-import { PRODUCTS, getRelatedProducts } from '../../api/products';
-import { CURRENCY } from '../../constants';
-import { useApp } from '../../context/AppContext';
-import ImageWithSkeleton from '../common/ImageWithSkeleton';
+import { Product } from '../types';
+import { PRODUCTS, getRelatedProducts } from '../api/products';
+import { CURRENCY } from '../constants';
+import { useApp } from '../context/AppContext';
+import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
 
 export default function ProductDetailScreen() {
   const { id } = useParams<{ id: string }>();

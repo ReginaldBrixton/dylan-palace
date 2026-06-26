@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, Loader2, Compass, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CartItem, CheckoutDetails } from '../../types';
-import { detectLocation, buildMapUrl } from '../../api/geolocation';
-import { SHIPPING, MOMO_NETWORKS, CURRENCY } from '../../constants';
-import { calculateSubtotal, calculateShipping, calculateTotal } from '../../utils/format';
-import { useApp } from '../../context/AppContext';
+import { CartItem, CheckoutDetails } from '../types';
+import { detectLocation, buildMapUrl } from '../api/geolocation';
+import { SHIPPING, MOMO_NETWORKS, CURRENCY } from '../constants';
+import { calculateSubtotal, calculateShipping, calculateTotal } from '../utils/format';
+import { useApp } from '../context/AppContext';
 
 export default function CheckoutScreen() {
   const navigate = useNavigate();

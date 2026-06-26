@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, SlidersHorizontal, Search, X, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Product } from '../../types';
-import { PRODUCTS } from '../../api/products';
-import { CURRENCY } from '../../constants';
+import { Product } from '../types';
+import { PRODUCTS } from '../api/products';
+import { CURRENCY } from '../constants';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ImageWithSkeleton from '../common/ImageWithSkeleton';
+import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
 
 const CATEGORY_MAP: Record<string, 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS'> = {
   shirts: 'SHIRTS',
@@ -254,7 +254,9 @@ export default function ProductListScreen() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  transition={{ duration: 0.35, ease: "easeOut", delay: Math.min(index * 0.04, 0.3) }}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                   key={product.id}
                   onClick={() => handleProductClick(product)}
                   onMouseDown={() => handlePressStart(product)}

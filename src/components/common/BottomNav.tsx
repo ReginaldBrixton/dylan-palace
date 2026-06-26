@@ -39,6 +39,7 @@ export default function BottomNav() {
 
             <motion.div
               animate={{ scale: isActive ? 1.15 : 1, y: isActive ? -2 : 0 }}
+              whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="relative z-10 drop-shadow-sm"
             >

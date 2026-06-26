@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Order, Product } from '../../types';
+import { Order, Product } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Package,
@@ -17,10 +17,10 @@ import {
   FileText,
   Compass
 } from 'lucide-react';
-import { triggerHaptic } from '../../utils/haptic';
-import { CURRENCY } from '../../constants';
-import { useApp } from '../../context/AppContext';
-import { PRODUCTS } from '../../api/products';
+import { triggerHaptic } from '../utils/haptic';
+import { CURRENCY } from '../constants';
+import { useApp } from '../context/AppContext';
+import { PRODUCTS } from '../api/products';
 
 interface TrackingMilestone {
   label: string;

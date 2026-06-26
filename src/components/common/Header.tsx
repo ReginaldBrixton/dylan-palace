@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Home, ShoppingBag, User } from 'lucide-react';
 
 interface HeaderProps {
@@ -107,15 +108,22 @@ export default function Header({ cartCount, onOpenCart }: HeaderProps) {
               className={`relative transition-all active:scale-95 cursor-pointer flex items-center justify-center p-1.5 ${textIconClass}`}
             >
               <ShoppingBag size={18} strokeWidth={2} />
-              {cartCount > 0 && (
-                <span
-                  id="cart-badge"
-                  className={`absolute top-0 right-0 text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-pulse transition-colors duration-500 ${isHomeFirstFold ? 'bg-white text-black' : 'bg-[#4A5D23] text-white'
-                    }`}
-                >
-                  {cartCount}
-                </span>
-              )}
+              <AnimatePresence>
+                {cartCount > 0 && (
+                  <motion.span
+                    id="cart-badge"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: [0, 1.3, 1] }}
+                    exit={{ scale: 0 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    key={cartCount}
+                    className={`absolute top-0 right-0 text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full transition-colors duration-500 ${isHomeFirstFold ? 'bg-white text-black' : 'bg-[#4A5D23] text-white'
+                      }`}
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </>
         )}

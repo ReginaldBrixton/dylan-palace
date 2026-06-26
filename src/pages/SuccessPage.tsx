@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, MapPin, Truck, Award, Package, Clock } from 'lucide-react';
-import { triggerHaptic } from '../../utils/haptic';
-import { CURRENCY } from '../../constants';
-import { useApp } from '../../context/AppContext';
+import { triggerHaptic } from '../utils/haptic';
+import { CURRENCY } from '../constants';
+import { useApp } from '../context/AppContext';
 
 export default function SuccessScreen() {
   const navigate = useNavigate();

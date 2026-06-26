@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Rotate3d, ArrowRight } from 'lucide-react';
-import { img } from '../../utils/imageMap';
-import { CURRENCY } from '../../constants';
-import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../ui/AtelierInteractive';
-import ImageWithSkeleton from '../common/ImageWithSkeleton';
+import { img } from '../utils/imageMap';
+import { CURRENCY } from '../constants';
+import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../components/ui/AtelierInteractive';
+import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 const SHOWCASE_SHOES = [
   {
@@ -39,6 +40,11 @@ export default function HomeScreen() {
   const [activeShoeIndex, setActiveShoeIndex] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
   const [spinCount, setSpinCount] = useState(0);
+
+  const [trousersRef, trousersVisible] = useScrollReveal<HTMLDivElement>();
+  const [bagsRef, bagsVisible] = useScrollReveal<HTMLDivElement>();
+  const [shoesRef, shoesVisible] = useScrollReveal<HTMLDivElement>();
+  const [labRef, labVisible] = useScrollReveal<HTMLDivElement>();
 
   const activeShoe = SHOWCASE_SHOES[activeShoeIndex];
 
@@ -77,19 +83,27 @@ export default function HomeScreen() {
           <h2 className="font-serif text-[32px] md:text-[40px] text-[#FFFFFF] mb-4 uppercase tracking-tighter leading-tight">
             THE SUMMER SHIFT
           </h2>
-          <button
+          <motion.button
             id="hero-cta"
             onClick={() => handleShopCategory('SHIRTS')}
-            className="bg-[#111111] text-[#FFFFFF] text-[13px] font-semibold uppercase tracking-[0.1em] px-8 py-3.5 w-full sm:w-auto hover:bg-[#FFFFFF] hover:text-[#111111] border border-[#111111] transition-all duration-300 active:scale-95 cursor-pointer rounded-lg"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            className="bg-[#111111] text-[#FFFFFF] text-[13px] font-semibold uppercase tracking-[0.1em] px-8 py-3.5 w-full sm:w-auto hover:bg-[#FFFFFF] hover:text-[#111111] border border-[#111111] transition-colors duration-300 cursor-pointer rounded-lg"
           >
             SHOP SHIRTS
-          </button>
+          </motion.button>
         </div>
       </section>
 
       {/* 3D Interactive Lab Area */}
-      <section className="w-full py-12 px-4 bg-[#F2F2F1] border-b border-[#E5E5E5]">
-        <div className="max-w-md mx-auto flex flex-col gap-6">
+      <section ref={labRef} className="w-full py-12 px-4 bg-[#F2F2F1] border-b border-[#E5E5E5]">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={labVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="max-w-md mx-auto flex flex-col gap-6"
+        >
           <div className="text-center">
             <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#8B8B8A] block mb-1">
               Interactive 3D Preview
@@ -213,15 +227,18 @@ export default function HomeScreen() {
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
-
-      {/* Interactive Atelier Category Grid */}
       <section className="w-full flex flex-col gap-0">
 
         {/* TROUSERS SECTION */}
-        <div className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div ref={trousersRef} className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={trousersVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+          >
             {/* Left Column: Image cover (Clickable, redirects to plp) */}
             <div
               id="cat-preview-trousers"
@@ -252,12 +269,17 @@ export default function HomeScreen() {
             <div className="w-full h-[360px]">
               <TrousersInteractive />
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* BAGS SECTION */}
-        <div className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div ref={bagsRef} className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={bagsVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+          >
             {/* Left Column: 3D hardware & opening clasp mechanism */}
             <div className="w-full h-[360px] order-2 md:order-1">
               <BagsInteractive />
@@ -288,12 +310,17 @@ export default function HomeScreen() {
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* SHOES SECTION */}
-        <div className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div ref={shoesRef} className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={shoesVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+          >
             {/* Left Column: Campaign card */}
             <div
               id="cat-preview-shoes"
@@ -324,7 +351,7 @@ export default function HomeScreen() {
             <div className="w-full h-[360px]">
               <ShoesInteractive />
             </div>
-          </div>
+          </motion.div>
         </div>
 
       </section>
