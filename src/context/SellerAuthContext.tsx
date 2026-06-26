@@ -1,66 +1,57 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import type { Session } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
-import type { Profile } from '../lib/database.types';
-import { fetchProfile } from '../lib/api';
+
+const SELLER_PIN = '0506';
+const STORAGE_KEY = 'dylan_seller_auth';
 
 interface SellerAuthContextType {
-  session: Session | null;
-  profile: Profile | null;
-  isSeller: boolean;
+  isAuthenticated: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  signInWithPin: (pin: string) => Promise<void>;
+  signOut: () => void;
 }
 
 const SellerAuthContext = createContext<SellerAuthContextType | undefined>(undefined);
 
 export function SellerAuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session) {
-        fetchProfile(data.session.user.id).then((p) => {
-          setProfile(p);
-          setLoading(false);
-        });
-      } else {
-        setLoading(false);
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored === 'true') {
+        setIsAuthenticated(true);
       }
-    });
+    } catch {
+      // ignore
+    }
+    setLoading(false);
+  }, []);
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      if (newSession) {
-        fetchProfile(newSession.user.id).then(setProfile);
-      } else {
-        setProfile(null);
+  const signInWithPin = useCallback(async (pin: string) => {
+    if (pin === SELLER_PIN) {
+      setIsAuthenticated(true);
+      try {
+        localStorage.setItem(STORAGE_KEY, 'true');
+      } catch {
+        // ignore
       }
-      setLoading(false);
-    });
-
-    return () => listener.subscription.unsubscribe();
+    } else {
+      throw new Error('Invalid PIN');
+    }
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+  const signOut = useCallback(() => {
+    setIsAuthenticated(false);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
   }, []);
-
-  const signOut = useCallback(async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    setProfile(null);
-  }, []);
-
-  const isSeller = profile?.role === 'seller';
 
   return (
-    <SellerAuthContext.Provider value={{ session, profile, isSeller, loading, signIn, signOut }}>
+    <SellerAuthContext.Provider value={{ isAuthenticated, loading, signInWithPin, signOut }}>
       {children}
     </SellerAuthContext.Provider>
   );

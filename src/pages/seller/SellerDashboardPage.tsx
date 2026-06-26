@@ -26,7 +26,7 @@ interface Stats {
 
 export default function SellerDashboard() {
   const navigate = useNavigate();
-  const { profile, signOut } = useSellerAuth();
+  const { signOut } = useSellerAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,8 +50,8 @@ export default function SellerDashboard() {
     load();
   }, [load]);
 
-  const handleSignOut = async () => {
-    await signOut();
+  const handleSignOut = () => {
+    signOut();
     navigate('/home');
   };
 
@@ -93,7 +93,7 @@ export default function SellerDashboard() {
 
         <div className="p-4 border-t border-[#333]">
           <div className="px-4 py-2 mb-2">
-            <p className="text-xs text-[#8B8B8A] truncate">{profile?.email}</p>
+            <p className="text-xs text-[#8B8B8A] truncate">Seller</p>
           </div>
           <button
             onClick={handleSignOut}
@@ -112,7 +112,7 @@ export default function SellerDashboard() {
             <h2 className="font-serif text-2xl font-bold text-[#111111] uppercase tracking-tighter mb-1">
               Dashboard
             </h2>
-            <p className="text-sm text-[#8B8B8A]">Welcome back, {profile?.full_name || 'Seller'}</p>
+            <p className="text-sm text-[#8B8B8A]">Welcome back, Seller</p>
           </div>
 
           {/* Stats Grid */}
@@ -159,13 +159,12 @@ export default function SellerDashboard() {
                       <p className="text-xs text-[#8B8B8A]">{order.full_name} • {order.email}</p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
-                        order.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${order.status === 'pending' ? 'bg-orange-100 text-orange-700' :
                         order.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
-                        order.status === 'shipped' ? 'bg-purple-100 text-purple-700' :
-                        order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                        'bg-red-100 text-red-700'
-                      }`}>
+                          order.status === 'shipped' ? 'bg-purple-100 text-purple-700' :
+                            order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                              'bg-red-100 text-red-700'
+                        }`}>
                         {order.status}
                       </span>
                       <p className="text-sm font-bold text-[#111111]">{CURRENCY}{order.total_amount.toFixed(2)}</p>

@@ -13,7 +13,6 @@ import {
   ArrowLeft,
   Search,
 } from 'lucide-react';
-import { useSellerAuth } from '../../context/SellerAuthContext';
 import {
   fetchAllProducts,
   createProduct,
@@ -72,7 +71,6 @@ const emptyForm: ProductForm = {
 
 export default function SellerProducts() {
   const navigate = useNavigate();
-  const { profile } = useSellerAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
