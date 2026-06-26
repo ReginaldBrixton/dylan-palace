@@ -1,15 +1,7 @@
-import React, { lazy, Suspense, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Screen, Product, Category, CheckoutDetails } from './types';
-import { PRODUCTS } from './api/products';
-import { useCart } from './hooks/useCart';
-import { useWishlist } from './hooks/useWishlist';
-import { useOrders } from './hooks/useOrders';
-import { countCartUnits } from './utils/format';
-import { triggerHaptic } from './utils/haptic';
-import Header from './components/common/Header';
-import BottomNav from './components/common/BottomNav';
-import { CartDrawer } from './components/ui';
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
+import Layout from './components/common/Layout';
 
 // Code-split screen components for smaller initial bundle
 const Splash = lazy(() => import('./components/screens/Splash'));
@@ -28,147 +20,33 @@ function ScreenLoader() {
   );
 }
 
+function SplashRoute() {
+  const navigate = useNavigate();
+  return <Splash onComplete={() => navigate('/home')} />;
+}
+
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('splash');
-  const [category, setCategory] = useState<Category>('SHIRTS');
-  const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[0]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [lastOrder, setLastOrder] = useState<CheckoutDetails | null>(null);
-  const [lastOrderId, setLastOrderId] = useState<string | undefined>(undefined);
-
-  const { cartItems, addToBag, updateQty, removeItem, clearCart } = useCart();
-  const { wishlist, toggleWishlist } = useWishlist();
-  const { pastOrders, addOrder } = useOrders();
-
-  const navigate = useCallback((target: Screen) => {
-    setScreen(target);
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, []);
-
-  const handleSelectProduct = useCallback((product: Product) => {
-    setSelectedProduct(product);
-  }, []);
-
-  const handleAddtoBag = useCallback((product: Product, size: string) => {
-    addToBag(product, size);
-    setTimeout(() => setIsCartOpen(true), 450);
-  }, [addToBag]);
-
-  const handleOrderComplete = useCallback((details: CheckoutDetails) => {
-    triggerHaptic('heavy');
-    setLastOrder(details);
-    const order = addOrder(details, cartItems);
-    setLastOrderId(order.id);
-    clearCart();
-    setScreen('success');
-  }, [addOrder, cartItems, clearCart]);
-
-  const totalCartUnits = countCartUnits(cartItems);
-
-  if (screen === 'splash') {
-    return (
-      <Suspense fallback={<ScreenLoader />}>
-        <Splash onComplete={() => setScreen('home')} />
-      </Suspense>
-    );
-  }
-
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#F9F9F8] text-[#111111] antialiased">
-      <Header
-        currentScreen={screen}
-        onNavigate={navigate}
-        cartCount={totalCartUnits}
-        onOpenCart={() => setIsCartOpen(true)}
-      />
-
-      <main className={`flex-grow pb-[80px] ${screen === 'home' ? 'pt-0' : 'pt-[52px]'}`}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={screen}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full h-full"
-          >
-            <Suspense fallback={<ScreenLoader />}>
-              {screen === 'home' && (
-                <HomeScreen
-                  onNavigate={navigate}
-                  onSelectCategory={setCategory}
-                />
-              )}
-
-              {screen === 'plp' && (
-                <ProductListScreen
-                  currentCategory={category}
-                  onSelectCategory={setCategory}
-                  onSelectProduct={handleSelectProduct}
-                  onNavigate={navigate}
-                />
-              )}
-
-              {screen === 'pdp' && (
-                <ProductDetailScreen
-                  product={selectedProduct}
-                  wishlist={wishlist}
-                  onToggleWishlist={toggleWishlist}
-                  onAddtoBag={handleAddtoBag}
-                  onSelectProduct={handleSelectProduct}
-                  onNavigate={navigate}
-                />
-              )}
-
-              {screen === 'checkout' && (
-                <CheckoutScreen
-                  cartItems={cartItems}
-                  onOrderComplete={handleOrderComplete}
-                  onNavigate={navigate}
-                />
-              )}
-
-              {screen === 'success' && (
-                <SuccessScreen
-                  orderId={lastOrderId}
-                  orderDetails={lastOrder}
-                  onContinueShopping={() => navigate('home')}
-                />
-              )}
-
-              {screen === 'profile' && (
-                <ProfileScreen
-                  pastOrders={pastOrders}
-                  wishlist={wishlist.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean) as Product[]}
-                  onSelectProduct={handleSelectProduct}
-                  onNavigate={navigate}
-                />
-              )}
-            </Suspense>
-          </motion.div>
-        </AnimatePresence>
-      </main>
-
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-        onUpdateQty={updateQty}
-        onRemoveItem={removeItem}
-        onProceedToCheckout={() => {
-          setIsCartOpen(false);
-          navigate('checkout');
-        }}
-      />
-
-      {screen !== 'success' && screen !== 'checkout' && (
-        <BottomNav
-          currentScreen={screen}
-          currentCategory={category}
-          onSelectCategory={setCategory}
-          onNavigate={navigate}
-        />
-      )}
-    </div>
+    <BrowserRouter>
+      <AppProvider>
+        <Layout>
+          <Suspense fallback={<ScreenLoader />}>
+            <Routes>
+              <Route path="/" element={<SplashRoute />} />
+              <Route path="/home" element={<HomeScreen />} />
+              <Route path="/shirts" element={<ProductListScreen />} />
+              <Route path="/trousers" element={<ProductListScreen />} />
+              <Route path="/bags" element={<ProductListScreen />} />
+              <Route path="/shoes" element={<ProductListScreen />} />
+              <Route path="/product/:id" element={<ProductDetailScreen />} />
+              <Route path="/checkout" element={<CheckoutScreen />} />
+              <Route path="/success" element={<SuccessScreen />} />
+              <Route path="/profile" element={<ProfileScreen />} />
+              <Route path="*" element={<Navigate to="/home" replace />} />
+            </Routes>
+          </Suspense>
+        </Layout>
+      </AppProvider>
+    </BrowserRouter>
   );
 }

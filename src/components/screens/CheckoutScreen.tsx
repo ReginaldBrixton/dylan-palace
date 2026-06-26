@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, Loader2, Compass, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CartItem, Screen, CheckoutDetails } from '../../types';
+import { CartItem, CheckoutDetails } from '../../types';
 import { detectLocation, buildMapUrl } from '../../api/geolocation';
 import { SHIPPING, MOMO_NETWORKS, CURRENCY } from '../../constants';
 import { calculateSubtotal, calculateShipping, calculateTotal } from '../../utils/format';
+import { useApp } from '../../context/AppContext';
 
-interface CheckoutScreenProps {
-  cartItems: CartItem[];
-  onOrderComplete: (details: CheckoutDetails) => void;
-  onNavigate: (screen: Screen) => void;
-}
-
-export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate }: CheckoutScreenProps) {
+export default function CheckoutScreen() {
+  const navigate = useNavigate();
+  const { cartItems, handleOrderComplete } = useApp();
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
@@ -69,7 +67,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
       return;
     }
 
-    onOrderComplete({
+    handleOrderComplete({
       fullName,
       email,
       phone,
@@ -81,6 +79,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
       momoNumber: paymentMethod === 'MOMO' ? momoNumber : undefined,
       totalAmount
     });
+    navigate('/success');
   };
 
   if (cartItems.length === 0) {
@@ -96,12 +95,12 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
           Add items to your bag before proceeding to checkout.
         </p>
         <button
-          onClick={() => onNavigate('home')}
+          onClick={() => navigate('/home')}
           className="px-6 py-3 bg-[#111111] text-white text-[11px] font-semibold uppercase tracking-widest cursor-pointer rounded-lg hover:bg-[#333333] active:scale-95 transition-all shadow-md"
         >
           BROWSE PRODUCTS
         </button>
-      </div>
+      </div >
     );
   }
 

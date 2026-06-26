@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Home, ShoppingBag, User } from 'lucide-react';
-import { Screen } from '../../types';
 
 interface HeaderProps {
-  currentScreen: Screen;
-  onNavigate: (screen: Screen) => void;
   cartCount: number;
   onOpenCart: () => void;
 }
 
-export default function Header({ currentScreen, onNavigate, cartCount, onOpenCart }: HeaderProps) {
-  const isProductPage = currentScreen === 'pdp';
-  const isCheckoutPage = currentScreen === 'checkout';
-  const isSuccessPage = currentScreen === 'success';
+export default function Header({ cartCount, onOpenCart }: HeaderProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const pathname = location.pathname;
+  const isHomePage = pathname === '/home';
+  const isProductPage = pathname.startsWith('/product/');
+  const isCheckoutPage = pathname === '/checkout';
+  const isSuccessPage = pathname === '/success';
 
   const [scrolled, setScrolled] = useState(false);
 
@@ -30,7 +33,7 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
   }, []);
 
   // Determine dynamic contrast themes depending on scroll state & current screen
-  const isHomeFirstFold = currentScreen === 'home' && !scrolled;
+  const isHomeFirstFold = isHomePage && !scrolled;
   const headerBgClass = isHomeFirstFold
     ? 'bg-black/15 backdrop-blur-[6px] border-transparent'
     : 'bg-white/90 backdrop-blur-2xl backdrop-saturate-[180%] border-b border-[#E5E5E5]/50 shadow-sm';
@@ -44,18 +47,18 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
 
       {/* Left Back/Home Button */}
       <div className="flex items-center justify-start z-10">
-        {currentScreen !== 'home' ? (
+        {!isHomePage ? (
           <button
             id="back-button"
             onClick={() => {
               if (isSuccessPage) {
-                onNavigate('home');
+                navigate('/home');
               } else if (isCheckoutPage) {
-                onNavigate('plp');
+                navigate(-1);
               } else if (isProductPage) {
-                onNavigate('plp');
+                navigate(-1);
               } else {
-                onNavigate('home');
+                navigate('/home');
               }
             }}
             aria-label="Go back"
@@ -66,7 +69,7 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
         ) : (
           <button
             id="home-icon"
-            onClick={() => onNavigate('home')}
+            onClick={() => navigate('/home')}
             aria-label="Home"
             className={`transition-all active:scale-95 cursor-pointer p-1 ${textIconClass}`}
           >
@@ -78,7 +81,7 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
       {/* Centered Brand Title */}
       <h1
         id="app-branding"
-        onClick={() => onNavigate('home')}
+        onClick={() => navigate('/home')}
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-serif text-[16px] md:text-[18px] font-bold tracking-tighter cursor-pointer select-none whitespace-nowrap z-0 pt-0.5 transition-all duration-500 ease-out ${isHomeFirstFold ? 'text-white tracking-[0.05em] scale-102' : 'text-[#111111] tracking-tighter scale-100'
           }`}
       >
@@ -91,7 +94,7 @@ export default function Header({ currentScreen, onNavigate, cartCount, onOpenCar
           <>
             <button
               id="profile-toggle-btn"
-              onClick={() => onNavigate('profile')}
+              onClick={() => navigate('/profile')}
               aria-label="Profile"
               className={`relative transition-all active:scale-95 cursor-pointer flex items-center justify-center p-1.5 ${textIconClass}`}
             >

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Order, Product, Screen } from '../../types';
+import { useNavigate } from 'react-router-dom';
+import { Order, Product } from '../../types';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Package,
@@ -18,13 +19,8 @@ import {
 } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
 import { CURRENCY } from '../../constants';
-
-interface ProfileScreenProps {
-  pastOrders: Order[];
-  wishlist: Product[];
-  onSelectProduct: (p: Product) => void;
-  onNavigate?: (screen: Screen) => void;
-}
+import { useApp } from '../../context/AppContext';
+import { PRODUCTS } from '../../api/products';
 
 interface TrackingMilestone {
   label: string;
@@ -35,7 +31,11 @@ interface TrackingMilestone {
   status: 'completed' | 'active' | 'upcoming';
 }
 
-export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct, onNavigate }: ProfileScreenProps) {
+export default function ProfileScreen() {
+  const navigate = useNavigate();
+  const { pastOrders, wishlist: wishlistIds } = useApp();
+  const wishlist = wishlistIds.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean) as Product[];
+
   const [activeTab, setActiveTab] = useState<'ORDERS' | 'WISHLIST'>('ORDERS');
   const [expandedTracking, setExpandedTracking] = useState<Record<string, boolean>>({});
 
@@ -667,8 +667,7 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct, o
               <div className="flex flex-col divide-y divide-[#E5E5E5] border-y border-[#E5E5E5]">
                 {wishlist.map((product) => (
                   <div key={product.id} className="flex items-center py-3 gap-3 cursor-pointer group hover:bg-[#F9F9F8]" onClick={() => {
-                    onSelectProduct(product);
-                    onNavigate?.('pdp');
+                    navigate(`/product/${product.id}`);
                   }}>
                     <div className="w-16 h-20 bg-[#eeeeed] shrink-0 rounded overflow-hidden">
                       <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />

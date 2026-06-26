@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Rotate3d, ArrowRight } from 'lucide-react';
-import { Screen, Category } from '../../types';
 import { img } from '../../utils/imageMap';
 import { CURRENCY } from '../../constants';
 import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../ui/AtelierInteractive';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
-
-interface HomeScreenProps {
-  onNavigate: (screen: Screen) => void;
-  onSelectCategory: (category: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS') => void;
-}
 
 const SHOWCASE_SHOES = [
   {
@@ -39,7 +34,8 @@ const SHOWCASE_SHOES = [
   }
 ];
 
-export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenProps) {
+export default function HomeScreen() {
+  const navigate = useNavigate();
   const [activeShoeIndex, setActiveShoeIndex] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
   const [spinCount, setSpinCount] = useState(0);
@@ -47,8 +43,7 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
   const activeShoe = SHOWCASE_SHOES[activeShoeIndex];
 
   const handleShopCategory = (cat: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS') => {
-    onSelectCategory(cat);
-    onNavigate('plp');
+    navigate(`/${cat.toLowerCase()}`);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

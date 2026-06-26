@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
-import { CartItem, Screen } from '../../types';
+import { CartItem } from '../../types';
 import { CURRENCY } from '../../constants';
 
 interface CartDrawerProps {

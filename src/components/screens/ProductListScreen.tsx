@@ -1,24 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, SlidersHorizontal, Search, X, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Product, Screen, Category } from '../../types';
+import { Product } from '../../types';
 import { PRODUCTS } from '../../api/products';
 import { CURRENCY } from '../../constants';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
 
-interface ProductListScreenProps {
-  currentCategory: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS';
-  onSelectCategory: (cat: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS') => void;
-  onSelectProduct: (product: Product) => void;
-  onNavigate: (screen: Screen) => void;
-}
+const CATEGORY_MAP: Record<string, 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS'> = {
+  shirts: 'SHIRTS',
+  trousers: 'TROUSERS',
+  shoes: 'SHOES',
+  bags: 'BAGS',
+};
 
-export default function ProductListScreen({
-  currentCategory,
-  onSelectCategory,
-  onSelectProduct,
-  onNavigate
-}: ProductListScreenProps) {
+export default function ProductListScreen() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentCategory = CATEGORY_MAP[location.pathname.slice(1)] || 'SHIRTS';
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const [displayLimit, setDisplayLimit] = useState(8);
@@ -95,8 +94,7 @@ export default function ProductListScreen({
 
   const handleProductClick = (product: Product) => {
     if (didLongPressRef.current) return;
-    onSelectProduct(product);
-    onNavigate('pdp');
+    navigate(`/product/${product.id}`);
   };
 
   const handlePressStart = (product: Product) => {

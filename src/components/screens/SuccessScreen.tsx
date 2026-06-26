@@ -1,24 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Check, MapPin, Truck, Award, Package, Clock } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
 import { CURRENCY } from '../../constants';
+import { useApp } from '../../context/AppContext';
 
-interface SuccessScreenProps {
-  orderId?: string;
-  orderDetails: {
-    fullName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    zip: string;
-    paymentMethod: 'MOMO' | 'DELIVERY';
-    totalAmount: number;
-  } | null;
-  onContinueShopping: () => void;
-}
-
-export default function SuccessScreen({ orderId, orderDetails, onContinueShopping }: SuccessScreenProps) {
+export default function SuccessScreen() {
+  const navigate = useNavigate();
+  const { lastOrder, lastOrderId } = useApp();
+  const orderId = lastOrderId;
+  const orderDetails = lastOrder;
   const displayOrderId = orderId || Math.floor(100000 + Math.random() * 90000).toString();
 
   // Simulate order progression for demo purposes
@@ -146,7 +137,7 @@ export default function SuccessScreen({ orderId, orderDetails, onContinueShoppin
 
       <button
         id="continue-shopping-btn"
-        onClick={onContinueShopping}
+        onClick={() => navigate('/home')}
         className="w-full max-w-md bg-[#111111] text-white py-4 font-semibold text-[13px] uppercase tracking-widest hover:bg-black transition-colors rounded-none cursor-pointer"
       >
         CONTINUE BY BROWSING
