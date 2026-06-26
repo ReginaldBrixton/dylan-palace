@@ -3,32 +3,13 @@ import { ChevronDown, SlidersHorizontal, Search, X, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Screen } from '../types';
 import { PRODUCTS } from '../data';
+import ImageWithSkeleton from './ImageWithSkeleton';
 
 interface ProductListScreenProps {
   currentCategory: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS';
   onSelectCategory: (cat: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS') => void;
   onSelectProduct: (product: Product) => void;
   onNavigate: (screen: Screen) => void;
-}
-
-// Reusable Image component that handles skeleton loading state
-function ImageWithSkeleton({ src, alt, loading = 'lazy' }: { src: string; alt: string; loading?: 'lazy' | 'eager' }) {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <>
-      {!loaded && (
-        <div className="absolute inset-0 bg-[#E5E5E5] animate-pulse z-0" />
-      )}
-      <img
-        alt={alt}
-        loading={loading}
-        className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${loaded ? 'opacity-100 z-10 relative' : 'opacity-0 absolute'}`}
-        src={src}
-        onLoad={() => setLoaded(true)}
-        referrerPolicy="no-referrer"
-      />
-    </>
-  );
 }
 
 export default function ProductListScreen({
@@ -41,7 +22,7 @@ export default function ProductListScreen({
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const [displayLimit, setDisplayLimit] = useState(8);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  
+
   const [filterMode, setFilterMode] = useState<string>('ALL'); // Selected Subtype
   const [priceSort, setPriceSort] = useState<'none' | 'asc' | 'desc'>('none');
   const [selectedBrand, setSelectedBrand] = useState('ALL');
@@ -62,7 +43,7 @@ export default function ProductListScreen({
     setIsFilterExpanded(false);
     setDisplayLimit(8);
     setQuickViewProduct(null);
-    
+
     setIsLoadingCategory(true);
     const renderTimer = setTimeout(() => {
       setIsLoadingCategory(false);
@@ -76,7 +57,7 @@ export default function ProductListScreen({
   const availableSubCategories = Array.from(
     new Set(baseProducts.map(p => p.subCategory).filter(Boolean))
   ) as string[];
-  
+
   const availableBrands = Array.from(
     new Set(baseProducts.map(p => p.brand).filter(Boolean))
   ) as string[];
@@ -132,15 +113,15 @@ export default function ProductListScreen({
 
   return (
     <div id="product-list-screen" className="w-full flex flex-col pb-32 animate-fade-in relative z-0">
-      
+
       {/* Sub-header / Filter Strip */}
       <div className="sticky top-[52px] w-full z-40 bg-white/85 backdrop-blur-2xl backdrop-saturate-[180%] border-b border-[#E5E5E5]/50 flex flex-col supports-[backdrop-filter]:bg-white/70 shadow-sm transition-all duration-300">
         {/* Search & Toggle Bar */}
         <div className="flex items-center gap-2 px-3 py-2">
           <div className="relative flex-1 flex items-center">
             <Search size={14} className="absolute left-3 text-[#8B8B8A]" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder={`SEARCH ${currentCategory}...`}
               className="w-full text-[11px] font-sans font-bold uppercase tracking-widest pl-9 py-2 border border-[#E5E5E5]/60 focus:border-[#111111] transition-all outline-none bg-white/80 backdrop-blur-sm rounded-full shadow-sm"
               value={searchQuery}
@@ -152,8 +133,8 @@ export default function ProductListScreen({
               </button>
             )}
           </div>
-          
-          <button 
+
+          <button
             onClick={() => setIsFilterExpanded(!isFilterExpanded)}
             className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 border transition-all duration-300 outline-none shadow-sm rounded-full ${isFilterExpanded ? 'border-[#111111] bg-[#111111] text-white' : 'border-[#E5E5E5]/60 hover:border-[#111111] text-[#111111] bg-white/80 backdrop-blur-sm'}`}
           >
@@ -165,7 +146,7 @@ export default function ProductListScreen({
         {/* Expanded Filters Panel */}
         <AnimatePresence>
           {isFilterExpanded && (
-            <motion.div 
+            <motion.div
               initial={{ height: 0, opacity: 0, translateY: -10 }}
               animate={{ height: 'auto', opacity: 1, translateY: 0 }}
               exit={{ height: 0, opacity: 0, translateY: -10 }}
@@ -173,13 +154,13 @@ export default function ProductListScreen({
               className="overflow-hidden border-t border-[#E5E5E5]/50 bg-white/40 backdrop-blur-md"
             >
               <div className="p-4 grid grid-cols-2 gap-4">
-                
+
                 {/* Type Filter */}
                 {availableSubCategories.length > 0 && (
                   <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-bold text-[#8B8B8A] uppercase tracking-wider">TYPE</span>
-                    <select 
-                      value={filterMode} 
+                    <select
+                      value={filterMode}
                       onChange={e => setFilterMode(e.target.value)}
                       className="w-full appearance-none text-[11px] uppercase tracking-widest bg-white border border-[#E5E5E5] p-2 rounded-none outline-none focus:border-[#111111] cursor-pointer"
                     >
@@ -193,8 +174,8 @@ export default function ProductListScreen({
                 {availableBrands.length > 0 && (
                   <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-bold text-[#8B8B8A] uppercase tracking-wider">BRAND</span>
-                    <select 
-                      value={selectedBrand} 
+                    <select
+                      value={selectedBrand}
                       onChange={e => setSelectedBrand(e.target.value)}
                       className="w-full appearance-none text-[11px] uppercase tracking-widest bg-white border border-[#E5E5E5] p-2 rounded-none outline-none focus:border-[#111111] cursor-pointer"
                     >
@@ -207,8 +188,8 @@ export default function ProductListScreen({
                 {/* Gender Filter */}
                 <div className="flex flex-col gap-2">
                   <span className="text-[10px] font-bold text-[#8B8B8A] uppercase tracking-wider">GENDER</span>
-                  <select 
-                    value={selectedGender} 
+                  <select
+                    value={selectedGender}
                     onChange={e => setSelectedGender(e.target.value)}
                     className="w-full appearance-none text-[11px] uppercase tracking-widest bg-white border border-[#E5E5E5] p-2 rounded-none outline-none focus:border-[#111111] cursor-pointer"
                   >
@@ -222,8 +203,8 @@ export default function ProductListScreen({
                 {/* Price Sort Filter */}
                 <div className="flex flex-col gap-2">
                   <span className="text-[10px] font-bold text-[#8B8B8A] uppercase tracking-wider">PRICE SORT</span>
-                  <select 
-                    value={priceSort} 
+                  <select
+                    value={priceSort}
                     onChange={e => setPriceSort(e.target.value as any)}
                     className="w-full appearance-none text-[11px] uppercase tracking-widest bg-white border border-[#E5E5E5] p-2 rounded-none outline-none focus:border-[#111111] cursor-pointer"
                   >
@@ -235,7 +216,7 @@ export default function ProductListScreen({
 
               </div>
               <div className="p-4 pt-0">
-                <button 
+                <button
                   onClick={() => setIsFilterExpanded(false)}
                   className="w-full py-2 bg-[#111111] text-white text-[11px] uppercase tracking-widest font-bold"
                 >
@@ -252,8 +233,8 @@ export default function ProductListScreen({
           <AnimatePresence>
             {isLoadingCategory ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <motion.div 
-                  key={`skeleton-${i}`} 
+                <motion.div
+                  key={`skeleton-${i}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -270,7 +251,7 @@ export default function ProductListScreen({
               ))
             ) : filtered.length > 0 ? (
               filtered.slice(0, displayLimit).map((product, index) => (
-                <motion.article 
+                <motion.article
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
@@ -286,7 +267,7 @@ export default function ProductListScreen({
                 >
                   {/* Square Aspect Ratio Image container */}
                   <div className="aspect-square w-full bg-[#eeeeed] overflow-hidden relative">
-                    <ImageWithSkeleton src={product.images[0]} alt={product.name} />
+                    <ImageWithSkeleton src={product.images[0]} alt={product.name} className="w-full h-full" imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
 
                     {/* Quick View Overlay Trigger */}
                     <button
@@ -311,7 +292,7 @@ export default function ProductListScreen({
                 </motion.article>
               ))
             ) : (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -358,7 +339,7 @@ export default function ProductListScreen({
               className="bg-white w-full max-w-md overflow-hidden flex flex-col relative pointer-events-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <button 
+              <button
                 onClick={() => setQuickViewProduct(null)}
                 className="absolute top-4 right-4 z-10 w-8 h-8 bg-white/90 backdrop-blur text-[#111111] rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors"
               >
@@ -366,9 +347,9 @@ export default function ProductListScreen({
               </button>
 
               <div className="aspect-[4/3] w-full bg-[#eeeeed] relative overflow-hidden">
-                <img 
-                  src={quickViewProduct.images[0]} 
-                  alt={quickViewProduct.name} 
+                <img
+                  src={quickViewProduct.images[0]}
+                  alt={quickViewProduct.name}
                   className="w-full h-full object-cover"
                 />
               </div>

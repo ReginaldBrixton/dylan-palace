@@ -7,7 +7,12 @@
       "image": "shirt-p_ss1.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "A relaxed camp collar shirt crafted from breathable cotton-blend. Features a sharp flat collar, horizontal hem line, and high-contrast horn-textured buttons.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss2",
@@ -16,7 +21,12 @@
       "image": "shirt-p_ss2.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "Heavily weighted 280GSM organic cotton jersey with dry hand-feel. Features a relaxed drop shoulder, thick double-needle collar, and vintage charcoal wash tone.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss3",
@@ -25,7 +35,11 @@
       "image": "shirt-p_ss3.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "Impeccable silk-blend tee with clean bonded edge cuffs and hem. Seamless neckline finish creates a highly fluid editorial transition under suit jackets.",
-      "sizes": ["S", "M", "L"]
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ]
     },
     {
       "id": "p_ss_blue_polo",
@@ -34,7 +48,12 @@
       "image": "shirt-p_ss_blue_polo.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "A luxurious short sleeve knit polo shirt adorned with grey and blue horizontal stripes. Features a sharp dark navy contrast collar and premium lightweight yarn construction.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_beige_polo",
@@ -43,7 +62,12 @@
       "image": "shirt-p_ss_beige_polo.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "An elegant fine-knit polo shirt styled with subtle beige and tan stripes. Complemented by a solid taupe ribbed collar, presenting a highly sophisticated casual asset.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_olive_polo",
@@ -52,7 +76,12 @@
       "image": "shirt-p_ss_olive_polo.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "Short sleeve fine-knit polo styled with elegant olive green and charcoal grey horizontal stripes. Complete with an olive ribbed collar and structured fit.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_grey_white_collar_polo",
@@ -61,7 +90,12 @@
       "image": "shirt-p_ss_grey_white_collar_polo.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "A striking premium knit polo shirt designed with a textured heather-grey body contrasted beautifully by a pristine white collar and modern flat placket.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_crochet_floral",
@@ -70,7 +104,11 @@
       "image": "shirt-p_ss_crochet_floral.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "An editorial masterpiece constructed from handmade colorful crochet sunflower patches. Bold, breathable open-work design finished with a classic camp collar and real wood buttons.",
-      "sizes": ["S", "M", "L"]
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ]
     },
     {
       "id": "p_ss_crochet_diamond",
@@ -79,7 +117,12 @@
       "image": "shirt-p_ss_crochet_diamond.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "Artisanal short sleeve resort knit shirt featuring a rich black crochet body highlighted by a high-contrast white diamond-lattice open lace overlay.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_grey_striped_hanging",
@@ -88,7 +131,12 @@
       "image": "shirt-p_ss_grey_striped_hanging.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "A premium heavy-weighted grey knit polo shirt featuring wide horizontal black stripes and delicate white accent lines. Infuses retro sport aesthetics into modern luxury.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_black_ribbed_panel",
@@ -97,7 +145,12 @@
       "image": "shirt-p_ss_black_ribbed_panel.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "A sleek black luxury knit polo shirt defined by elegant vertical ribbed columns across the chest, creating high-fashion geometric texture depth.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_green_patterned",
@@ -106,7 +159,12 @@
       "image": "shirt-p_ss_green_patterned.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "Rich forest green short sleeve knit polo boasting sophisticated cream horizontal geometric diamond patterns. Perfect blend of heritage golf feel and high street luxury.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_burgundy_ribbed",
@@ -115,7 +173,12 @@
       "image": "shirt-p_ss_burgundy_ribbed.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "Luxury short sleeve polo shirt cut from super soft combed burgundy yarn. Standard ribbed texture throughout delivers highly tactile luxury comfort.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_ss_ghana_home",
@@ -124,7 +187,13 @@
       "image": "shirt-p_ss_ghana_home.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "The official white home jersey for the Ghana national football team. Displays abstract high-contrast line graphical layout in pan-African red, yellow, and green, complete with the iconic bold black star at center.",
-      "sizes": ["S", "M", "L", "XL", "XXL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ]
     },
     {
       "id": "p_ss_ghana_away",
@@ -133,25 +202,47 @@
       "image": "shirt-p_ss_ghana_away.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "The spectacular away jersey of the Ghana national team in rich yellow-gold. Styled with traditional woven fabric pattern textures and contrast green collar detailing, centering the Black Star.",
-      "sizes": ["S", "M", "L", "XL", "XXL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ]
     },
     {
       "id": "p1",
       "name": "Structured Linen Shirt",
       "price": 145,
-      "image": ["shirt-p1_1.jpg", "shirt-p1_2.jpg", "shirt-p1_3.jpg"],
+      "image": [
+        "shirt-p1_1.jpg",
+        "shirt-p1_3.jpg"
+      ],
       "subCategory": "LONG SLEEVES",
       "description": "An uncompromising approach to summer shirting. Crafted from heavyweight, structured linen that maintains its architectural silhouette throughout the day. Features a hidden placket and zero visible stitching for extreme precision.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p2",
       "name": "Oxford Poplin Shirt",
       "price": 180,
-      "image": ["shirt-p2_1.jpg", "shirt-p2_2.jpg"],
+      "image": [
+        "shirt-p2_1.jpg",
+        "shirt-p2_2.jpg"
+      ],
       "subCategory": "LONG SLEEVES",
       "description": "Impeccably tailored white button-down shirt. Features crisp single-needle stitching, structured premium double-ply cotton poplin for a crisp fall, and clean geometric lines.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p3",
@@ -160,7 +251,11 @@
       "image": "shirt-p3.jpg",
       "subCategory": "LONG SLEEVES",
       "description": "Heavyweight raw denim overshirt styled with a stark, modern aesthetic. Silver polished button snaps and geometric double breast chest pockets provide high-contrast functionality.",
-      "sizes": ["M", "L", "XL"]
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p4",
@@ -169,7 +264,11 @@
       "image": "shirt-p4.jpg",
       "subCategory": "LONG SLEEVES",
       "description": "Pure flowing off-white silk chiffon shirt. Extremely smooth drape with translucent features, giving a dramatic airy look that transitions beautifully between environments.",
-      "sizes": ["S", "M", "L"]
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ]
     },
     {
       "id": "p5",
@@ -178,7 +277,12 @@
       "image": "shirt-p5.jpg",
       "subCategory": "LONG SLEEVES",
       "description": "A striking design hybrid between a structured jacket and a minimal shirt. Heavy architectural tailoring makes this charcoal beauty stand on its own feet.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p6",
@@ -187,7 +291,12 @@
       "image": "shirt-p6.jpg",
       "subCategory": "LONG SLEEVES",
       "description": "Fine blue and white striped cotton poplin pattern with classic single-button cuffs. Crafted with high stitch density for maximum luxury and long-lasting editorial shape.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_si1",
@@ -196,7 +305,12 @@
       "image": "shirt-p_si1.jpg",
       "subCategory": "SINGLETS",
       "description": "Classic ribbed athletic singlet cut from heavy organic cotton-modal yarn. Deep scooped neckline, wide shoulder straps, and tailored side darts for a raw brutal shape.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_si2",
@@ -205,7 +319,11 @@
       "image": "shirt-p_si2.jpg",
       "subCategory": "SINGLETS",
       "description": "Architectural asymmetric knit singlet. Curved side slits and unfinished flat hems create a perfect layering tool with high visual rhythm.",
-      "sizes": ["S", "M", "L"]
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ]
     },
     {
       "id": "p_add_resort_abstract",
@@ -214,7 +332,12 @@
       "image": "shirt-p_add_resort_abstract.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "A stunning resort-style shirt featuring an abstract earthy botanical pattern printed on ultra-fluid, sustainable tencel fiber. Styled with a classic cuban camp collar and clean casual fit.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_add_linen_buttonup",
@@ -223,7 +346,12 @@
       "image": "shirt-p_add_linen_buttonup.jpg",
       "subCategory": "LONG SLEEVES",
       "description": "Naturally breathable long-sleeve shirt crafted from premium Portuguese linen yarn. Featuring structural chest pockets, a sharp collar stand, and mother-of-pearl buttons.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_add_utility_overshirt",
@@ -232,16 +360,26 @@
       "image": "shirt-p_add_utility_overshirt.jpg",
       "subCategory": "LONG SLEEVES",
       "description": "The ultimate layering piece. Crafted from heavyweight wash-treated utility canvas, featuring an elegant flat placket, large architectural flap pockets, and a clean square hem.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_add_pinstripe_dress",
       "name": "Signature Pinstripe Dress Shirt",
       "price": 195,
-      "image": "shirt-p_add_pinstripe_dress.jpg",
+      "image": "shirt-img_3808.jpg",
       "subCategory": "LONG SLEEVES",
       "description": "An exquisite stripe shirt detailed with fine charcoal stripes. Expertly tailored in Italy with standard spread collar, curved hemline, and custom button cuffs.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     },
     {
       "id": "p_add_piquet_polo",
@@ -250,7 +388,12 @@
       "image": "shirt-p_add_piquet_polo.jpg",
       "subCategory": "SHORT SLEEVES",
       "description": "Crafted from soft comb-cotton pique weave. High tactile elegance, solid rib cuffs, and a dynamic two-button placket for complete stylistic versatility.",
-      "sizes": ["S", "M", "L", "XL"]
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ]
     }
   ]
 }

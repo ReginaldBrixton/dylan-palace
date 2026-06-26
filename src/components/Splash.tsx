@@ -26,7 +26,7 @@ export default function Splash({ onComplete }: SplashProps) {
   }, [onComplete]);
 
   return (
-    <motion.div 
+    <motion.div
       id="splash-screen"
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
@@ -37,19 +37,43 @@ export default function Splash({ onComplete }: SplashProps) {
       <div className="h-1/4 w-full"></div>
 
       {/* Centralized Wordmark Logo */}
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="flex-grow flex items-center justify-center"
       >
-        <div className="w-48 md:w-64 aspect-square flex items-center justify-center bg-transparent relative">
-          <img 
-            alt="Dylan's Palace Brand Logo" 
-            className="w-full h-full object-contain filter invert-0 drop-shadow-sm" 
-            src="https://lh3.googleusercontent.com/aida/AP1WRLtvJ5-gn7DMrCDl8rXPR9TVJiWX67XvhR1ku74xfsMcSmowk821NgXhWegGFgrZ-fzDndxUcBDCcb8jOVfcnQIGbYEOqLGTeIgy3pMvDtCL8bUcw7kj-wRDhZXpEAaDkNEmqXGsrkSmYJRrMVobADGXLoxLzfpJYC58yhBiMEXGFy2t5oN3fz3PbehBs5y6-Fjq4grNg1QbaHbgtBpTxslDKkmr5-ox0KejRij1epPdStDFqXn_W1BfHBY"
-            referrerPolicy="no-referrer"
+        <div className="flex flex-col items-center justify-center bg-transparent relative">
+          <motion.div
+            initial={{ letterSpacing: '0.5em', opacity: 0 }}
+            animate={{ letterSpacing: '0.05em', opacity: 1 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif text-[28px] md:text-[36px] font-bold text-[#111111] uppercase tracking-tight text-center leading-none"
+          >
+            Dylan's
+          </motion.div>
+          <motion.div
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="w-32 h-px bg-[#111111] my-3 origin-center"
           />
+          <motion.div
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif text-[20px] md:text-[28px] font-bold text-[#111111] uppercase tracking-[0.15em] text-center leading-none"
+          >
+            Palace
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#8B8B8A] mt-4 font-semibold"
+          >
+            Premium Bespoke Apparel
+          </motion.div>
         </div>
       </motion.div>
 
@@ -61,7 +85,7 @@ export default function Splash({ onComplete }: SplashProps) {
             <span className="font-mono">{Math.round(progress)}%</span>
           </p>
           <div className="h-[2px] w-full bg-[#E5E5E5] rounded-full overflow-hidden">
-            <motion.div 
+            <motion.div
               className="h-full bg-[#111111]"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}

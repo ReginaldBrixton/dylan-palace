@@ -4,29 +4,11 @@ import { Rotate3d, ArrowRight } from 'lucide-react';
 import { Screen } from '../types';
 import { img } from '../imageMap';
 import { TrousersInteractive, BagsInteractive, ShoesInteractive } from './AtelierInteractive';
+import ImageWithSkeleton from './ImageWithSkeleton';
 
 interface HomeScreenProps {
   onNavigate: (screen: Screen) => void;
   onSelectCategory: (category: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS') => void;
-}
-
-function ImageWithSkeleton({ src, alt, className, loading = 'lazy' }: { src: string; alt: string; className?: string; loading?: 'lazy' | 'eager' }) {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <>
-      {!loaded && (
-        <div className="absolute inset-0 bg-[#E5E5E5] animate-pulse z-0 pointer-events-none animate-duration-1000" />
-      )}
-      <img
-        alt={alt}
-        className={`${className} ${loaded ? 'opacity-100' : 'opacity-0'}`}
-        src={src}
-        onLoad={() => setLoaded(true)}
-        loading={loading}
-        referrerPolicy="no-referrer"
-      />
-    </>
-  );
 }
 
 const SHOWCASE_SHOES = [
@@ -34,7 +16,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen1',
     name: 'Minimal Street Sneaker',
     price: 320,
-    image: img('shoes/minimalist_street_sneaker_1781867805261.jpg'),
+    image: img('shoes/shoe-p_sh_gen1.jpg'),
     description: 'Minimal high-fashion street sneaker with concrete floor studio lighting.',
     subText: 'Futuristic design'
   },
@@ -42,7 +24,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen2',
     name: 'Industrial Leather Boot',
     price: 480,
-    image: img('shoes/brutalist_black_boot_1781867824040.jpg'),
+    image: img('shoes/shoe-p_sh_gen2.jpg'),
     description: 'Bold, brutalist heavy-duty platform boot with high-contrast shadows.',
     subText: 'Brutalist high-fashion'
   },
@@ -50,7 +32,7 @@ const SHOWCASE_SHOES = [
     id: 'p_sh_gen3',
     name: 'Classic Dark Loafer',
     price: 280,
-    image: img('shoes/elegant_leather_loafer_1781867845008.jpg'),
+    image: img('shoes/shoe-p_sh_gen3.jpg'),
     description: 'Polished modern luxury slipper loafer styled on warm organic linen fabric.',
     subText: 'Minimal modern luxury'
   }
@@ -85,20 +67,21 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
 
   return (
     <div id="home-screen" className="w-full flex flex-col pb-32 animate-fade-in">
-      
+
       {/* Editorial Hero Banner */}
       <section className="relative w-full h-[70vh] min-h-[500px] border-b border-[#E5E5E5] overflow-hidden">
         <ImageWithSkeleton
-          className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none transition-opacity duration-500"
-          alt="A striking, high-contrast fashion editorial shot of a person wearing a crisp, minimalist white linen shirt." 
-          src={img('shirts/hero_summer_shift.jpg')}
+          className="absolute inset-0 w-full h-full"
+          imgClassName="w-full h-full object-cover select-none pointer-events-none"
+          alt="A striking, high-contrast fashion editorial shot of a person wearing a crisp, minimalist white linen shirt."
+          src={img('shirts/shirt-p1_1.jpg')}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/70 via-[#111111]/20 to-transparent"></div>
         <div className="absolute bottom-0 left-0 p-6 w-full flex flex-col items-start z-10">
           <h2 className="font-serif text-[32px] md:text-[40px] text-[#FFFFFF] mb-4 uppercase tracking-tighter leading-tight">
             THE SUMMER SHIFT
           </h2>
-          <button 
+          <button
             id="hero-cta"
             onClick={() => handleShopCategory('SHIRTS')}
             className="bg-[#111111] text-[#FFFFFF] text-[13px] font-semibold uppercase tracking-[0.1em] px-8 py-3.5 w-full sm:w-auto hover:bg-[#FFFFFF] hover:text-[#111111] border border-[#111111] transition-all duration-300 active:scale-95 cursor-pointer rounded-lg"
@@ -124,7 +107,7 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
           </div>
 
           {/* Interactive 3D Perspective Card Container */}
-          <div 
+          <div
             className="relative w-full h-[360px] cursor-grab active:cursor-grabbing select-none"
             style={{ perspective: 1000 }}
             onMouseMove={handleMouseMove}
@@ -133,16 +116,16 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
           >
             <motion.div
               className="absolute inset-0 bg-white border border-[#E5E5E5] rounded-2xl shadow-xl overflow-hidden flex flex-col p-6 transition-colors duration-500 ease-out"
-              animate={{ 
-                rotateY: spinCount * 360 + (tilt.active ? tilt.x * 28 : 0), 
-                rotateX: tilt.active ? tilt.y * -28 : 0, 
-                scale: tilt.active ? 1.02 : 1 
+              animate={{
+                rotateY: spinCount * 360 + (tilt.active ? tilt.x * 28 : 0),
+                rotateX: tilt.active ? tilt.y * -28 : 0,
+                scale: tilt.active ? 1.02 : 1
               }}
               transition={{ type: "spring", stiffness: 100, damping: 18 }}
             >
               {/* Dynamic light refraction flare overlay effect */}
               {tilt.active && (
-                <div 
+                <div
                   className="absolute inset-0 pointer-events-none mix-blend-soft-light transition-opacity duration-300 z-10"
                   style={{
                     background: `radial-gradient(circle 140px at ${50 + tilt.x * 100}% ${50 + tilt.y * 100}%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 80%)`
@@ -180,7 +163,8 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
                     className="w-full h-full flex items-center justify-center relative"
                   >
                     <ImageWithSkeleton
-                      className="w-full h-full max-h-[160px] object-contain rounded-lg drop-shadow-2xl transition-transform duration-500 hover:scale-105 pointer-events-none"
+                      className="w-full h-full"
+                      imgClassName="w-full h-full max-h-[160px] object-contain rounded-lg drop-shadow-2xl transition-transform duration-500 hover:scale-105 pointer-events-none"
                       alt={activeShoe.name}
                       src={activeShoe.image}
                       loading="eager"
@@ -202,7 +186,7 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
                 <p className="text-[11px] text-[#666666] leading-relaxed line-clamp-2 h-8">
                   {activeShoe.description}
                 </p>
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleShopCategory('SHOES');
@@ -224,11 +208,10 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
                   setActiveShoeIndex(idx);
                   trigger3dSpin();
                 }}
-                className={`py-1.5 px-3 rounded-full border text-[9px] font-extrabold uppercase tracking-widest transition-all duration-300 active:scale-90 cursor-pointer ${
-                  activeShoeIndex === idx 
-                    ? 'bg-[#111111] text-white border-[#111111] scale-105 shadow-sm' 
-                    : 'bg-white text-[#555555] border-[#E5E5E5] opacity-75'
-                }`}
+                className={`py-1.5 px-3 rounded-full border text-[9px] font-extrabold uppercase tracking-widest transition-all duration-300 active:scale-90 cursor-pointer ${activeShoeIndex === idx
+                  ? 'bg-[#111111] text-white border-[#111111] scale-105 shadow-sm'
+                  : 'bg-white text-[#555555] border-[#E5E5E5] opacity-75'
+                  }`}
               >
                 {shoe.name.split(' ')[0]}
               </button>
@@ -239,20 +222,21 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
 
       {/* Interactive Atelier Category Grid */}
       <section className="w-full flex flex-col gap-0">
-        
+
         {/* TROUSERS SECTION */}
         <div className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             {/* Left Column: Image cover (Clickable, redirects to plp) */}
-            <div 
+            <div
               id="cat-preview-trousers"
               onClick={() => handleShopCategory('TROUSERS')}
               className="relative w-full h-[360px] rounded-2xl overflow-hidden shadow-lg group cursor-pointer"
             >
               <ImageWithSkeleton
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
-                alt="Wide-leg pleated trousers." 
-                src={img('trousers/wide_leg_pleated_trousers.jpg')}
+                className="absolute inset-0 w-full h-full"
+                imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
+                alt="Wide-leg pleated trousers."
+                src={img('trousers/trouser-p_tr_l1.jpg')}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
@@ -284,15 +268,16 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
             </div>
 
             {/* Right Column: Campaign card */}
-            <div 
+            <div
               id="cat-preview-bags"
               onClick={() => handleShopCategory('BAGS')}
               className="relative w-full h-[360px] rounded-2xl overflow-hidden shadow-lg group cursor-pointer order-1 md:order-2"
             >
               <ImageWithSkeleton
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
-                alt="Minimalist structured black leather bag on pedestal." 
-                src={img('bags/sleek_leather_clasp_bag.jpg')}
+                className="absolute inset-0 w-full h-full"
+                imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
+                alt="Minimalist structured black leather bag on pedestal."
+                src={img('bags/bag-p8.jpg')}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
@@ -314,15 +299,16 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
         <div className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             {/* Left Column: Campaign card */}
-            <div 
+            <div
               id="cat-preview-shoes"
               onClick={() => handleShopCategory('SHOES')}
               className="relative w-full h-[360px] rounded-2xl overflow-hidden shadow-lg group cursor-pointer"
             >
               <ImageWithSkeleton
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
-                alt="Avant-garde black leather shoes." 
-                src={img('shoes/avant_garde_oxford.jpg')}
+                className="absolute inset-0 w-full h-full"
+                imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
+                alt="Avant-garde black leather shoes."
+                src={img('shoes/shoe-p9.jpg')}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">

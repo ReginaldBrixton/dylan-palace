@@ -18,7 +18,7 @@ export default function App() {
   const [category, setCategory] = useState<'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS'>('SHIRTS');
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[0]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  
+
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem("dp_cart");
@@ -43,7 +43,7 @@ export default function App() {
       if (saved && JSON.parse(saved).length > 0) {
         return JSON.parse(saved);
       }
-      
+
       // Default high-fashion seed order
       const seedOrder1: Order = {
         id: "DP-83021",
@@ -98,7 +98,7 @@ export default function App() {
       return [];
     }
   });
-  
+
   const [lastOrder, setLastOrder] = useState<Order['details'] & { totalAmount: number, paymentMethod: string } | null>(null);
 
   // Sync cart data to local storage for realistic persistence
@@ -117,9 +117,9 @@ export default function App() {
   };
 
   const handleToggleWishlist = (productId: string) => {
-    setWishlist(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId) 
+    setWishlist(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
         : [...prev, productId]
     );
   };
@@ -149,7 +149,7 @@ export default function App() {
   };
 
   const handleUpdateQty = (itemId: string, change: number) => {
-    setCartItems((prevItems) => 
+    setCartItems((prevItems) =>
       prevItems.map((item) => {
         if (item.id === itemId) {
           const newQty = Math.max(1, item.quantity + change);
@@ -177,7 +177,7 @@ export default function App() {
     if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // Haptic feedback on checkout complete
 
     setLastOrder(details);
-    
+
     // Save to past orders
     const newOrder: Order = {
       id: Math.floor(100000 + Math.random() * 90000).toString(),
@@ -192,7 +192,7 @@ export default function App() {
         city: details.city
       }
     };
-    
+
     setPastOrders(prev => [newOrder, ...prev]);
     setCartItems([]); // Clear bag after securing purchase
     setScreen('success');
@@ -211,10 +211,10 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-[#F9F9F8] text-[#111111] antialiased">
-      
+
       {/* Standardized App Top Header Bar */}
-      <Header 
-        currentScreen={screen} 
+      <Header
+        currentScreen={screen}
         onNavigate={(target) => {
           setScreen(target);
           window.scrollTo({ top: 0, behavior: 'instant' });
@@ -228,24 +228,24 @@ export default function App() {
         <AnimatePresence mode="wait">
           <motion.div
             key={screen}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="w-full h-full"
           >
             {screen === 'home' && (
-              <HomeScreen 
+              <HomeScreen
                 onNavigate={(tgt) => {
                   setScreen(tgt);
                   window.scrollTo({ top: 0, behavior: 'instant' });
-                }} 
-                onSelectCategory={setCategory} 
+                }}
+                onSelectCategory={setCategory}
               />
             )}
 
             {screen === 'plp' && (
-              <ProductListScreen 
+              <ProductListScreen
                 currentCategory={category}
                 onSelectCategory={setCategory}
                 onSelectProduct={handleSelectProduct}
@@ -257,7 +257,7 @@ export default function App() {
             )}
 
             {screen === 'pdp' && (
-              <ProductDetailScreen 
+              <ProductDetailScreen
                 product={selectedProduct}
                 wishlist={wishlist}
                 onToggleWishlist={handleToggleWishlist}
@@ -267,7 +267,7 @@ export default function App() {
             )}
 
             {screen === 'checkout' && (
-              <CheckoutScreen 
+              <CheckoutScreen
                 cartItems={cartItems}
                 onOrderComplete={handleOrderComplete}
                 onNavigate={(tgt) => {
@@ -278,7 +278,7 @@ export default function App() {
             )}
 
             {screen === 'success' && (
-              <SuccessScreen 
+              <SuccessScreen
                 orderDetails={lastOrder as any}
                 onContinueShopping={() => {
                   setScreen('home');
@@ -286,10 +286,10 @@ export default function App() {
                 }}
               />
             )}
-            
+
             {screen === 'profile' && (
-              <ProfileScreen 
-                pastOrders={pastOrders} 
+              <ProfileScreen
+                pastOrders={pastOrders}
                 wishlist={wishlist.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean) as Product[]}
                 onSelectProduct={handleSelectProduct}
               />
@@ -299,7 +299,7 @@ export default function App() {
       </main>
 
       {/* Persistent slide-up modal bottom sheet summary drawer */}
-      <CartDrawer 
+      <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
@@ -314,7 +314,7 @@ export default function App() {
 
       {/* Standardized Bottom category fast access nav shelf */}
       {screen !== 'success' && screen !== 'checkout' && (
-        <BottomNav 
+        <BottomNav
           currentScreen={screen}
           currentCategory={category}
           onSelectCategory={setCategory}

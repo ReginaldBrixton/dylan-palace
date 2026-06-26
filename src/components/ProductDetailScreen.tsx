@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Truck, Plus, Minus, Info, Heart, Share2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
 import { PRODUCTS } from '../data';
+import ImageWithSkeleton from './ImageWithSkeleton';
 
 interface ProductDetailScreenProps {
   product: Product;
@@ -15,7 +17,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
   const [isAdded, setIsAdded] = useState(false);
-  
+
   // Accordion state
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
@@ -66,18 +68,30 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
 
   return (
     <div id="product-detail-screen" className="w-full flex flex-col pb-40 animate-fade-in bg-[#F9F9F8]">
-      
+
       {/* Immersive Image Carousel (100vw x 120vw container height) */}
       <section className="relative w-full aspect-[4/5] bg-[#eeeeed] overflow-hidden select-none">
-        
+
         {/* Active Image */}
         <div className="w-full h-full relative">
-          <img 
-            className="w-full h-full object-cover transition-all duration-500" 
-            alt={`${product.name} - View ${activeImageIndex + 1}`}
-            src={product.images[activeImageIndex]}
-            referrerPolicy="no-referrer"
-          />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeImageIndex}
+              initial={{ opacity: 0, scale: 1.02 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full h-full"
+            >
+              <ImageWithSkeleton
+                className="w-full h-full"
+                imgClassName="w-full h-full object-cover"
+                alt={`${product.name} - View ${activeImageIndex + 1}`}
+                src={product.images[activeImageIndex]}
+                loading="eager"
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
@@ -88,7 +102,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
           >
             <Heart size={20} className={isWishlisted ? "fill-[#111111] text-[#111111]" : "text-[#111111]"} />
           </button>
-          
+
           <button
             onClick={handleShare}
             className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#111111] hover:bg-white shadow-sm transition-colors"
@@ -101,13 +115,13 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
         {/* Horizontal Navigation indicators */}
         {product.images.length > 1 && (
           <>
-            <button 
+            <button
               onClick={() => setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : product.images.length - 1))}
               className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-black border border-gray-200 hover:bg-white cursor-pointer"
             >
               ←
             </button>
-            <button 
+            <button
               onClick={() => setActiveImageIndex((prev) => (prev < product.images.length - 1 ? prev + 1 : 0))}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-black border border-gray-200 hover:bg-white cursor-pointer"
             >
@@ -120,13 +134,12 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
         {product.images.length > 1 && (
           <div className="absolute bottom-4 left-0 w-full flex justify-center gap-2 z-10">
             {product.images.map((_, idx) => (
-              <button 
+              <button
                 key={idx}
                 aria-label={`Go to image slide ${idx + 1}`}
                 onClick={() => setActiveImageIndex(idx)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                  idx === activeImageIndex ? 'bg-[#111111] scale-125' : 'bg-[#E5E5E5]'
-                }`}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === activeImageIndex ? 'bg-[#111111] scale-125' : 'bg-[#E5E5E5]'
+                  }`}
               ></button>
             ))}
           </div>
@@ -163,7 +176,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
           <h2 className="text-[12px] font-bold text-[#8B8B8A] uppercase tracking-wider">
             Select Size
           </h2>
-          <button 
+          <button
             onClick={() => setShowSizeGuide(true)}
             className="text-[12px] text-[#111111] uppercase tracking-wider underline decoration-1 underline-offset-4 cursor-pointer hover:text-[#4A5D23] transition-colors"
           >
@@ -172,15 +185,14 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
         </div>
         <div className="grid grid-cols-4 gap-3">
           {product.sizes.map((size) => (
-            <button 
+            <button
               key={size}
               onClick={() => setSelectedSize(size)}
               aria-pressed={selectedSize === size}
-              className={`h-12 border transition-all duration-200 font-semibold text-[13px] uppercase tracking-widest flex items-center justify-center cursor-pointer ${
-                selectedSize === size 
-                  ? 'border-2 border-[#111111] bg-white text-[#111111] scale-[1.02]' 
-                  : 'border-[#E5E5E5] bg-white text-[#8B8B8A] hover:border-[#111111]'
-              }`}
+              className={`h-12 border transition-all duration-200 font-semibold text-[13px] uppercase tracking-widest flex items-center justify-center cursor-pointer ${selectedSize === size
+                ? 'border-2 border-[#111111] bg-white text-[#111111] scale-[1.02]'
+                : 'border-[#E5E5E5] bg-white text-[#8B8B8A] hover:border-[#111111]'
+                }`}
             >
               {size}
             </button>
@@ -190,10 +202,10 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
 
       {/* Interactive Accordion segments */}
       <section className="px-6 py-4 bg-white">
-        
+
         {/* Segment 1: Details & Care */}
         <div className="border-b border-[#E5E5E5]">
-          <button 
+          <button
             onClick={() => toggleSection('details')}
             className="w-full py-4 flex justify-between items-center text-left cursor-pointer hover:opacity-85"
           >
@@ -214,7 +226,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
 
         {/* Segment 2: Shipping & Returns */}
         <div className="border-b border-[#E5E5E5]">
-          <button 
+          <button
             onClick={() => toggleSection('shipping')}
             className="w-full py-4 flex justify-between items-center text-left cursor-pointer hover:opacity-85"
           >
@@ -235,7 +247,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
 
         {/* Segment 3: Sustainability */}
         <div className="border-b border-[#E5E5E5]">
-          <button 
+          <button
             onClick={() => toggleSection('sustainability')}
             className="w-full py-4 flex justify-between items-center text-left cursor-pointer hover:opacity-85"
           >
@@ -255,7 +267,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
 
         {/* Segment 4: Reviews */}
         <div>
-          <button 
+          <button
             onClick={() => toggleSection('reviews')}
             className="w-full py-4 flex justify-between items-center text-left cursor-pointer hover:opacity-85"
           >
@@ -307,8 +319,8 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
         </h3>
         <div className="grid grid-cols-3 gap-3">
           {relatedProducts.map(related => (
-            <div 
-              key={related.id} 
+            <div
+              key={related.id}
               className="flex flex-col cursor-pointer bg-white"
               onClick={() => {
                 if (onSelectProduct) {
@@ -318,7 +330,12 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
               }}
             >
               <div className="aspect-[3/4] w-full bg-[#eeeeed] overflow-hidden mb-2 relative">
-                <img src={related.images[0]} alt={related.name} className="w-full h-full object-cover mix-blend-multiply" />
+                <ImageWithSkeleton
+                  src={related.images[0]}
+                  alt={related.name}
+                  className="w-full h-full"
+                  imgClassName="w-full h-full object-cover mix-blend-multiply"
+                />
               </div>
               <h4 className="text-[10px] font-bold text-[#111111] truncate">{related.name}</h4>
               <p className="text-[10px] text-[#555555]">GH₵{related.price.toFixed(2)}</p>
@@ -329,13 +346,12 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
 
       {/* Sticky CTA Footer Button */}
       <div className="fixed bottom-[72px] left-0 w-full bg-white/70 backdrop-blur-2xl border-t border-[#E5E5E5]/50 p-4 z-40 pb-6 supports-[backdrop-filter]:bg-white/60">
-        <button 
+        <button
           onClick={handleAddToBag}
-          className={`w-full h-14 font-semibold text-[13px] uppercase tracking-widest flex items-center justify-center transition-all duration-300 active:scale-[0.98] cursor-pointer rounded-lg shadow-lg ${
-            isAdded 
-              ? 'bg-[#4A5D23] text-white' 
-              : 'bg-[#111111] text-white hover:bg-black'
-          }`}
+          className={`w-full h-14 font-semibold text-[13px] uppercase tracking-widest flex items-center justify-center transition-all duration-300 active:scale-[0.98] cursor-pointer rounded-lg shadow-lg ${isAdded
+            ? 'bg-[#4A5D23] text-white'
+            : 'bg-[#111111] text-white hover:bg-black'
+            }`}
         >
           {isAdded ? "ADDED TO BAG" : `ADD TO BAG - GH₵${product.price}.00`}
         </button>
@@ -375,7 +391,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
                 <span>6.2- 6.4</span>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => setShowSizeGuide(false)}
               className="w-full py-3 bg-[#111111] text-white text-[11px] font-semibold uppercase tracking-widest cursor-pointer"
             >
