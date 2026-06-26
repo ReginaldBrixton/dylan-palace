@@ -1,13 +1,13 @@
 import { GoogleGenAI } from '@google/genai';
 
 const GEMINI_KEYS = [
-  import.meta.env.VITE_GEMINI_API_KEY,
-  import.meta.env.VITE_GEMINI_API_KEY_1,
-  import.meta.env.VITE_GEMINI_API_KEY_2,
-  import.meta.env.VITE_GEMINI_API_KEY_3,
-  import.meta.env.VITE_GEMINI_API_KEY_4,
-  import.meta.env.VITE_GEMINI_API_KEY_5,
-  import.meta.env.VITE_GEMINI_API_KEY_6,
+  import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyBqceT8v86yhVtKyEw4vegn9uLEUA5Zpa4',
+  import.meta.env.VITE_GEMINI_API_KEY_1 || 'AIzaSyAaIImIugbXNyVa0Y-bxak2Qievc9bbwz0',
+  import.meta.env.VITE_GEMINI_API_KEY_2 || 'AIzaSyBVxYnsmw4j-jsRphYECj_TjP3BPD-gvHs',
+  import.meta.env.VITE_GEMINI_API_KEY_3 || 'AIzaSyDhvJ2PosA-Ra_pOoHzFzzJ2SWD5Iugf-A',
+  import.meta.env.VITE_GEMINI_API_KEY_4 || 'AIzaSyB6giA9QL_VTxc6hv1k5-3mRjxArSVM2tE',
+  import.meta.env.VITE_GEMINI_API_KEY_5 || 'AIzaSyDLerpK9XgXZ-AOov-Jo8eLhpZgiCstBro',
+  import.meta.env.VITE_GEMINI_API_KEY_6 || 'AIzaSyB0lcouTZWjK5nORiR6V_pr0m8vzStY3jA',
 ].filter(Boolean) as string[];
 
 const MODEL = 'gemini-2.5-flash-lite';

@@ -3,7 +3,7 @@
  * Uses the UploadThing REST API to get presigned URLs and upload files.
  */
 
-const UPLOADTHING_TOKEN = import.meta.env.VITE_UPLOADTHING_TOKEN || '';
+const UPLOADTHING_TOKEN = import.meta.env.VITE_UPLOADTHING_TOKEN || 'eyJhcGlLZXkiOiJza19saXZlXzNlOTA1MjQwNTUzNjEwZWQzYWY0NDc3NzhhNTllYTQ5ZTAzM2MxYjQ3ODczMmMyOTQxYzhmY2NiZjlhNWIxOTciLCJhcHBJZCI6IjFva3Q1cHpqZ2wiLCJyZWdpb25zIjpbInNlYTEiXX0=';
 
 interface UploadThingFile {
   id: string;
