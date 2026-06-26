@@ -288,7 +288,7 @@ export default function SellerProducts() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={handleOpenAdd}
-              className="flex items-center gap-2 bg-[#111111] text-white px-5 py-3 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-[#333] transition-colors cursor-pointer"
+              className="flex items-center gap-2 bg-[#111111] text-white px-5 py-3.5 rounded-xl text-sm font-semibold uppercase tracking-widest hover:bg-[#333] transition-colors cursor-pointer shadow-lg"
             >
               <Plus size={16} /> Add Product
             </motion.button>
@@ -302,7 +302,7 @@ export default function SellerProducts() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search products..."
-              className="w-full bg-white border border-[#E5E5E5] rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+              className="w-full bg-white border border-[#E5E5E5] rounded-xl pl-10 pr-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] transition-all"
             />
           </div>
 
@@ -405,7 +405,7 @@ export default function SellerProducts() {
 
                 {/* Image Upload */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
                     Product Images
                   </label>
                   <div className="flex gap-3 flex-wrap">
@@ -438,7 +438,7 @@ export default function SellerProducts() {
                     whileTap={{ scale: 0.99 }}
                     onClick={handleAIAnalyze}
                     disabled={aiLoading}
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg text-xs font-semibold uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3.5 rounded-xl text-sm font-semibold uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 shadow-md"
                   >
                     {aiLoading ? (
                       <><Loader2 size={14} className="animate-spin" /> AI Analyzing...</>
@@ -450,34 +450,34 @@ export default function SellerProducts() {
 
                 {/* Name */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">Name</label>
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Name</label>
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="Product name"
-                    className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                    className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
                   />
                 </div>
 
                 {/* Brand & Category */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">Brand</label>
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Brand</label>
                     <input
                       type="text"
                       value={form.brand}
                       onChange={(e) => setForm({ ...form, brand: e.target.value })}
                       placeholder="Brand"
-                      className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">Category</label>
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Category</label>
                     <select
                       value={form.category}
                       onChange={(e) => setForm({ ...form, category: e.target.value as ProductCategory })}
-                      className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all cursor-pointer"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -489,7 +489,7 @@ export default function SellerProducts() {
                 {/* Price & Stock */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
                       Price ({CURRENCY})
                     </label>
                     <input
@@ -498,37 +498,37 @@ export default function SellerProducts() {
                       value={form.price}
                       onChange={(e) => setForm({ ...form, price: e.target.value })}
                       placeholder="0.00"
-                      className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">Stock Qty</label>
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Stock Qty</label>
                     <input
                       type="number"
                       value={form.stock_quantity}
                       onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })}
                       placeholder="0"
-                      className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Description */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">Description</label>
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">Description</label>
                   <textarea
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     placeholder="Product description"
                     rows={3}
-                    className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors resize-none"
+                    className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all resize-none"
                   />
                 </div>
 
                 {/* Sizes & Colors */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
                       Sizes (comma-separated)
                     </label>
                     <input
@@ -536,11 +536,11 @@ export default function SellerProducts() {
                       value={form.sizes.join(', ')}
                       onChange={(e) => setForm({ ...form, sizes: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                       placeholder="S, M, L, XL"
-                      className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
                       Colors (comma-separated)
                     </label>
                     <input
@@ -548,14 +548,14 @@ export default function SellerProducts() {
                       value={form.colors.join(', ')}
                       onChange={(e) => setForm({ ...form, colors: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                       placeholder="Black, White"
-                      className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                      className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Tags */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A]">
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-[#555555]">
                     Tags (comma-separated)
                   </label>
                   <input
@@ -563,7 +563,7 @@ export default function SellerProducts() {
                     value={form.tags.join(', ')}
                     onChange={(e) => setForm({ ...form, tags: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                     placeholder="minimal, luxury, summer"
-                    className="border border-[#E5E5E5] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                    className="bg-[#F9F9F8] border border-[#E5E5E5] rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] focus:bg-white transition-all"
                   />
                 </div>
 
@@ -576,7 +576,7 @@ export default function SellerProducts() {
                       onChange={(e) => setForm({ ...form, in_stock: e.target.checked })}
                       className="w-4 h-4 cursor-pointer"
                     />
-                    <span className="text-sm text-[#111111]">In Stock</span>
+                    <span className="text-base text-[#111111]">In Stock</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -585,7 +585,7 @@ export default function SellerProducts() {
                       onChange={(e) => setForm({ ...form, is_featured: e.target.checked })}
                       className="w-4 h-4 cursor-pointer"
                     />
-                    <span className="text-sm text-[#111111]">Featured</span>
+                    <span className="text-base text-[#111111]">Featured</span>
                   </label>
                 </div>
 
@@ -593,7 +593,7 @@ export default function SellerProducts() {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => setShowModal(false)}
-                    className="flex-1 bg-[#F5F5F4] text-[#111111] py-3 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-[#E5E5E5] transition-colors cursor-pointer"
+                    className="flex-1 bg-[#F5F5F4] text-[#111111] py-3.5 rounded-xl text-sm font-semibold uppercase tracking-widest hover:bg-[#E5E5E5] transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -601,7 +601,7 @@ export default function SellerProducts() {
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex-1 bg-[#111111] text-white py-3 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-[#333] transition-colors cursor-pointer disabled:opacity-50"
+                    className="flex-1 bg-[#111111] text-white py-3.5 rounded-xl text-sm font-semibold uppercase tracking-widest hover:bg-[#333] transition-colors cursor-pointer disabled:opacity-50 shadow-lg"
                   >
                     {saving ? 'Saving...' : 'Save Product'}
                   </motion.button>

@@ -79,7 +79,7 @@ export default function SellerUsers() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search users by name or email..."
-              className="w-full bg-white border border-[#E5E5E5] rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+              className="w-full bg-white border border-[#E5E5E5] rounded-xl pl-10 pr-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] transition-all"
             />
           </div>
 
@@ -101,9 +101,8 @@ export default function SellerUsers() {
                   className="bg-white rounded-xl border border-[#E5E5E5] p-5"
                 >
                   <div className="flex items-start gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      profile.role === 'seller' ? 'bg-purple-100' : 'bg-blue-100'
-                    }`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${profile.role === 'seller' ? 'bg-purple-100' : 'bg-blue-100'
+                      }`}>
                       {profile.role === 'seller' ? (
                         <Shield size={18} className="text-purple-600" />
                       ) : (
@@ -114,9 +113,8 @@ export default function SellerUsers() {
                       <p className="text-sm font-bold text-[#111111] truncate">
                         {profile.full_name || 'Unnamed'}
                       </p>
-                      <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block mt-0.5 ${
-                        profile.role === 'seller' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
-                      }`}>
+                      <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block mt-0.5 ${profile.role === 'seller' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                        }`}>
                         {profile.role}
                       </span>
                     </div>

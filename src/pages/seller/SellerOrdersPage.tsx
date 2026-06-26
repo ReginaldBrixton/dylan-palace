@@ -133,13 +133,13 @@ export default function SellerOrders() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by order number, name, email..."
-                className="w-full bg-white border border-[#E5E5E5] rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#111111] transition-colors"
+                className="w-full bg-white border border-[#E5E5E5] rounded-xl pl-10 pr-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] transition-all"
               />
             </div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="bg-white border border-[#E5E5E5] rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#111111] transition-colors cursor-pointer"
+              className="bg-white border border-[#E5E5E5] rounded-xl px-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] transition-all cursor-pointer"
             >
               <option value="all">All Status</option>
               {STATUS_OPTIONS.map((s) => (
@@ -251,11 +251,10 @@ export default function SellerOrders() {
                           key={s}
                           onClick={() => handleStatusUpdate(selectedOrder.id, s)}
                           disabled={updating}
-                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 ${
-                            selectedOrder.status === s
+                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 ${selectedOrder.status === s
                               ? `${cfg.bg} ${cfg.color} ring-2 ring-current`
                               : 'bg-[#F5F5F4] text-[#8B8B8A] hover:bg-[#E5E5E5]'
-                          }`}
+                            }`}
                         >
                           <cfg.icon size={10} />
                           {s}

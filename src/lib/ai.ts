@@ -10,7 +10,7 @@ const GEMINI_KEYS = [
   import.meta.env.VITE_GEMINI_API_KEY_6 || 'AIzaSyB0lcouTZWjK5nORiR6V_pr0m8vzStY3jA',
 ].filter(Boolean) as string[];
 
-const MODEL = 'gemini-2.5-flash-lite';
+const MODEL = 'gemini-3.1-flash-lite';
 
 export interface AIProductSuggestion {
   name: string;
