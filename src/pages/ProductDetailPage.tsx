@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Truck, Heart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Truck, Heart, Share2, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
 import { getCachedProductById, getRelatedProducts } from '../lib/product-cache';
@@ -27,6 +28,15 @@ export default function ProductDetailScreen() {
 
   // Carousel ref
   const carouselRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showSizeGuide) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowSizeGuide(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showSizeGuide]);
 
   useEffect(() => {
     setLoading(true);
@@ -93,18 +103,18 @@ export default function ProductDetailScreen() {
   return (
     <div id="product-detail-screen" className="w-full flex flex-col pb-40 animate-fade-in bg-[#F9F9F8]">
 
-      {/* Immersive Image Carousel (100vw x 120vw container height) */}
-      <section className="relative w-full aspect-[4/5] bg-[#eeeeed] overflow-hidden select-none">
+      {/* Immersive Image Carousel */}
+      <section className="relative w-full h-[52vh] sm:h-[60vh] lg:aspect-[4/5] lg:h-auto bg-[#eeeeed] overflow-hidden select-none">
 
         {/* Active Image */}
         <div className="w-full h-full relative">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeImageIndex}
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, x: 30, scale: 1.03 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -30, scale: 0.98 }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="w-full h-full"
             >
               <ImageWithSkeleton
@@ -142,15 +152,17 @@ export default function ProductDetailScreen() {
             <>
               <button
                 onClick={() => setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : product.images.length - 1))}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-black border border-gray-200 hover:bg-white cursor-pointer"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/85 backdrop-blur-md flex items-center justify-center text-[#111111] border border-gray-200/60 hover:bg-white hover:scale-110 active:scale-95 cursor-pointer transition-all duration-200 shadow-sm"
+                aria-label="Previous image"
               >
-                ←
+                <ChevronLeft size={18} />
               </button>
               <button
                 onClick={() => setActiveImageIndex((prev) => (prev < product.images.length - 1 ? prev + 1 : 0))}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-black border border-gray-200 hover:bg-white cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/85 backdrop-blur-md flex items-center justify-center text-[#111111] border border-gray-200/60 hover:bg-white hover:scale-110 active:scale-95 cursor-pointer transition-all duration-200 shadow-sm"
+                aria-label="Next image"
               >
-                →
+                <ChevronRight size={18} />
               </button>
             </>
           )
@@ -165,7 +177,7 @@ export default function ProductDetailScreen() {
                   key={idx}
                   aria-label={`Go to image slide ${idx + 1}`}
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === activeImageIndex ? 'bg-[#111111] scale-125' : 'bg-[#E5E5E5]'
+                  className={`rounded-full transition-all duration-300 ${idx === activeImageIndex ? 'w-6 h-2 bg-[#111111]' : 'w-2 h-2 bg-[#111111]/30 hover:bg-[#111111]/50'
                     }`}
                 ></button>
               ))}
@@ -175,28 +187,46 @@ export default function ProductDetailScreen() {
       </section >
 
       {/* Product Information details */}
-      < section className="px-6 pt-8 pb-4 border-b border-[#E5E5E5] bg-white" >
-        <div className="flex flex-col gap-1.5 label-caps tracking-widest text-[#8B8B8A] mb-1">
-          {product.category}
-        </div>
-        <h1 className="font-serif text-[26px] font-bold text-[#111111] leading-tight mb-2">
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="px-6 pt-4 pb-4 border-b border-[#E5E5E5] bg-white"
+      >
+        <h1 className="font-serif text-[20px] sm:text-[24px] lg:text-[26px] font-bold text-[#111111] leading-tight mb-3">
           {product.name}
         </h1>
-        <p className="text-[20px] font-bold text-[#111111] mb-4">
-          {CURRENCY}{product.price.toFixed(2)}
-        </p>
-        <p className="text-[14px] leading-relaxed text-[#555555] max-w-prose">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          className="inline-flex items-center gap-2 bg-[#111111]/5 border border-[#111111]/10 rounded-full px-4 py-1.5 mb-4"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-[#4A5D23] animate-pulse" />
+          <span className="font-mono text-[15px] sm:text-[17px] font-bold text-[#111111] tracking-tight">
+            {CURRENCY}{product.price.toFixed(2)}
+          </span>
+        </motion.div>
+        <p className="text-[13px] sm:text-[14px] leading-relaxed text-[#555555] max-w-prose">
           {product.description}
         </p>
-      </section >
+      </motion.section>
 
       {/* Inline Delivery / Truck Timeline block */}
-      < section className="px-6 py-4 border-b border-[#E5E5E5] flex items-center gap-2 bg-white" >
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-30px" }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="px-6 py-4 border-b border-[#E5E5E5] flex items-center gap-2 bg-white"
+      >
         <Truck size={18} className="text-[#4A5D23]" />
-        <span className="text-[12px] font-semibold text-[#4A5D23] uppercase tracking-wider">
+        <span className="text-[10px] sm:text-[12px] font-semibold text-[#4A5D23] uppercase tracking-wider">
           FAST DELIVERY WITHIN ACCRA • FREE PICKUP AT ODORKOR SHOP
         </span>
-      </section >
+      </motion.section>
 
       {/* Size Selector Box grids */}
       < section className="px-6 py-6 border-b border-[#E5E5E5] bg-white" >
@@ -217,7 +247,7 @@ export default function ProductDetailScreen() {
               key={size}
               onClick={() => setSelectedSize(size)}
               aria-pressed={selectedSize === size}
-              className={`h-12 border transition-all duration-200 font-semibold text-[13px] uppercase tracking-widest flex items-center justify-center cursor-pointer ${selectedSize === size
+              className={`h-11 sm:h-12 border transition-all duration-200 font-semibold text-[12px] sm:text-[13px] uppercase tracking-widest flex items-center justify-center cursor-pointer ${selectedSize === size
                 ? 'border-2 border-[#111111] bg-white text-[#111111] scale-[1.02]'
                 : 'border-[#E5E5E5] bg-white text-[#8B8B8A] hover:border-[#111111]'
                 }`}
@@ -249,29 +279,6 @@ export default function ProductDetailScreen() {
                 <p>• Expertly woven thread with double reinforced edge seams.</p>
                 <p>• Machine wash cold or professional dry clean only.</p>
                 <p>• Medium-hot iron to preserve crisp silhouette structure.</p>
-              </div>
-            )
-          }
-        </div >
-
-        {/* Segment 2: Shipping & Returns */}
-        < div className="border-b border-[#E5E5E5]" >
-          <button
-            onClick={() => toggleSection('shipping')}
-            className="w-full py-4 flex justify-between items-center text-left cursor-pointer hover:opacity-85"
-          >
-            <h3 className="text-[12px] font-bold text-[#111111] uppercase tracking-wider">
-              Shipping &amp; Returns
-            </h3>
-            <span className="text-[18px] font-mono">{expandedSection === 'shipping' ? '−' : '+'}</span>
-          </button>
-          {
-            expandedSection === 'shipping' && (
-              <div className="pb-4 text-[13px] text-[#555555] leading-relaxed animate-fade-in space-y-2">
-                <p>• <strong>Free pickup available</strong> at our Odorkor shop.</p>
-                <p>• Delivery options available across Accra and nationwide through registered dispatch services.</p>
-                <p>• Safe <strong>Pay on Delivery</strong> options fully supported at checkout for local buyers.</p>
-                <p>• In-store exchanges available within 7 days with original receipt.</p>
               </div>
             )
           }
@@ -314,7 +321,7 @@ export default function ProductDetailScreen() {
             expandedSection === 'reviews' && (
               <div className="pb-4 animate-fade-in">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="font-serif text-[28px] font-bold text-[#111111]">4.8</span>
+                  <span className="font-serif text-[22px] sm:text-[28px] font-bold text-[#111111]">4.8</span>
                   <div className="flex text-[#111111]">
                     {'★★★★★'.split('').map((s, i) => (
                       <span key={i} className={i < 4 ? 'opacity-100' : 'opacity-20'}>★</span>
@@ -404,64 +411,109 @@ export default function ProductDetailScreen() {
         </div>
       </section>
 
-      {/* Sticky CTA Footer Button */}
-      < div className="fixed bottom-[72px] left-0 w-full bg-white/70 backdrop-blur-2xl border-t border-[#E5E5E5]/50 p-4 z-40 pb-6 supports-[backdrop-filter]:bg-white/60" >
-        <button
-          onClick={handleAddToBag}
-          className={`w-full h-14 font-semibold text-[13px] uppercase tracking-widest flex items-center justify-center transition-all duration-300 active:scale-[0.98] cursor-pointer rounded-lg shadow-lg ${isAdded
-            ? 'bg-[#4A5D23] text-white'
-            : 'bg-[#111111] text-white hover:bg-black'
-            }`}
-        >
-          {isAdded ? "ADDED TO BAG" : `ADD TO BAG - ${CURRENCY}${product.price.toFixed(2)}`}
-        </button>
-      </div >
-
-      {/* Size Guide Modal/Overlay */}
-      {
-        showSizeGuide && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 transition-all animate-fade-in">
-            <div className="bg-white border border-[#E5E5E5] max-w-sm w-full p-6 relative">
-              <h4 className="font-serif text-[18px] font-bold text-[#111111] uppercase tracking-tight mb-4">
-                EDITORIAL SIZE METRICS
-              </h4>
-              <div className="border border-[#E5E5E5] text-[12px] mb-6">
-                <div className="grid grid-cols-3 bg-[#F9F9F8] border-b border-[#E5E5E5] p-2 text-[#8B8B8A] font-bold">
-                  <span>SIZE</span>
-                  <span>CHEST (IN)</span>
-                  <span>HEIGHT (FT)</span>
-                </div>
-                <div className="grid grid-cols-3 border-b border-[#E5E5E5] p-2">
-                  <span>S</span>
-                  <span>36 - 38</span>
-                  <span>5.6 - 5.8</span>
-                </div>
-                <div className="grid grid-cols-3 border-b border-[#E5E5E5] p-2">
-                  <span>M</span>
-                  <span>38 - 40</span>
-                  <span>5.8 - 6.0</span>
-                </div>
-                <div className="grid grid-cols-3 border-b border-[#E5E5E5] p-2">
-                  <span>L</span>
-                  <span>40 - 42</span>
-                  <span>6.0 - 6.2</span>
-                </div>
-                <div className="grid grid-cols-3 p-2">
-                  <span>XL</span>
-                  <span>42 - 44</span>
-                  <span>6.2- 6.4</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowSizeGuide(false)}
-                className="w-full py-3 bg-[#111111] text-white text-[11px] font-semibold uppercase tracking-widest cursor-pointer"
-              >
-                CLOSE GUIDE
-              </button>
-            </div>
+      {/* Sticky Compact CTA Bar - sits on top of BottomNav */}
+      <motion.div
+        initial={{ y: 60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+        className="fixed bottom-[72px] left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-t border-[#E5E5E5]/60 px-3 py-2"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0 pl-1">
+            <p className="text-[8px] font-bold text-[#8B8B8A] uppercase tracking-widest leading-none mb-0.5">
+              {isAdded ? 'Added!' : 'Price'}
+            </p>
+            <p className="font-mono text-[14px] sm:text-[16px] font-bold text-[#111111] leading-none truncate">
+              {CURRENCY}{product.price.toFixed(2)}
+            </p>
           </div>
-        )
-      }
+          <motion.button
+            onClick={handleAddToBag}
+            whileTap={{ scale: 0.96 }}
+            animate={isAdded ? { scale: [1, 1.04, 1] } : {}}
+            transition={{ duration: 0.3 }}
+            className={`shrink-0 px-5 sm:px-7 h-10 sm:h-11 font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest flex items-center justify-center cursor-pointer rounded-xl shadow-md transition-colors duration-300 ${isAdded
+              ? 'bg-[#4A5D23] text-white'
+              : 'bg-[#111111] text-white hover:bg-black'
+              }`}
+          >
+            {isAdded ? '✓ ADDED' : 'ADD TO BAG'}
+          </motion.button>
+        </div>
+      </motion.div>
+
+      {/* Size Guide Bottom Sheet */}
+      {createPortal(
+        <AnimatePresence>
+          {showSizeGuide && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[60] bg-[#111111]/50 backdrop-blur-sm flex items-end sm:items-center sm:justify-center sm:p-6"
+              onClick={() => setShowSizeGuide(false)}
+            >
+              <motion.div
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl p-5 sm:p-6 relative max-h-[80vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Grab handle */}
+                <div className="w-10 h-1 bg-[#E5E5E5] rounded-full mx-auto mb-4 sm:hidden" />
+
+                <button
+                  onClick={() => setShowSizeGuide(false)}
+                  className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-[#8B8B8A] hover:text-[#111111] hover:bg-[#F5F5F4] rounded-full transition-colors cursor-pointer"
+                  aria-label="Close"
+                >
+                  <X size={16} />
+                </button>
+
+                <h4 className="font-serif text-[16px] sm:text-[18px] font-bold text-[#111111] uppercase tracking-tight mb-4 pr-8">
+                  Editorial Size Metrics
+                </h4>
+                <div className="border border-[#E5E5E5] text-[12px] mb-5 rounded-lg overflow-hidden">
+                  <div className="grid grid-cols-3 bg-[#F9F9F8] border-b border-[#E5E5E5] p-2.5 text-[#8B8B8A] font-bold uppercase tracking-wider text-[10px]">
+                    <span>Size</span>
+                    <span>Chest (in)</span>
+                    <span>Height (ft)</span>
+                  </div>
+                  <div className="grid grid-cols-3 border-b border-[#E5E5E5] p-2.5">
+                    <span className="font-bold">S</span>
+                    <span>36 - 38</span>
+                    <span>5.6 - 5.8</span>
+                  </div>
+                  <div className="grid grid-cols-3 border-b border-[#E5E5E5] p-2.5">
+                    <span className="font-bold">M</span>
+                    <span>38 - 40</span>
+                    <span>5.8 - 6.0</span>
+                  </div>
+                  <div className="grid grid-cols-3 border-b border-[#E5E5E5] p-2.5">
+                    <span className="font-bold">L</span>
+                    <span>40 - 42</span>
+                    <span>6.0 - 6.2</span>
+                  </div>
+                  <div className="grid grid-cols-3 p-2.5">
+                    <span className="font-bold">XL</span>
+                    <span>42 - 44</span>
+                    <span>6.2 - 6.4</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowSizeGuide(false)}
+                  className="w-full py-3 bg-[#111111] text-white text-[11px] font-semibold uppercase tracking-widest cursor-pointer rounded-lg hover:bg-black transition-colors"
+                >
+                  CLOSE GUIDE
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
     </div >
   );

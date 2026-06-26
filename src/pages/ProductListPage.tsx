@@ -34,6 +34,15 @@ export default function ProductListScreen() {
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPressRef = useRef(false);
 
+  useEffect(() => {
+    if (!quickViewProduct) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setQuickViewProduct(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [quickViewProduct]);
+
   // Reset filters when category changes
 
   useEffect(() => {

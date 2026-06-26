@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppProvider } from './context/AppContext';
@@ -43,6 +43,14 @@ const pageVariants = {
 
 const pageTransition = { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const };
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function AnimatedRoutes() {
   const location = useLocation();
   return (
@@ -56,6 +64,7 @@ function AnimatedRoutes() {
         transition={pageTransition}
         className="w-full"
       >
+        <ScrollToTop />
         <Routes location={location}>
           <Route path="/" element={<HomeScreen />} />
           <Route path="/splash" element={<SplashRoute />} />

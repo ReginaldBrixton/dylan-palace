@@ -43,158 +43,242 @@ export function ShoesInteractive() {
       {/* Sneaker SVG Chassis */}
       <div className="flex-grow flex items-center justify-center relative min-h-[170px] py-2">
         <svg
-          viewBox="0 0 240 160"
-          className="w-full h-full max-h-[160px] drop-shadow-lg"
+          viewBox="0 0 260 170"
+          className="w-full h-full max-h-[170px] drop-shadow-lg"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Subtle grid background to look like a draft blueprint */}
-          <pattern id="grid" width="12" height="12" patternUnits="userSpaceOnUse">
-            <path d="M 12 0 L 0 0 0 12" fill="none" stroke="#F1F1F1" strokeWidth="1" />
-          </pattern>
-          <rect width="240" height="160" fill="url(#grid)" rx="8" />
+          <defs>
+            <pattern id="grid" width="12" height="12" patternUnits="userSpaceOnUse">
+              <path d="M 12 0 L 0 0 0 12" fill="none" stroke="#F1F1F1" strokeWidth="1" />
+            </pattern>
+            <linearGradient id="gUpper" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="55%" stopColor="#F3F3F1" />
+              <stop offset="100%" stopColor="#DDDDDB" />
+            </linearGradient>
+            <linearGradient id="gToe" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#F6F6F5" />
+              <stop offset="100%" stopColor="#D6D6D3" />
+            </linearGradient>
+            <linearGradient id="gHeel" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#EEEEEC" />
+              <stop offset="100%" stopColor="#CDCDCB" />
+            </linearGradient>
+            <linearGradient id="gMid" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="100%" stopColor="#E4E4E1" />
+            </linearGradient>
+            <linearGradient id="gOut" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3C3C3C" />
+              <stop offset="100%" stopColor="#141414" />
+            </linearGradient>
+            <radialGradient id="gCollar" cx="50%" cy="40%" r="70%">
+              <stop offset="0%" stopColor="#3A3A3A" />
+              <stop offset="100%" stopColor="#141414" />
+            </radialGradient>
+          </defs>
+          <rect width="260" height="170" fill="url(#grid)" rx="8" />
 
-          {/* SNEAKER OUTLINE SHAPE */}
-          {/* Sole */}
-          <path
-            d="M 20,130 C 50,131 90,132 140,132 C 175,132 195,128 220,118 C 220,112 215,108 200,108 L 190,108 Q 110,110 20,118 Z"
-            fill="#E5E5E5"
-            stroke="#111111"
-            strokeWidth="1.5"
-            className="transition-colors duration-500"
-          />
-          {/* Midsole Layer */}
-          <path
-            d="M 22,122 C 70,123 120,123 170,121 C 190,120 205,116 218,111 L 217,114 C 192,124 172,127 135,127 C 85,127 45,126 22,125 Z"
-            fill="#FFFFFF"
-            stroke="#111111"
-            strokeWidth="1"
-          />
+          {/* GROUND SHADOW */}
+          <ellipse cx="132" cy="148" rx="104" ry="5.5" fill="#111111" opacity="0.10" />
 
-          {/* Upper mesh chassis */}
-          <motion.path
-            d="M 24,115 C 38,82 58,58 100,58 C 110,58 118,65 125,75 C 132,85 140,92 165,95 C 185,97 205,101 216,108"
+          {/* OUTSOLE - thick rubber bottom with toe spring */}
+          <path
+            d="M 30,136 C 26,141 29,146 36,146 L 210,146 C 222,146 231,142 237,134 C 239,131 237,128 233,128 C 226,131 217,133 207,134 C 150,137 82,137 44,136 C 38,135 33,134 30,136 Z"
+            fill="url(#gOut)"
+            stroke="#0C0C0C"
+            strokeWidth="0.8"
+          />
+          {/* Outsole tread notches */}
+          <g stroke="#000000" strokeWidth="1" opacity="0.45">
+            <line x1="58" y1="138" x2="58" y2="145" />
+            <line x1="80" y1="138" x2="80" y2="145" />
+            <line x1="102" y1="138" x2="102" y2="145" />
+            <line x1="124" y1="138" x2="124" y2="145" />
+            <line x1="146" y1="138" x2="146" y2="145" />
+            <line x1="168" y1="138" x2="168" y2="145" />
+            <line x1="190" y1="137" x2="190" y2="145" />
+          </g>
+
+          {/* MIDSOLE - white foam wedge */}
+          <path
+            d="M 36,113 C 70,118 112,122 152,121 C 178,120 198,118 212,116 C 222,115 229,117 233,121 L 234,128 C 226,131 217,133 207,134 C 150,137 82,137 44,136 C 38,136 32,136 30,136 L 30,134 C 27,127 29,119 36,113 Z"
+            fill="url(#gMid)"
+            stroke="#C9C9C7"
+            strokeWidth="0.9"
+          />
+          {/* Midsole foam seam */}
+          <path
+            d="M 34,126 C 80,130 140,131 206,127 C 218,126 226,126 232,127"
             fill="none"
+            stroke="#D2D2D0"
+            strokeWidth="0.8"
+          />
+          {/* Heel air-unit detail */}
+          <ellipse cx="44" cy="129" rx="9" ry="4" fill="#FFFFFF" stroke="#C9C9C7" strokeWidth="0.7" opacity="0.9" />
+
+          {/* HEEL COUNTER - rigid back panel */}
+          <path
+            d="M 40,113 C 37,96 41,80 50,69 C 53,66 57,66 59,69 C 51,80 48,96 49,113 C 46,114 43,114 40,113 Z"
+            fill="url(#gHeel)"
             stroke="#111111"
-            strokeWidth="2"
+            strokeWidth="1.1"
+          />
+          {/* Heel pull tab */}
+          <path
+            d="M 50,69 C 47,64 47,59 51,57 C 55,55 59,57 60,61 C 57,62 54,64 53,68 Z"
+            fill="#E2E2E0"
+            stroke="#111111"
+            strokeWidth="0.9"
+          />
+
+          {/* UPPER BODY - main side panel */}
+          <motion.path
+            d="M 40,113 C 38,96 43,79 53,69 C 60,62 69,58 80,57 C 90,56 96,57 99,60 C 112,55 126,56 140,62 C 160,71 180,84 202,100 C 212,107 220,112 224,116 C 216,117 205,117 195,118 C 150,121 92,120 40,113 Z"
+            fill="url(#gUpper)"
+            stroke="#1A1A1A"
+            strokeWidth="1.4"
             animate={{
-              d: `M 24,115 C 38,${82 - tension * 0.05} 58,${58 - tension * 0.08} ${100 - tension * 0.05},${58 + tension * 0.05} C ${110 - tension * 0.05},${58 + tension * 0.05} 118,65 125,75 C 132,85 140,92 165,95 C 185,97 205,101 216,108`
+              d: `M 40,113 C 38,96 43,79 53,${69 - tension * 0.015} C 60,${62 - tension * 0.01} 69,${58 - tension * 0.015} 80,${57 - tension * 0.02} C 90,${56 - tension * 0.02} 96,${57 - tension * 0.015} 99,${60 - tension * 0.02} C 112,${55 - tension * 0.015} 126,56 140,62 C 160,71 180,84 202,100 C 212,107 220,112 224,116 C 216,117 205,117 195,118 C 150,121 92,120 40,113 Z`
             }}
             transition={{ type: 'spring', stiffness: 120, damping: 15 }}
           />
 
-          {/* Heel counter cup & pull tab */}
-          <motion.path
-            d="M 24,115 C 14,105 16,75 22,70 C 24,68 28,68 28,73 L 26,90"
-            fill="none"
-            stroke="#111111"
-            strokeWidth="1.5"
-            animate={{
-              scaleX: 1 - tension * 0.0005,
-              skewY: tension * 0.02
-            }}
+          {/* Quarter panel shading overlay */}
+          <path
+            d="M 52,108 C 60,90 74,74 92,68 C 110,63 132,67 154,78 C 176,89 196,102 212,113 C 200,114 188,114 176,114 C 130,116 88,114 52,108 Z"
+            fill="#000000"
+            opacity="0.04"
           />
 
-          {/* Eyelets (Lacing Holes) */}
-          <circle cx="106" cy="67" r="2.5" fill="#FFFFFF" stroke="#111111" strokeWidth="1.5" />
-          <circle cx="114" cy="74" r="2.5" fill="#FFFFFF" stroke="#111111" strokeWidth="1.5" />
-          <circle cx="122" cy="81" r="2.5" fill="#FFFFFF" stroke="#111111" strokeWidth="1.5" />
-          <circle cx="130" cy="88" r="2.5" fill="#FFFFFF" stroke="#111111" strokeWidth="1.5" />
-
-          {/* Tongue component */}
-          <motion.path
-            d="M 100,58 Q 115,45 132,58"
+          {/* TOE CAP - reinforced front */}
+          <path
+            d="M 168,110 C 184,106 200,105 214,110 C 220,112 224,114 224,116 C 216,117 205,117 195,118 C 186,118 178,117 171,116 C 168,114 167,112 168,110 Z"
+            fill="url(#gToe)"
+            stroke="#1A1A1A"
+            strokeWidth="1.1"
+          />
+          {/* Toe cap seam */}
+          <path
+            d="M 170,113 C 186,109 202,108 216,112"
             fill="none"
+            stroke="#BDBDBB"
+            strokeWidth="0.7"
+            strokeDasharray="2.5,2"
+          />
+          {/* Perforation dots */}
+          <g fill="#BCBCBA" opacity="0.8">
+            <circle cx="182" cy="110" r="0.8" /><circle cx="188" cy="109" r="0.8" />
+            <circle cx="194" cy="109" r="0.8" /><circle cx="200" cy="110" r="0.8" />
+            <circle cx="185" cy="113" r="0.8" /><circle cx="191" cy="112" r="0.8" />
+            <circle cx="197" cy="112" r="0.8" /><circle cx="203" cy="113" r="0.8" />
+          </g>
+
+          {/* Vamp / forefoot seam */}
+          <path
+            d="M 100,64 C 120,68 142,77 164,90 C 180,99 194,107 206,113"
+            fill="none"
+            stroke="#C9C9C7"
+            strokeWidth="0.7"
+            strokeDasharray="3,2"
+          />
+
+          {/* BRAND SWOOSH */}
+          <path
+            d="M 70,108 C 100,98 140,90 184,84 C 192,83 197,86 198,92 C 191,90 183,91 175,93 C 138,100 102,108 74,114 Z"
+            fill="#4A5D23"
+            opacity="0.92"
+          />
+
+          {/* COLLAR OPENING - padded ankle opening */}
+          <motion.path
+            d="M 55,68 C 62,59 72,54 84,53 C 91,53 96,55 99,60 C 92,57 82,57 74,60 C 66,63 60,66 57,71 Z"
+            fill="url(#gCollar)"
             stroke="#111111"
-            strokeWidth="2.5"
-            strokeLinecap="round"
+            strokeWidth="0.8"
             animate={{
-              y: tension * 0.1,
-              x: -tension * 0.05
+              d: `M 55,68 C 62,${59 - tension * 0.015} 72,${54 - tension * 0.02} 84,${53 - tension * 0.015} C 91,${53 - tension * 0.01} 96,${55 - tension * 0.015} 99,${60 - tension * 0.02} C 92,57 82,57 74,60 C 66,63 60,66 57,71 Z`
             }}
+            transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+          />
+
+          {/* TONGUE - padded, peeks above the laces */}
+          <motion.path
+            d="M 95,60 C 97,49 103,42 112,42 C 119,42 124,48 125,56 C 121,51 114,50 108,52 C 102,54 98,57 97,62 Z"
+            fill="url(#gToe)"
+            stroke="#1A1A1A"
+            strokeWidth="1"
+            animate={{ y: -tension * 0.07, x: tension * 0.02 }}
             transition={{ type: 'spring', stiffness: 100, damping: 15 }}
           />
+          <rect x="106" y="46" width="13" height="4.5" rx="1.2" fill="#4A5D23" />
 
-          {/* SHOELACES - Dynamically weaving path depending on tension state */}
-          {/* Weave Segment 1 */}
-          <motion.line
-            x1="106" y1="67"
-            x2="114" y2="74"
-            stroke="#4A5D23"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            animate={{
-              x1: 106 + tension * 0.04,
-              y1: 67 + tension * 0.05,
-              x2: 114 - tension * 0.04,
-              stroke: tension > 70 ? "#111111" : "#4A5D23"
-            }}
-            transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-          />
-          {/* Weave Segment 2 */}
-          <motion.line
-            x1="114" y1="74"
-            x2="122" y2="81"
-            stroke="#4A5D23"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            animate={{
-              x1: 114 + tension * 0.04,
-              y1: 74 + tension * 0.05,
-              x2: 122 - tension * 0.04,
-              stroke: tension > 70 ? "#111111" : "#4A5D23"
-            }}
-            transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-          />
-          {/* Weave Segment 3 */}
-          <motion.line
-            x1="122" y1="81"
-            x2="130" y2="88"
-            stroke="#4A5D23"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            animate={{
-              x1: 122 + tension * 0.04,
-              y1: 81 + tension * 0.05,
-              x2: 130 - tension * 0.04,
-              stroke: tension > 70 ? "#111111" : "#4A5D23"
-            }}
-            transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-          />
+          {/* EYELETS - two rows along the instep */}
+          <g fill="#2A2A2A" stroke="#000000" strokeWidth="0.6">
+            <circle cx="100" cy="62" r="1.7" /><circle cx="110" cy="65" r="1.7" />
+            <circle cx="120" cy="69" r="1.7" /><circle cx="130" cy="73" r="1.7" />
+            <circle cx="97" cy="70" r="1.7" /><circle cx="107" cy="73" r="1.7" />
+            <circle cx="117" cy="77" r="1.7" /><circle cx="127" cy="81" r="1.7" />
+          </g>
 
-          {/* Hanging Bow Laces (Tighten up perfectly!) */}
-          <motion.path
-            d="M 106,67 Q 95,48 85,55 C 75,62 90,75 106,67"
-            fill="none"
-            stroke="#4A5D23"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            animate={{
-              d: `M 106,67 Q ${95 + tension * 0.15},${48 + tension * 0.22} ${85 + tension * 0.25},${55 + tension * 0.18} C ${75 + tension * 0.3},62 ${90 + tension * 0.18},75 106,67`,
-              stroke: tension > 70 ? "#111111" : "#4A5D23"
-            }}
-            transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-          />
+          {/* LACES - criss-cross, gap closes with tension */}
+          {(() => {
+            const c = tension > 70 ? '#111111' : '#4A5D23';
+            const e = tension * 0.04;   // back row moves down
+            const f = tension * 0.04;   // front row moves up
+            const L = (x1: number, y1: number, x2: number, y2: number, i: number) => (
+              <motion.line
+                key={i}
+                x1={x1} y1={y1} x2={x2} y2={y2}
+                stroke={c} strokeWidth="2.2" strokeLinecap="round"
+                animate={{ x1, y1, x2, y2 }}
+                transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+              />
+            );
+            return (
+              <>
+                {L(100, 62 + e, 98, 70 - f, 0)}
+                {L(100, 62 + e, 107, 73 - f, 1)}
+                {L(97, 70 - f, 110, 65 + e, 2)}
+                {L(110, 65 + e, 117, 77 - f, 3)}
+                {L(107, 73 - f, 120, 69 + e, 4)}
+                {L(120, 69 + e, 127, 81 - f, 5)}
+                {L(117, 77 - f, 130, 73 + e, 6)}
+              </>
+            );
+          })()}
 
-          <motion.path
-            d="M 106,67 Q 100,38 115,44 C 125,50 115,62 106,67"
-            fill="none"
-            stroke="#4A5D23"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            animate={{
-              d: `M 106,67 Q ${100 + tension * 0.1},${38 + tension * 0.3} ${115 + tension * 0.02},${44 + tension * 0.22} C ${125 - tension * 0.1},50 ${115 - tension * 0.1},62 106,67`,
-              stroke: tension > 70 ? "#111111" : "#4A5D23"
-            }}
+          {/* BOW KNOT */}
+          <motion.g
+            animate={{ y: -tension * 0.04, scale: 1 - tension * 0.0012 }}
             transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-          />
+            style={{ transformOrigin: '101px 60px' }}
+          >
+            <motion.path
+              d="M 101,60 C 93,52 82,50 78,57 C 75,63 84,68 96,63 Z"
+              fill="none" stroke={tension > 70 ? '#111111' : '#4A5D23'} strokeWidth="2.2" strokeLinecap="round"
+              animate={{ d: `M 101,60 C ${93 - tension * 0.03},${52 - tension * 0.04} ${82 - tension * 0.05},${50 - tension * 0.03} ${78 - tension * 0.04},${57 - tension * 0.02} C ${75 - tension * 0.03},${63 - tension * 0.02} ${84 - tension * 0.02},68 ${96 - tension * 0.01},63 Z` }}
+              transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+            />
+            <motion.path
+              d="M 101,60 C 109,52 120,50 124,57 C 127,63 118,68 106,63 Z"
+              fill="none" stroke={tension > 70 ? '#111111' : '#4A5D23'} strokeWidth="2.2" strokeLinecap="round"
+              animate={{ d: `M 101,60 C ${109 + tension * 0.03},${52 - tension * 0.04} ${120 + tension * 0.05},${50 - tension * 0.03} ${124 + tension * 0.04},${57 - tension * 0.02} C ${127 + tension * 0.03},${63 - tension * 0.02} ${118 + tension * 0.02},68 ${106 + tension * 0.01},63 Z` }}
+              transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+            />
+            <circle cx="101" cy="60" r="2.4" fill={tension > 70 ? '#111111' : '#4A5D23'} />
+            <motion.path d="M 99,62 Q 96,71 93,79" fill="none" stroke={tension > 70 ? '#111111' : '#4A5D23'} strokeWidth="1.6" strokeLinecap="round" animate={{ d: `M 99,62 Q ${96 - tension * 0.01},${71 + tension * 0.02} ${93 - tension * 0.02},${79 + tension * 0.03}` }} transition={{ type: 'spring', stiffness: 120, damping: 15 }} />
+            <motion.path d="M 103,62 Q 106,71 109,79" fill="none" stroke={tension > 70 ? '#111111' : '#4A5D23'} strokeWidth="1.6" strokeLinecap="round" animate={{ d: `M 103,62 Q ${106 + tension * 0.01},${71 + tension * 0.02} ${109 + tension * 0.02},${79 + tension * 0.03}` }} transition={{ type: 'spring', stiffness: 120, damping: 15 }} />
+          </motion.g>
 
-          {/* Dynamic Specs details tags */}
+          {/* Dynamic spec tags on hover */}
           <g opacity={hovered ? 1 : 0} className="transition-opacity duration-300">
-            <line x1="58" y1="58" x2="35" y2="35" stroke="#111111" strokeWidth="0.8" strokeDasharray="3,3" />
-            <text x="10" y="28" className="font-mono text-[7px]" fill="#111111">CALFSKIN GRAB</text>
-
-            <line x1="165" y1="95" x2="190" y2="70" stroke="#111111" strokeWidth="0.8" strokeDasharray="3,3" />
-            <text x="175" y="64" className="font-mono text-[7px]" fill="#111111">PERFORATED TOE</text>
+            <line x1="48" y1="80" x2="26" y2="52" stroke="#111111" strokeWidth="0.6" strokeDasharray="2,2" />
+            <text x="6" y="46" className="font-mono text-[6px]" fill="#111111">HEEL COUNTER</text>
+            <line x1="196" y1="105" x2="220" y2="84" stroke="#111111" strokeWidth="0.6" strokeDasharray="2,2" />
+            <text x="208" y="78" className="font-mono text-[6px]" fill="#111111">TOE CAP</text>
+            <line x1="113" y1="60" x2="118" y2="30" stroke="#4A5D23" strokeWidth="0.6" strokeDasharray="2,2" />
+            <text x="100" y="24" className="font-mono text-[6px]" fill="#4A5D23">LACE SYSTEM</text>
           </g>
         </svg>
 
