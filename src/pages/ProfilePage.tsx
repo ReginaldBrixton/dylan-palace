@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Order, Product } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
@@ -20,7 +20,7 @@ import {
 import { triggerHaptic } from '../utils/haptic';
 import { CURRENCY } from '../constants';
 import { useApp } from '../context/AppContext';
-import { PRODUCTS } from '../api/products';
+import { getCachedProducts } from '../lib/product-cache';
 
 interface TrackingMilestone {
   label: string;
@@ -34,7 +34,13 @@ interface TrackingMilestone {
 export default function ProfileScreen() {
   const navigate = useNavigate();
   const { pastOrders, wishlist: wishlistIds } = useApp();
-  const wishlist = wishlistIds.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean) as Product[];
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getCachedProducts().then(setAllProducts).catch(() => { });
+  }, []);
+
+  const wishlist = wishlistIds.map(id => allProducts.find(p => p.id === id)).filter(Boolean) as Product[];
 
   const [activeTab, setActiveTab] = useState<'ORDERS' | 'WISHLIST'>('ORDERS');
   const [expandedTracking, setExpandedTracking] = useState<Record<string, boolean>>({});

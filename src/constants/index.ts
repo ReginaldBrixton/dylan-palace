@@ -1,5 +1,4 @@
 import { Product } from '../types';
-import { PRODUCTS } from '../api/products';
 
 export const STORAGE_KEYS = {
   CART: 'dp_cart',
@@ -25,6 +24,17 @@ export const MOMO_NETWORKS = [
 
 export const CURRENCY = 'GH₵';
 
+const PLACEHOLDER_PRODUCT: Product = {
+  id: 'placeholder',
+  name: 'Product',
+  price: 0,
+  category: 'SHIRTS',
+  images: [],
+  description: '',
+  sizes: ['M'],
+  deliversBy: '',
+};
+
 export const SEED_ORDERS = (): Array<{
   id: string;
   date: string;
@@ -37,10 +47,9 @@ export const SEED_ORDERS = (): Array<{
       id: 'DP-83021',
       date: new Date(Date.now() - 24 * 60 * 60 * 1000 * 1.5).toISOString(),
       items: [
-        { id: 'p_ss1', product: PRODUCTS[0], selectedSize: 'M', quantity: 1 },
-        { id: 'p_ss2', product: PRODUCTS[1], selectedSize: 'L', quantity: 2 },
+        { id: 'p_ss1', product: PLACEHOLDER_PRODUCT, selectedSize: 'M', quantity: 1 },
       ],
-      totalAmount: PRODUCTS[0].price + PRODUCTS[1].price * 2,
+      totalAmount: 320,
       status: 'SHIPPED',
       details: {
         fullName: 'Reginald Brixton',
@@ -56,9 +65,9 @@ export const SEED_ORDERS = (): Array<{
       id: 'DP-79284',
       date: new Date(Date.now() - 24 * 60 * 60 * 1000 * 5).toISOString(),
       items: [
-        { id: 'p_ss3', product: PRODUCTS[2], selectedSize: 'S', quantity: 1 },
+        { id: 'p_ss3', product: PLACEHOLDER_PRODUCT, selectedSize: 'S', quantity: 1 },
       ],
-      totalAmount: PRODUCTS[2].price,
+      totalAmount: 280,
       status: 'DELIVERED',
       details: {
         fullName: 'Reginald Brixton',

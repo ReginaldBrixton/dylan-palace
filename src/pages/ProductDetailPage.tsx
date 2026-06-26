@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Truck, Heart, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
-import { PRODUCTS, getRelatedProducts } from '../api/products';
+import { getCachedProductById, getRelatedProducts } from '../lib/product-cache';
 import { CURRENCY } from '../constants';
 import { useApp } from '../context/AppContext';
 import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
@@ -12,9 +12,11 @@ export default function ProductDetailScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { wishlist, toggleWishlist, handleAddtoBag } = useApp();
-  const product = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
+  const [selectedSize, setSelectedSize] = useState('M');
   const [isAdded, setIsAdded] = useState(false);
 
   // Accordion state
@@ -24,15 +26,30 @@ export default function ProductDetailScreen() {
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     setActiveImageIndex(0);
-    setSelectedSize(product.sizes[0] || 'M');
     setIsAdded(false);
     setExpandedSection(null);
-  }, [product.id, product.sizes]);
+    if (!id) return;
+    getCachedProductById(id)
+      .then((p) => {
+        if (p) {
+          setProduct(p);
+          setSelectedSize(p.sizes[0] || 'M');
+          getRelatedProducts(p, 3).then(setRelatedProducts);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [id]);
 
-  const relatedProducts = useMemo(() => {
-    return getRelatedProducts(product, 3);
-  }, [product.id, product.category]);
+  if (loading || !product) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center bg-[#F9F9F8]">
+        <div className="w-8 h-8 border-2 border-[#E5E5E5] border-t-[#111111] rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const toggleSection = (section: string) => {
     if (expandedSection === section) {

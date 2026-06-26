@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, SlidersHorizontal, Search, X, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
-import { PRODUCTS } from '../api/products';
+import { getCachedProductsByCategory } from '../lib/product-cache';
 import { CURRENCY } from '../constants';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
@@ -28,6 +28,7 @@ export default function ProductListScreen() {
   const [selectedBrand, setSelectedBrand] = useState('ALL');
   const [selectedGender, setSelectedGender] = useState('ALL');
   const [isLoadingCategory, setIsLoadingCategory] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
 
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPressRef = useRef(false);
@@ -45,14 +46,18 @@ export default function ProductListScreen() {
     setQuickViewProduct(null);
 
     setIsLoadingCategory(true);
-    const renderTimer = setTimeout(() => {
-      setIsLoadingCategory(false);
-    }, 600); // Quick elegant loading skeleton transition
-
-    return () => clearTimeout(renderTimer);
+    getCachedProductsByCategory(currentCategory)
+      .then((data) => {
+        setProducts(data);
+        setIsLoadingCategory(false);
+      })
+      .catch((err) => {
+        console.error('Failed to load products:', err);
+        setIsLoadingCategory(false);
+      });
   }, [currentCategory]);
 
-  const baseProducts = PRODUCTS.filter(p => p.category === currentCategory);
+  const baseProducts = products;
 
   const availableSubCategories = Array.from(
     new Set(baseProducts.map(p => p.subCategory).filter(Boolean))

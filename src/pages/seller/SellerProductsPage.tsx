@@ -23,6 +23,7 @@ import { uploadFile, deleteFile } from '../../lib/uploadthing';
 import { analyzeProductImage, type AIProductSuggestion } from '../../lib/ai';
 import type { Product, ProductCategory } from '../../lib/database.types';
 import { CURRENCY } from '../../constants';
+import { invalidateCache } from '../../lib/product-cache';
 
 const CATEGORIES: ProductCategory[] = ['SHIRTS', 'TROUSERS', 'SHOES', 'BAGS'];
 
@@ -202,6 +203,7 @@ export default function SellerProducts() {
         await createProduct(productData);
       }
 
+      invalidateCache();
       setShowModal(false);
       await load();
     } catch (err: any) {
@@ -212,9 +214,22 @@ export default function SellerProducts() {
   };
 
   const handleDelete = async (product: Product) => {
-    if (!confirm(`Delete "${product.name}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete "${product.name}"? This will also delete all associated images from UploadThing.`)) return;
     try {
+      // Delete associated images from UploadThing
+      const images = productImages(product);
+      for (const imgUrl of images) {
+        try {
+          // Extract file key from URL (UploadThing URLs contain the key)
+          const urlParts = imgUrl.split('/');
+          const fileKey = urlParts[urlParts.length - 1].split('.')[0];
+          if (fileKey) await deleteFile(fileKey);
+        } catch (e) {
+          console.warn('Failed to delete image from UploadThing:', e);
+        }
+      }
       await deleteProduct(product.id);
+      invalidateCache();
       await load();
     } catch (err: any) {
       setError(`Delete failed: ${err.message}`);
@@ -222,6 +237,15 @@ export default function SellerProducts() {
   };
 
   const removeImage = (idx: number) => {
+    const imgUrl = form.images[idx];
+    // Try to delete from UploadThing (best-effort)
+    try {
+      const urlParts = imgUrl.split('/');
+      const fileKey = urlParts[urlParts.length - 1].split('.')[0];
+      if (fileKey) deleteFile(fileKey).catch(() => { });
+    } catch {
+      // ignore
+    }
     setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
   };
 

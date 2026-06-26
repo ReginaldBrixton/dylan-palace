@@ -1,52 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Rotate3d, ArrowRight } from 'lucide-react';
-import { img } from '../utils/imageMap';
 import { CURRENCY } from '../constants';
 import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../components/ui/AtelierInteractive';
 import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { getCachedFeaturedProducts, getCachedProducts } from '../lib/product-cache';
+import type { Product } from '../types';
 
-const SHOWCASE_SHOES = [
-  {
-    id: 'p_sh_gen1',
-    name: 'Minimal Street Sneaker',
-    price: 320,
-    image: img('shoes/shoe-p_sh_gen1.jpg'),
-    description: 'Minimal high-fashion street sneaker with concrete floor studio lighting.',
-    subText: 'Futuristic design'
-  },
-  {
-    id: 'p_sh_gen2',
-    name: 'Industrial Leather Boot',
-    price: 480,
-    image: img('shoes/shoe-p_sh_gen2.jpg'),
-    description: 'Bold, brutalist heavy-duty platform boot with high-contrast shadows.',
-    subText: 'Brutalist high-fashion'
-  },
-  {
-    id: 'p_sh_gen3',
-    name: 'Classic Dark Loafer',
-    price: 280,
-    image: img('shoes/shoe-p_sh_gen3.jpg'),
-    description: 'Polished modern luxury slipper loafer styled on warm organic linen fabric.',
-    subText: 'Minimal modern luxury'
-  }
-];
+const FALLBACK_IMAGE = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500">' +
+  '<rect width="400" height="500" fill="#F4F4F3"/>' +
+  '<text x="200" y="250" font-family="sans-serif" font-size="14" fill="#8B8B8A" text-anchor="middle" dominant-baseline="middle">' +
+  'Dylan\'s Palace' +
+  '</text>' +
+  '</svg>'
+)}`;
 
 export default function HomeScreen() {
   const navigate = useNavigate();
   const [activeShoeIndex, setActiveShoeIndex] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
   const [spinCount, setSpinCount] = useState(0);
+  const [showcaseShoes, setShowcaseShoes] = useState<Product[]>([]);
+  const [heroImage, setHeroImage] = useState(FALLBACK_IMAGE);
+  const [trousersImage, setTrousersImage] = useState(FALLBACK_IMAGE);
+  const [bagsImage, setBagsImage] = useState(FALLBACK_IMAGE);
+  const [shoesImage, setShoesImage] = useState(FALLBACK_IMAGE);
 
   const [trousersRef, trousersVisible] = useScrollReveal<HTMLDivElement>();
   const [bagsRef, bagsVisible] = useScrollReveal<HTMLDivElement>();
   const [shoesRef, shoesVisible] = useScrollReveal<HTMLDivElement>();
   const [labRef, labVisible] = useScrollReveal<HTMLDivElement>();
 
-  const activeShoe = SHOWCASE_SHOES[activeShoeIndex];
+  useEffect(() => {
+    getCachedProducts().then((all) => {
+      if (all.length === 0) return;
+      const first = all[0];
+      if (first.images[0]) setHeroImage(first.images[0]);
+
+      const trousers = all.find(p => p.category === 'TROUSERS');
+      if (trousers?.images[0]) setTrousersImage(trousers.images[0]);
+
+      const bags = all.find(p => p.category === 'BAGS');
+      if (bags?.images[0]) setBagsImage(bags.images[0]);
+
+      const shoes = all.find(p => p.category === 'SHOES');
+      if (shoes?.images[0]) setShoesImage(shoes.images[0]);
+    });
+    getCachedFeaturedProducts(3).then(setShowcaseShoes);
+  }, []);
+
+  const activeShoe = showcaseShoes[activeShoeIndex] || showcaseShoes[0];
 
   const handleShopCategory = (cat: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS') => {
     navigate(`/${cat.toLowerCase()}`);
@@ -76,7 +82,7 @@ export default function HomeScreen() {
           className="absolute inset-0 w-full h-full"
           imgClassName="w-full h-full object-cover select-none pointer-events-none"
           alt="A striking, high-contrast fashion editorial shot of a person wearing a crisp, minimalist white linen shirt."
-          src={img('shirts/shirt-p1_1.jpg')}
+          src={heroImage}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/70 via-[#111111]/20 to-transparent"></div>
         <div className="absolute bottom-0 left-0 p-6 w-full flex flex-col items-start z-10">
@@ -147,10 +153,10 @@ export default function HomeScreen() {
               <div className="flex justify-between items-start w-full z-10">
                 <div className="flex flex-col">
                   <span className="font-mono text-[9px] text-[#8B8B8A] uppercase tracking-wider">
-                    SPEC_ {activeShoe.id}
+                    SPEC_ {activeShoe?.id || '...'}
                   </span>
                   <span className="text-[11px] font-extrabold uppercase text-[#111111] tracking-tight mt-0.5">
-                    {activeShoe.subText}
+                    {activeShoe?.brand || 'Premium'}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 px-2 py-1 bg-[#F9F9F8] border border-[#E5E5E5]/60 rounded-full">
@@ -176,7 +182,7 @@ export default function HomeScreen() {
                       className="w-full h-full"
                       imgClassName="w-full h-full max-h-[160px] object-contain rounded-lg drop-shadow-2xl transition-transform duration-500 hover:scale-105 pointer-events-none"
                       alt={activeShoe.name}
-                      src={activeShoe.image}
+                      src={activeShoe?.images[0] || FALLBACK_IMAGE}
                       loading="eager"
                     />
                   </motion.div>
@@ -187,14 +193,14 @@ export default function HomeScreen() {
               <div className="flex flex-col w-full z-10 pt-2 gap-1.5">
                 <div className="flex justify-between items-baseline">
                   <h4 className="font-serif text-[20px] font-bold text-[#111111] uppercase tracking-tight">
-                    {activeShoe.name}
+                    {activeShoe?.name || 'Loading...'}
                   </h4>
                   <span className="font-serif text-[18px] font-bold text-[#4A5D23]">
-                    {CURRENCY}{activeShoe.price}
+                    {CURRENCY}{activeShoe?.price?.toFixed(2) || '0.00'}
                   </span>
                 </div>
                 <p className="text-[11px] text-[#666666] leading-relaxed line-clamp-2 h-8">
-                  {activeShoe.description}
+                  {activeShoe?.description || ''}
                 </p>
                 <button
                   onClick={(e) => {
@@ -211,7 +217,7 @@ export default function HomeScreen() {
 
           {/* Interactive Footwear Index controller bars selector */}
           <div className="flex justify-center items-center gap-3 mt-1 select-none">
-            {SHOWCASE_SHOES.map((shoe, idx) => (
+            {showcaseShoes.map((shoe, idx) => (
               <button
                 key={shoe.id}
                 onClick={() => {
@@ -249,7 +255,7 @@ export default function HomeScreen() {
                 className="absolute inset-0 w-full h-full"
                 imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
                 alt="Wide-leg pleated trousers."
-                src={img('trousers/trouser-p_tr_l1.jpg')}
+                src={trousersImage}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
@@ -295,7 +301,7 @@ export default function HomeScreen() {
                 className="absolute inset-0 w-full h-full"
                 imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
                 alt="Minimalist structured black leather bag on pedestal."
-                src={img('bags/bag-p8.jpg')}
+                src={bagsImage}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
@@ -331,7 +337,7 @@ export default function HomeScreen() {
                 className="absolute inset-0 w-full h-full"
                 imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
                 alt="Avant-garde black leather shoes."
-                src={img('shoes/shoe-p9.jpg')}
+                src={shoesImage}
               />
               <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
