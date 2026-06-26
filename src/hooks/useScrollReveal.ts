@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 
 /**
  * Reveals an element when it scrolls into view.
@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
  */
 export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
   threshold = 0.15
-): [React.RefObject<T | null>, boolean] {
+): [RefObject<T | null>, boolean] {
   const ref = useRef<T>(null);
   const [isVisible, setIsVisible] = useState(false);
 

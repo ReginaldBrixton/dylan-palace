@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useSellerAuth } from '../../context/SellerAuthContext';
 import {
-  fetchProducts,
+  fetchAllProducts,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -26,6 +26,19 @@ import type { Product, ProductCategory } from '../../lib/database.types';
 import { CURRENCY } from '../../constants';
 
 const CATEGORIES: ProductCategory[] = ['SHIRTS', 'TROUSERS', 'SHOES', 'BAGS'];
+
+// Helpers to normalize joined DB product to flat form fields
+function productImages(p: Product): string[] {
+  return (p.product_images || []).sort((a, b) => a.position - b.position).map((img) => img.url);
+}
+
+function productSizes(p: Product): string[] {
+  return (p.product_sizes || []).map((s) => s.size);
+}
+
+function productCategoryName(p: Product): ProductCategory {
+  return (p.category?.name || 'SHIRTS') as ProductCategory;
+}
 
 interface ProductForm {
   name: string;
@@ -74,7 +87,7 @@ export default function SellerProducts() {
   const load = useCallback(async () => {
     try {
       // Fetch all products (including out of stock) - seller view
-      const data = await fetchProducts();
+      const data = await fetchAllProducts();
       setProducts(data);
     } catch (err) {
       console.error('Failed to load products:', err);
@@ -89,7 +102,7 @@ export default function SellerProducts() {
 
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.category.toLowerCase().includes(search.toLowerCase())
+    productCategoryName(p).toLowerCase().includes(search.toLowerCase())
   );
 
   const handleOpenAdd = () => {
@@ -102,16 +115,16 @@ export default function SellerProducts() {
     setForm({
       name: product.name,
       brand: product.brand || '',
-      category: product.category,
+      category: productCategoryName(product),
       price: product.price.toString(),
       description: product.description || '',
-      images: product.images,
-      sizes: product.sizes,
-      colors: product.colors,
+      images: productImages(product),
+      sizes: productSizes(product),
+      colors: product.colors || [],
       in_stock: product.in_stock,
       stock_quantity: product.stock_quantity.toString(),
       is_featured: product.is_featured,
-      tags: product.tags,
+      tags: product.tags || [],
     });
     setEditingId(product.id);
     setShowModal(true);
@@ -183,7 +196,6 @@ export default function SellerProducts() {
         stock_quantity: parseInt(form.stock_quantity) || 0,
         is_featured: form.is_featured,
         tags: form.tags,
-        created_by: profile?.id || null,
       };
 
       if (editingId) {
@@ -290,8 +302,8 @@ export default function SellerProducts() {
                   className="bg-white rounded-xl border border-[#E5E5E5] overflow-hidden group"
                 >
                   <div className="aspect-square bg-[#F5F5F4] overflow-hidden relative">
-                    {product.images[0] ? (
-                      <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                    {productImages(product)[0] ? (
+                      <img src={productImages(product)[0]} alt={product.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex items-center justify-center h-full">
                         <Package size={24} className="text-[#E5E5E5]" />
@@ -310,7 +322,7 @@ export default function SellerProducts() {
                   </div>
                   <div className="p-4">
                     <p className="text-[9px] font-bold text-[#8B8B8A] uppercase tracking-wider mb-0.5">
-                      {product.category}
+                      {productCategoryName(product)}
                     </p>
                     <h3 className="text-sm font-bold text-[#111111] truncate mb-1">{product.name}</h3>
                     <p className="font-serif text-lg font-bold text-[#111111] mb-3">

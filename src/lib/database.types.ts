@@ -1,9 +1,13 @@
-// Database types matching the Supabase schema
+// Database types matching the Prisma-designed Supabase schema
 
-export type ProductCategory = 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS';
+export type ProductCategoryName = 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS';
 export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
 export type PaymentMethod = 'MOMO' | 'DELIVERY';
 export type UserRole = 'customer' | 'seller';
+export type Gender = 'MALE' | 'FEMALE' | 'UNISEX';
+
+// Keep old alias for backward compatibility
+export type ProductCategory = ProductCategoryName;
 
 export interface Profile {
   id: string;
@@ -15,23 +19,59 @@ export interface Profile {
   updated_at: string;
 }
 
+export interface Category {
+  id: number;
+  name: ProductCategoryName;
+  display_name: string;
+  slug: string;
+}
+
+export interface SubCategory {
+  id: number;
+  name: string;
+  display_name: string;
+  slug: string;
+  category_id: number;
+}
+
+export interface ProductImage {
+  id: string;
+  product_id: string;
+  url: string;
+  alt_text: string | null;
+  position: number;
+  created_at: string;
+}
+
+export interface ProductSize {
+  id: string;
+  product_id: string;
+  size: string;
+  in_stock: boolean;
+}
+
 export interface Product {
   id: string;
   name: string;
   brand: string | null;
-  category: ProductCategory;
+  category_id: number;
+  sub_category_id: number | null;
   price: number;
   description: string | null;
-  images: string[];
-  sizes: string[];
-  colors: string[];
+  gender: Gender | null;
   in_stock: boolean;
   stock_quantity: number;
   is_featured: boolean;
   tags: string[];
+  colors: string[];
+  created_by: string | null;
   created_at: string;
   updated_at: string;
-  created_by: string | null;
+  // Joined relations (when fetched with select)
+  category?: Category;
+  sub_category?: SubCategory | null;
+  product_images?: ProductImage[];
+  product_sizes?: ProductSize[];
 }
 
 export interface Order {

@@ -1,0 +1,1034 @@
+{
+  "products": [
+    {
+      "id": "p_ss1",
+      "name": "Boxy Camp Collar Shirt",
+      "price": 120,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "A relaxed camp collar shirt crafted from breathable cotton-blend. Features a sharp flat collar, horizontal hem line, and high-contrast horn-textured buttons.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEYCXcCWvzjkS9PKwZ46dx5W7iFzpNlXB1fnJO",
+          "altText": "Boxy Camp Collar Shirt - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss2",
+      "name": "Washed Charcoal Tee",
+      "price": 85,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "Heavily weighted 280GSM organic cotton jersey with dry hand-feel. Features a relaxed drop shoulder, thick double-needle collar, and vintage charcoal wash tone.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEW924t7qsSuHLK1cqEvzP3Nr7ZV5MfetphyQF",
+          "altText": "Washed Charcoal Tee - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss3",
+      "name": "Bound Silk Tee",
+      "price": 165,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "Impeccable silk-blend tee with clean bonded edge cuffs and hem. Seamless neckline finish creates a highly fluid editorial transition under suit jackets.",
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE1VacF5WzRjWsbvf5VBgi2QJD9CcOHToA4ue7",
+          "altText": "Bound Silk Tee - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_blue_polo",
+      "name": "Horizontal Blue Striped Knit Polo",
+      "price": 135,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "A luxurious short sleeve knit polo shirt adorned with grey and blue horizontal stripes. Features a sharp dark navy contrast collar and premium lightweight yarn construction.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEOAgJWrdcKbzxkGFZ9BuHrNQ7EytMsUiIq8pe",
+          "altText": "Horizontal Blue Striped Knit Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_beige_polo",
+      "name": "Beige Striped Knit Polo",
+      "price": 135,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "An elegant fine-knit polo shirt styled with subtle beige and tan stripes. Complemented by a solid taupe ribbed collar, presenting a highly sophisticated casual asset.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEZ33SWmGlqI12CPHO8Udiyf4GTpzk73sKwX0b",
+          "altText": "Beige Striped Knit Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_olive_polo",
+      "name": "Olive Striped Knit Polo",
+      "price": 135,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "Short sleeve fine-knit polo styled with elegant olive green and charcoal grey horizontal stripes. Complete with an olive ribbed collar and structured fit.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEHRixe3ARlSmHIkYjFBQP250ZDKehxarUs1c7",
+          "altText": "Olive Striped Knit Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_grey_white_collar_polo",
+      "name": "Two-Tone Grey Knit Polo",
+      "price": 145,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "A striking premium knit polo shirt designed with a textured heather-grey body contrasted beautifully by a pristine white collar and modern flat placket.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEExbxwkCagF2MXmvKkuNz3A1JqWUE87R0bdBr",
+          "altText": "Two-Tone Grey Knit Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_crochet_floral",
+      "name": "Crochet Floral Patchwork Shirt",
+      "price": 240,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "An editorial masterpiece constructed from handmade colorful crochet sunflower patches. Bold, breathable open-work design finished with a classic camp collar and real wood buttons.",
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEUB9HkVIIo9MFDkO5fRB3lPSNg1YhribZKuz6",
+          "altText": "Crochet Floral Patchwork Shirt - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_crochet_diamond",
+      "name": "Black Diamond Crochet Shirt",
+      "price": 220,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "Artisanal short sleeve resort knit shirt featuring a rich black crochet body highlighted by a high-contrast white diamond-lattice open lace overlay.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEwSiukIUBDAC8WEZxFwrH9uk36YnIlVMd7mTL",
+          "altText": "Black Diamond Crochet Shirt - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_grey_striped_hanging",
+      "name": "Retro Grey Striped Polo",
+      "price": 155,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "A premium heavy-weighted grey knit polo shirt featuring wide horizontal black stripes and delicate white accent lines. Infuses retro sport aesthetics into modern luxury.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEL6aLozHYhg8XVNWlCRG2Fbxofwv4apiTKrkA",
+          "altText": "Retro Grey Striped Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_black_ribbed_panel",
+      "name": "Ribbed-Panel Black Polo",
+      "price": 150,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "A sleek black luxury knit polo shirt defined by elegant vertical ribbed columns across the chest, creating high-fashion geometric texture depth.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEa2sDclKV8HLDWcCTGblFhZ4qKQSwsoapX79k",
+          "altText": "Ribbed-Panel Black Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_green_patterned",
+      "name": "Patterned Forest Green Polo",
+      "price": 160,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "Rich forest green short sleeve knit polo boasting sophisticated cream horizontal geometric diamond patterns. Perfect blend of heritage golf feel and high street luxury.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEmV8a9gnTUJ87deH3OEFhALBywD5QfVS4scoI",
+          "altText": "Patterned Forest Green Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_burgundy_ribbed",
+      "name": "Burgundy Ribbed Knit Polo",
+      "price": 140,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "Luxury short sleeve polo shirt cut from super soft combed burgundy yarn. Standard ribbed texture throughout delivers highly tactile luxury comfort.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEG3hL63FeYz7lKRVuNS6Ph5x4O18TLIbifCFp",
+          "altText": "Burgundy Ribbed Knit Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_ghana_home",
+      "name": "Ghana Federation Home Jersey",
+      "price": 110,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "The official white home jersey for the Ghana national football team. Displays abstract high-contrast line graphical layout in pan-African red, yellow, and green, complete with the iconic bold black star at center.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE74B5bF9F5bZsWuYNVxLR2M3oXJvcmD4Ky06i",
+          "altText": "Ghana Federation Home Jersey - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_ss_ghana_away",
+      "name": "Ghana Federation Away Jersey",
+      "price": 110,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "The spectacular away jersey of the Ghana national team in rich yellow-gold. Styled with traditional woven fabric pattern textures and contrast green collar detailing, centering the Black Star.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE1pOUPzWzRjWsbvf5VBgi2QJD9CcOHToA4ue7",
+          "altText": "Ghana Federation Away Jersey - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p1",
+      "name": "Structured Linen Shirt",
+      "price": 145,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "An uncompromising approach to summer shirting. Crafted from heavyweight, structured linen that maintains its architectural silhouette throughout the day. Features a hidden placket and zero visible stitching for extreme precision.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKED77osoTO7ksmn0ACFv2l3yw1gPEYGI6pxSBh",
+          "altText": "Structured Linen Shirt - Image 1",
+          "position": 0
+        },
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEmSmZUSTUJ87deH3OEFhALBywD5QfVS4scoIk",
+          "altText": "Structured Linen Shirt - Image 2",
+          "position": 1
+        }
+      ]
+    },
+    {
+      "id": "p2",
+      "name": "Oxford Poplin Shirt",
+      "price": 180,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "Impeccably tailored white button-down shirt. Features crisp single-needle stitching, structured premium double-ply cotton poplin for a crisp fall, and clean geometric lines.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE3QqD3w0HK8kJPavuLVz4Y6fNItxUsge1WDr0",
+          "altText": "Oxford Poplin Shirt - Image 1",
+          "position": 0
+        },
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE4CPANPDQREUtukI1ALv5NWo8BKGXljFiV6rc",
+          "altText": "Oxford Poplin Shirt - Image 2",
+          "position": 1
+        }
+      ]
+    },
+    {
+      "id": "p3",
+      "name": "Denim Overshirt",
+      "price": 220,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "Heavyweight raw denim overshirt styled with a stark, modern aesthetic. Silver polished button snaps and geometric double breast chest pockets provide high-contrast functionality.",
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE9VZK7dcLI7DOxT5ZHNtV3qF2s4jW8coG0Xyb",
+          "altText": "Denim Overshirt - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p4",
+      "name": "Silk Chiffon Shirt",
+      "price": 310,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "Pure flowing off-white silk chiffon shirt. Extremely smooth drape with translucent features, giving a dramatic airy look that transitions beautifully between environments.",
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEXFPmL2PZRLziG3at9m4TAh7UPob5QxeIwqCF",
+          "altText": "Silk Chiffon Shirt - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p5",
+      "name": "Structured Shacket",
+      "price": 450,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "A striking design hybrid between a structured jacket and a minimal shirt. Heavy architectural tailoring makes this charcoal beauty stand on its own feet.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEc8ZbrBt8eRPqlo7x1MrSztKYEZNJOIiQ0HLX",
+          "altText": "Structured Shacket - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p6",
+      "name": "Striped Poplin",
+      "price": 195,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "Fine blue and white striped cotton poplin pattern with classic single-button cuffs. Crafted with high stitch density for maximum luxury and long-lasting editorial shape.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEZef4JbGlqI12CPHO8Udiyf4GTpzk73sKwX0b",
+          "altText": "Striped Poplin - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_si1",
+      "name": "Ribbed Knit Singlet",
+      "price": 75,
+      "category": "SHIRTS",
+      "subCategory": "SINGLETS",
+      "description": "Classic ribbed athletic singlet cut from heavy organic cotton-modal yarn. Deep scooped neckline, wide shoulder straps, and tailored side darts for a raw brutal shape.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEtIAGk1bTPtG2vAUWXSOqIKdDbh4Cl1oYj87F",
+          "altText": "Ribbed Knit Singlet - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_si2",
+      "name": "Raw Asymmetric Vest",
+      "price": 95,
+      "category": "SHIRTS",
+      "subCategory": "SINGLETS",
+      "description": "Architectural asymmetric knit singlet. Curved side slits and unfinished flat hems create a perfect layering tool with high visual rhythm.",
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEjgPTM4U3RMvmPor9q8lhWpXKxQ4ebLtVZHau",
+          "altText": "Raw Asymmetric Vest - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_add_resort_abstract",
+      "name": "Abstract Earth Resort Shirt",
+      "price": 155,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "A stunning resort-style shirt featuring an abstract earthy botanical pattern printed on ultra-fluid, sustainable tencel fiber. Styled with a classic cuban camp collar and clean casual fit.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEFKf2ni61V6J84DKrYbdxvZIW9BTiEOuzjhqf",
+          "altText": "Abstract Earth Resort Shirt - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_add_linen_buttonup",
+      "name": "Portuguese Linen Button-Up",
+      "price": 165,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "Naturally breathable long-sleeve shirt crafted from premium Portuguese linen yarn. Featuring structural chest pockets, a sharp collar stand, and mother-of-pearl buttons.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEMqBAobs1qCJG1T6y5eWB4ivHK2INPbORwUkX",
+          "altText": "Portuguese Linen Button-Up - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_add_utility_overshirt",
+      "name": "Minimal Canvas Overshirt",
+      "price": 185,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "The ultimate layering piece. Crafted from heavyweight wash-treated utility canvas, featuring an elegant flat placket, large architectural flap pockets, and a clean square hem.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEhUpb7uav1e0b3DZmJnv7Rzi4CM8tfUSPKlaF",
+          "altText": "Minimal Canvas Overshirt - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_add_pinstripe_dress",
+      "name": "Signature Pinstripe Dress Shirt",
+      "price": 195,
+      "category": "SHIRTS",
+      "subCategory": "LONG SLEEVES",
+      "description": "An exquisite stripe shirt detailed with fine charcoal stripes. Expertly tailored in Italy with standard spread collar, curved hemline, and custom button cuffs.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE2wFdlfuhtr93IaJWxTEhYF6cek8B15UdRjK2",
+          "altText": "Signature Pinstripe Dress Shirt - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_add_piquet_polo",
+      "name": "Fine Pique Classic Polo",
+      "price": 125,
+      "category": "SHIRTS",
+      "subCategory": "SHORT SLEEVES",
+      "description": "Crafted from soft comb-cotton pique weave. High tactile elegance, solid rib cuffs, and a dynamic two-button placket for complete stylistic versatility.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEbSRS3mLHrTK0gPNk1ex5lXIsYviC7aQj4dFD",
+          "altText": "Fine Pique Classic Polo - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_s1",
+      "name": "Brutalist Cargo Shorts",
+      "price": 110,
+      "category": "TROUSERS",
+      "subCategory": "SHORTS",
+      "gender": "MALE",
+      "description": "Heavy architectural cotton shorts with flat cargo pockets flushed to the side seams. Hidden button flies, zero outward hardware, and clean raw edges.",
+      "sizes": [
+        "28",
+        "30",
+        "32",
+        "34",
+        "36"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE3fayMc0HK8kJPavuLVz4Y6fNItxUsge1WDr0",
+          "altText": "Brutalist Cargo Shorts - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_s2",
+      "name": "Pleated Walk Shorts",
+      "price": 135,
+      "category": "TROUSERS",
+      "subCategory": "SHORTS",
+      "gender": "MALE",
+      "description": "Crisp wide-leg pleated shorts crafted from visual structure drill twill. Sharp front creasing ensures an impeccably modern street presence.",
+      "sizes": [
+        "30",
+        "32",
+        "34",
+        "36"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEtrK4fkbTPtG2vAUWXSOqIKdDbh4Cl1oYj87F",
+          "altText": "Pleated Walk Shorts - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_s_chevron",
+      "name": "Dual Chevron Athletic Shorts",
+      "price": 95,
+      "category": "TROUSERS",
+      "subCategory": "SHORTS",
+      "gender": "MALE",
+      "description": "Premium casual training shorts package containing a deep black pair and an off-white cream pair. Finished with a clean contrasting double-chevron logo at left hem.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEXM4RM2ZRLziG3at9m4TAh7UPob5QxeIwqCFr",
+          "altText": "Dual Chevron Athletic Shorts - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_s_circular",
+      "name": "Circular Patch Sweat Shorts",
+      "price": 85,
+      "category": "TROUSERS",
+      "subCategory": "SHORTS",
+      "gender": "MALE",
+      "description": "Ultra cozy sweat shorts crafted in delicate pastel cream-yellow heavy fleece cotton. Featuring a high contrast custom circular branding emblem on left hem.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEAPi0y8oV5lNEKTWnCz1Up4vwd2Xgiek73Fht",
+          "altText": "Circular Patch Sweat Shorts - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_s5",
+      "name": "High-Waisted Denim Shorts",
+      "price": 115,
+      "category": "TROUSERS",
+      "subCategory": "SHORTS",
+      "gender": "FEMALE",
+      "description": "Relaxed premium high-waisted denim shorts. Authentic wash with raw cuffed hems and traditional five-pocket hardware.",
+      "sizes": [
+        "26",
+        "28",
+        "30",
+        "32"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEVoOCZ3NNYWjzxmcAOB74Z8Hv2n1Ibr3Ch69s",
+          "altText": "High-Waisted Denim Shorts - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_j8",
+      "name": "Architectural Pleated Trousers",
+      "price": 175,
+      "category": "TROUSERS",
+      "subCategory": "TROUSERS",
+      "gender": "MALE",
+      "description": "Sculpted wide-leg pleated trousers in premium wool-blend twill. Deep front pleats create dramatic drape while maintaining a sharp architectural silhouette.",
+      "sizes": [
+        "28",
+        "30",
+        "32",
+        "34",
+        "36"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE87nSvsVIMZaPNfmeipXcLJWqKRH6QBhF94zs",
+          "altText": "Architectural Pleated Trousers - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_l5",
+      "name": "Tailored Wool Trousers",
+      "price": 220,
+      "category": "TROUSERS",
+      "subCategory": "TROUSERS",
+      "gender": "MALE",
+      "description": "Impeccably tailored flat-front trousers crafted from fine Italian wool. Clean lines, precise break, and a structured waistband for uncompromising elegance.",
+      "sizes": [
+        "30",
+        "32",
+        "34",
+        "36"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEcBGBc4t8eRPqlo7x1MrSztKYEZNJOIiQ0HLX",
+          "altText": "Tailored Wool Trousers - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_l6",
+      "name": "Relaxed Linen Trousers",
+      "price": 155,
+      "category": "TROUSERS",
+      "subCategory": "TROUSERS",
+      "gender": "MALE",
+      "description": "Breathable premium linen trousers with a relaxed drape and tapered ankle. Effortless warm-weather tailoring with a refined editorial finish.",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEbj77xPLHrTK0gPNk1ex5lXIsYviC7aQj4dFD",
+          "altText": "Relaxed Linen Trousers - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_tr_l7",
+      "name": "Pleated Wide-Leg Trousers",
+      "price": 195,
+      "category": "TROUSERS",
+      "subCategory": "TROUSERS",
+      "gender": "FEMALE",
+      "description": "Avant-garde wide-leg pleated trousers with dramatic volume and fluid movement. High-waisted silhouette with crisp front creases for editorial impact.",
+      "sizes": [
+        "26",
+        "28",
+        "30",
+        "32"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEYCE8dZNzjkS9PKwZ46dx5W7iFzpNlXB1fnJO",
+          "altText": "Pleated Wide-Leg Trousers - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_sh_sn1",
+      "name": "Monolith Trail Runner",
+      "price": 195,
+      "category": "SHOES",
+      "subCategory": "SNEAKERS",
+      "description": "Tech trail performance runner utilizing highly structured panels, breathable mesh base, and thick vulcanized lug outer grips for maximalist contrast appeal.",
+      "sizes": [
+        "40",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEHHVwsmARlSmHIkYjFBQP250ZDKehxarUs1c7",
+          "altText": "Monolith Trail Runner - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_sh_sn2",
+      "name": "Off-white Vulc Trainer",
+      "price": 140,
+      "category": "SHOES",
+      "subCategory": "SNEAKERS",
+      "description": "Clean low profile sneakers featuring premium calf leather linings, dual stitched canvas upper panels, and a completely flat vulcanized custom out-sole.",
+      "sizes": [
+        "39",
+        "40",
+        "41",
+        "42",
+        "43",
+        "44"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEe15UeFYhSxE5az8rKbufW4CFo3X6PAJsNVMk",
+          "altText": "Off-white Vulc Trainer - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p9",
+      "name": "Avant-Garde Oxford",
+      "price": 290,
+      "category": "SHOES",
+      "subCategory": "OXFORDS",
+      "description": "Avant-garde black leather lace-ups resting elegantly. Highly detailed seamless crafting, hard polished outer finish, and standard low profile block heel for uncompromised styling.",
+      "sizes": [
+        "39",
+        "40",
+        "41",
+        "42",
+        "43",
+        "44"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEhfILNAv1e0b3DZmJnv7Rzi4CM8tfUSPKlaFL",
+          "altText": "Avant-Garde Oxford - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_sh_ox2",
+      "name": "Polished Box-Calf Derbies",
+      "price": 330,
+      "category": "SHOES",
+      "subCategory": "OXFORDS",
+      "description": "Classic derby lace-ups using highly polished glass surface box-calf leather. Structured Goodyear Welt stitch construction guarantees eternal utility.",
+      "sizes": [
+        "40",
+        "41",
+        "42",
+        "43",
+        "44"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE2ZvHP8htr93IaJWxTEhYF6cek8B15UdRjK2y",
+          "altText": "Polished Box-Calf Derbies - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_sh_bo1",
+      "name": "Chelsea Platform Boot",
+      "price": 410,
+      "category": "SHOES",
+      "subCategory": "BOOTS",
+      "description": "Sleek black calf leather ankle chelsea boot utilizing robust side stretch elastic inserts, heavy stack platform outsoles, and direct fit double pull-tabs.",
+      "sizes": [
+        "40",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE7axFkB9F5bZsWuYNVxLR2M3oXJvcmD4Ky06i",
+          "altText": "Chelsea Platform Boot - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_sh_gen1",
+      "name": "Minimal Street Sneaker",
+      "price": 320,
+      "category": "SHOES",
+      "subCategory": "SNEAKERS",
+      "description": "A minimalist, high-fashion street sneaker. Clean lines and a monochromatic cohesive design created for ultimate street presence.",
+      "sizes": [
+        "40",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEacnTLIKV8HLDWcCTGblFhZ4qKQSwsoapX79k",
+          "altText": "Minimal Street Sneaker - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_sh_gen2",
+      "name": "Industrial Leather Boot",
+      "price": 480,
+      "category": "SHOES",
+      "subCategory": "BOOTS",
+      "description": "A bold, heavy-duty black leather platform boot with a brutalist high-fashion aesthetic.",
+      "sizes": [
+        "40",
+        "41",
+        "42",
+        "43",
+        "44"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEZ6Scr2GlqI12CPHO8Udiyf4GTpzk73sKwX0b",
+          "altText": "Industrial Leather Boot - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_sh_gen3",
+      "name": "Classic Dark Loafer",
+      "price": 280,
+      "category": "SHOES",
+      "subCategory": "LOAFERS",
+      "description": "A highly polished, dark brown leather loafer shoe embodying a minimalist modern luxury aesthetic.",
+      "sizes": [
+        "39",
+        "40",
+        "41",
+        "42",
+        "43"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEWBG1ivqsSuHLK1cqEvzP3Nr7ZV5MfetphyQF",
+          "altText": "Classic Dark Loafer - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p7",
+      "name": "Structured Canvas Tote",
+      "price": 220,
+      "category": "BAGS",
+      "subCategory": "TOTES",
+      "description": "A durable structured black canvas tote bag. Perfect rectangular silhouette with rigid corners, flat hand straps, and clean minimalistic metal rivet reinforcements.",
+      "sizes": [
+        "OS"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEFiClB61V6J84DKrYbdxvZIW9BTiEOuzjhqfA",
+          "altText": "Structured Canvas Tote - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p8",
+      "name": "Sleek Leather Clasp Bag",
+      "price": 380,
+      "category": "BAGS",
+      "subCategory": "CLUTCHES",
+      "description": "Meticulously crafted black structured leather bag resting on stark architectural geometries. Heavy premium leather hardware with precise magnetic clasp alignment.",
+      "sizes": [
+        "OS"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKE3dlsEr0HK8kJPavuLVz4Y6fNItxUsge1WDr0",
+          "altText": "Sleek Leather Clasp Bag - Image 1",
+          "position": 0
+        }
+      ]
+    },
+    {
+      "id": "p_bg_bp1",
+      "name": "Monolith Tech Backpack",
+      "price": 260,
+      "category": "BAGS",
+      "subCategory": "BACKPACKS",
+      "description": "Matte custom weathercoat outer nylon pack with seamless taped zip dividers. Includes structured hidden internal tech sleeve slots.",
+      "sizes": [
+        "OS"
+      ],
+      "images": [
+        {
+          "url": "https://utfs.io/f/rcR5Ive7JRKEV1dhSGNNYWjzxmcAOB74Z8Hv2n1Ibr3Ch69s",
+          "altText": "Monolith Tech Backpack - Image 1",
+          "position": 0
+        }
+      ]
+    }
+  ]
+}

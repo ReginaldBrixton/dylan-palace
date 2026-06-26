@@ -74,9 +74,9 @@ export async function uploadFile(file: File): Promise<UploadThingFile> {
     id: fileData.id || uploadData.id,
     name: file.name,
     size: file.size,
-    url: fileData.url || uploadData.fileUrl,
+    url: fileData.ufsUrl || fileData.url || uploadData.fileUrl,
     key: fileData.key || uploadData.key,
-    fileUrl: fileData.url || uploadData.fileUrl,
+    fileUrl: fileData.ufsUrl || fileData.url || uploadData.fileUrl,
   };
 }
 

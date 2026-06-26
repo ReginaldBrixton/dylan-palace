@@ -1,55 +1,224 @@
 import { supabase } from './supabase';
-import type { Product, Order, OrderItem, Profile, ProductCategory, OrderStatus } from './database.types';
+import type { Product, Order, OrderItem, Profile, ProductCategory, OrderStatus, Category, SubCategory } from './database.types';
 
 // ============================================
-// PRODUCTS
+// CATEGORIES
 // ============================================
 
-export async function fetchProducts(category?: ProductCategory): Promise<Product[]> {
-  let query = supabase.from('products').select('*').eq('in_stock', true);
-  if (category) {
-    query = query.eq('category', category);
-  }
-  const { data, error } = await query.order('created_at', { ascending: false });
+const categoryCache = new Map<string, Category>();
+
+export async function fetchCategories(): Promise<Category[]> {
+  const { data, error } = await supabase.from('categories').select('*').order('name');
+  if (error) throw error;
+  (data || []).forEach((c) => categoryCache.set(c.name, c));
+  return data || [];
+}
+
+export async function fetchCategoryId(name: ProductCategory): Promise<number | null> {
+  if (categoryCache.has(name)) return categoryCache.get(name)!.id;
+  await fetchCategories();
+  return categoryCache.get(name)?.id || null;
+}
+
+export async function fetchSubCategories(categoryId?: number): Promise<SubCategory[]> {
+  let query = supabase.from('sub_categories').select('*').order('name');
+  if (categoryId) query = query.eq('category_id', categoryId);
+  const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
 
+// ============================================
+// PRODUCTS (with joined relations)
+// ============================================
+
+const PRODUCT_SELECT = `
+  *,
+  category:categories(*),
+  sub_category:sub_categories(*),
+  product_images(*),
+  product_sizes(*)
+` as const;
+
+export async function fetchProducts(category?: ProductCategory): Promise<Product[]> {
+  let query = supabase.from('products').select(PRODUCT_SELECT).eq('in_stock', true);
+  if (category) {
+    const catId = await fetchCategoryId(category);
+    if (catId) query = query.eq('category_id', catId);
+  }
+  const { data, error } = await query.order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []) as unknown as Product[];
+}
+
+export async function fetchAllProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select(PRODUCT_SELECT)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []) as unknown as Product[];
+}
+
 export async function fetchProductById(id: string): Promise<Product | null> {
-  const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
+  const { data, error } = await supabase
+    .from('products')
+    .select(PRODUCT_SELECT)
+    .eq('id', id)
+    .single();
   if (error) {
-    if (error.code === 'PGRST116') return null; // Not found
+    if (error.code === 'PGRST116') return null;
     throw error;
   }
-  return data;
+  return data as unknown as Product;
 }
 
 export async function fetchFeaturedProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('*')
+    .select(PRODUCT_SELECT)
     .eq('is_featured', true)
     .eq('in_stock', true)
     .limit(6);
   if (error) throw error;
-  return data || [];
+  return (data || []) as unknown as Product[];
 }
 
-export async function createProduct(product: Omit<Product, 'id' | 'created_at' | 'updated_at'>): Promise<Product> {
-  const { data, error } = await supabase.from('products').insert(product).select().single();
-  if (error) throw error;
-  return data;
+export async function createProduct(
+  product: {
+    name: string;
+    brand?: string | null;
+    category: ProductCategory;
+    subCategory?: string;
+    price: number;
+    description?: string | null;
+    gender?: string | null;
+    images: string[];
+    sizes: string[];
+    colors?: string[];
+    in_stock?: boolean;
+    stock_quantity?: number;
+    is_featured?: boolean;
+    tags?: string[];
+  }
+): Promise<Product> {
+  const catId = await fetchCategoryId(product.category);
+  if (!catId) throw new Error(`Category ${product.category} not found`);
+
+  // Resolve sub-category if provided
+  let subCatId: number | null = null;
+  if (product.subCategory) {
+    const slug = product.subCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const { data: subCat } = await supabase
+      .from('sub_categories')
+      .select('id')
+      .eq('slug', slug)
+      .eq('category_id', catId)
+      .single();
+    subCatId = subCat?.id || null;
+  }
+
+  // Insert product
+  const { data: prodData, error: prodError } = await supabase
+    .from('products')
+    .insert({
+      name: product.name,
+      brand: product.brand || null,
+      category_id: catId,
+      sub_category_id: subCatId,
+      price: product.price,
+      description: product.description || null,
+      gender: product.gender || null,
+      in_stock: product.in_stock ?? true,
+      stock_quantity: product.stock_quantity ?? 0,
+      is_featured: product.is_featured ?? false,
+      tags: product.tags || [],
+      colors: product.colors || [],
+    })
+    .select('id')
+    .single();
+  if (prodError) throw prodError;
+
+  const productId = prodData.id;
+
+  // Insert images
+  if (product.images.length > 0) {
+    const imageRows = product.images.map((url, i) => ({
+      product_id: productId,
+      url,
+      alt_text: `${product.name} - Image ${i + 1}`,
+      position: i,
+    }));
+    const { error: imgError } = await supabase.from('product_images').insert(imageRows);
+    if (imgError) throw imgError;
+  }
+
+  // Insert sizes
+  if (product.sizes.length > 0) {
+    const sizeRows = product.sizes.map((size) => ({
+      product_id: productId,
+      size,
+      in_stock: true,
+    }));
+    const { error: sizeError } = await supabase.from('product_sizes').insert(sizeRows);
+    if (sizeError) throw sizeError;
+  }
+
+  return await fetchProductById(productId) as Product;
 }
 
-export async function updateProduct(id: string, updates: Partial<Product>): Promise<Product> {
+export async function updateProduct(id: string, updates: Partial<Product> & {
+  images?: string[];
+  sizes?: string[];
+  category?: ProductCategory;
+}): Promise<Product> {
+  const { images, sizes, category, ...productFields } = updates;
+
+  const updateData: Record<string, any> = { ...productFields };
+
+  if (category) {
+    const catId = await fetchCategoryId(category);
+    if (catId) updateData.category_id = catId;
+  }
+
+  // Remove relation fields that don't exist on the products table
+  delete updateData.category;
+  delete updateData.sub_category;
+  delete updateData.product_images;
+  delete updateData.product_sizes;
+
   const { data, error } = await supabase
     .from('products')
-    .update(updates)
+    .update(updateData)
     .eq('id', id)
-    .select()
+    .select('id')
     .single();
   if (error) throw error;
-  return data;
+
+  // Update images if provided
+  if (images) {
+    await supabase.from('product_images').delete().eq('product_id', id);
+    if (images.length > 0) {
+      const imageRows = images.map((url, i) => ({
+        product_id: id,
+        url,
+        alt_text: `${updateData.name || 'Product'} - Image ${i + 1}`,
+        position: i,
+      }));
+      await supabase.from('product_images').insert(imageRows);
+    }
+  }
+
+  // Update sizes if provided
+  if (sizes) {
+    await supabase.from('product_sizes').delete().eq('product_id', id);
+    if (sizes.length > 0) {
+      const sizeRows = sizes.map((size) => ({ product_id: id, size, in_stock: true }));
+      await supabase.from('product_sizes').insert(sizeRows);
+    }
+  }
+
+  return await fetchProductById(id) as Product;
 }
 
 export async function deleteProduct(id: string): Promise<void> {

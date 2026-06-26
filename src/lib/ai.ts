@@ -1,18 +1,16 @@
 import { GoogleGenAI } from '@google/genai';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+const GEMINI_KEYS = [
+  import.meta.env.VITE_GEMINI_API_KEY,
+  import.meta.env.VITE_GEMINI_API_KEY_1,
+  import.meta.env.VITE_GEMINI_API_KEY_2,
+  import.meta.env.VITE_GEMINI_API_KEY_3,
+  import.meta.env.VITE_GEMINI_API_KEY_4,
+  import.meta.env.VITE_GEMINI_API_KEY_5,
+  import.meta.env.VITE_GEMINI_API_KEY_6,
+].filter(Boolean) as string[];
 
-let ai: GoogleGenAI | null = null;
-
-function getAI(): GoogleGenAI {
-  if (!ai) {
-    if (!GEMINI_API_KEY) {
-      throw new Error('Missing VITE_GEMINI_API_KEY. Add it to .env.local');
-    }
-    ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-  }
-  return ai;
-}
+const MODEL = 'gemini-2.5-flash-lite';
 
 export interface AIProductSuggestion {
   name: string;
@@ -23,13 +21,44 @@ export interface AIProductSuggestion {
   colors: string[];
 }
 
-/**
- * Analyzes a product image using Gemini AI and suggests
- * product name, description, brand, category, tags, and colors.
- * The seller still sets the price manually.
- */
+async function callGemini(imageBase64: string, mimeType: string, prompt: string): Promise<string> {
+  let lastError: Error | null = null;
+
+  for (const key of GEMINI_KEYS) {
+    try {
+      const ai = new GoogleGenAI({ apiKey: key });
+      const result = await ai.models.generateContent({
+        model: MODEL,
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType: mimeType || 'image/jpeg',
+                  data: imageBase64,
+                },
+              },
+            ],
+          },
+        ],
+      });
+      const text = result.text || '';
+      if (text) return text;
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`Gemini key failed (${key.slice(0, 10)}...):`, err.message);
+    }
+  }
+
+  throw lastError || new Error('No Gemini API keys configured');
+}
+
 export async function analyzeProductImage(imageUrl: string): Promise<AIProductSuggestion> {
-  const genai = getAI();
+  if (GEMINI_KEYS.length === 0) {
+    throw new Error('Missing VITE_GEMINI_API_KEY. Add at least one key to .env.local');
+  }
 
   // Fetch the image and convert to base64
   const response = await fetch(imageUrl);
@@ -50,30 +79,12 @@ Return ONLY a JSON object with this exact structure:
 
 Analyze the image carefully and provide accurate fashion-specific details.`;
 
-  const result = await genai.models.generateContent({
-    model: 'gemini-2.0-flash',
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          { text: prompt },
-          {
-            inlineData: {
-              mimeType: blob.type || 'image/jpeg',
-              data: base64,
-            },
-          },
-        ],
-      },
-    ],
-  });
-
-  const text = result.response?.text?.() || '';
+  const text = await callGemini(base64, blob.type, prompt);
 
   // Extract JSON from the response
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    throw new Error('AI did not return valid JSON');
+    throw new Error('AI did not return valid JSON: ' + text.slice(0, 200));
   }
 
   const suggestion = JSON.parse(jsonMatch[0]) as AIProductSuggestion;
@@ -81,7 +92,7 @@ Analyze the image carefully and provide accurate fashion-specific details.`;
   // Validate category
   const validCategories = ['SHIRTS', 'TROUSERS', 'SHOES', 'BAGS'];
   if (!validCategories.includes(suggestion.category)) {
-    suggestion.category = 'SHIRTS'; // Default fallback
+    suggestion.category = 'SHIRTS';
   }
 
   return suggestion;
@@ -92,7 +103,6 @@ function blobToBase64(blob: Blob): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
       const base64 = result.split(',')[1];
       resolve(base64);
     };
