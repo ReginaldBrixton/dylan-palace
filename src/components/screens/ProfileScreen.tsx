@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Order, Product } from '../../types';
+import { Order, Product, Screen } from '../../types';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Package,
@@ -17,11 +17,13 @@ import {
   Compass
 } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
+import { CURRENCY } from '../../constants';
 
 interface ProfileScreenProps {
   pastOrders: Order[];
   wishlist: Product[];
   onSelectProduct: (p: Product) => void;
+  onNavigate?: (screen: Screen) => void;
 }
 
 interface TrackingMilestone {
@@ -33,7 +35,7 @@ interface TrackingMilestone {
   status: 'completed' | 'active' | 'upcoming';
 }
 
-export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }: ProfileScreenProps) {
+export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct, onNavigate }: ProfileScreenProps) {
   const [activeTab, setActiveTab] = useState<'ORDERS' | 'WISHLIST'>('ORDERS');
   const [expandedTracking, setExpandedTracking] = useState<Record<string, boolean>>({});
 
@@ -68,7 +70,7 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
           <span style="font-size: 11px; color: #666666;">Size: ${item.selectedSize} | Qty: ${item.quantity}</span>
         </td>
         <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #E5E5E5; font-size: 13px; color: #111111;">
-          GH₵${(item.product.price * item.quantity).toFixed(2)}
+          ${CURRENCY}${(item.product.price * item.quantity).toFixed(2)}
         </td>
       </tr>
     `).join('');
@@ -231,11 +233,11 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
         <div class="summary-box">
           <div class="summary-row">
             <span>Subtotal:</span>
-            <span>GH₵${subtotal.toFixed(2)}</span>
+            <span>${CURRENCY}${subtotal.toFixed(2)}</span>
           </div>
           <div class="summary-row" style="color: #666666;">
             <span>VAT (15%):</span>
-            <span>GH₵${vat.toFixed(2)}</span>
+            <span>${CURRENCY}${vat.toFixed(2)}</span>
           </div>
           <div class="summary-row" style="color: #666666;">
             <span>Standard Palace Delivery:</span>
@@ -243,7 +245,7 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
           </div>
           <div class="total-row">
             <span>Amount Paid:</span>
-            <span>GH₵${order.totalAmount.toFixed(2)}</span>
+            <span>${CURRENCY}${order.totalAmount.toFixed(2)}</span>
           </div>
         </div>
 
@@ -466,7 +468,7 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
                           </div>
                           <div className="text-right">
                             <p className="font-serif text-[15px] font-bold text-[#111111]">
-                              GH₵{order.totalAmount.toFixed(2)}
+                              {CURRENCY}{order.totalAmount.toFixed(2)}
                             </p>
                             <span className={`inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-widest ${order.status === 'DELIVERED'
                               ? 'bg-[#4A5D23]/10 text-[#4A5D23]'
@@ -503,7 +505,7 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
                                 </div>
                               </div>
                               <span className="font-mono text-[#111111] pt-0.5 font-medium">
-                                GH₵{(item.product.price * item.quantity).toFixed(2)}
+                                {CURRENCY}{(item.product.price * item.quantity).toFixed(2)}
                               </span>
                             </li>
                           ))}
@@ -664,14 +666,17 @@ export default function ProfileScreen({ pastOrders, wishlist, onSelectProduct }:
             ) : (
               <div className="flex flex-col divide-y divide-[#E5E5E5] border-y border-[#E5E5E5]">
                 {wishlist.map((product) => (
-                  <div key={product.id} className="flex items-center py-3 gap-3 cursor-pointer group hover:bg-[#F9F9F8]" onClick={() => onSelectProduct(product)}>
+                  <div key={product.id} className="flex items-center py-3 gap-3 cursor-pointer group hover:bg-[#F9F9F8]" onClick={() => {
+                    onSelectProduct(product);
+                    onNavigate?.('pdp');
+                  }}>
                     <div className="w-16 h-20 bg-[#eeeeed] shrink-0 rounded overflow-hidden">
                       <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0 font-sans">
                       <p className="text-[9px] font-bold text-[#8B8B8A] uppercase tracking-wider mb-0.5">{product.brand || product.category}</p>
                       <h4 className="text-[12px] font-bold text-[#111111] truncate">{product.name}</h4>
-                      <p className="font-serif text-[13px] font-bold text-[#111111] mt-1">GH₵{product.price.toFixed(2)}</p>
+                      <p className="font-serif text-[13px] font-bold text-[#111111] mt-1">{CURRENCY}{product.price.toFixed(2)}</p>
                     </div>
                     <ChevronRight size={16} className="text-[#E5E5E5] group-hover:text-[#111111] shrink-0" />
                   </div>

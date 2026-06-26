@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { Truck, Plus, Minus, Info, Heart, Share2 } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Truck, Heart, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Product } from '../../types';
+import { Product, Screen } from '../../types';
 import { getRelatedProducts } from '../../api/products';
+import { CURRENCY } from '../../constants';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
 
 interface ProductDetailScreenProps {
@@ -11,9 +12,10 @@ interface ProductDetailScreenProps {
   onToggleWishlist: (productId: string) => void;
   onAddtoBag: (product: Product, size: string) => void;
   onSelectProduct?: (product: Product) => void;
+  onNavigate?: (screen: Screen) => void;
 }
 
-export default function ProductDetailScreen({ product, wishlist, onToggleWishlist, onAddtoBag, onSelectProduct }: ProductDetailScreenProps) {
+export default function ProductDetailScreen({ product, wishlist, onToggleWishlist, onAddtoBag, onSelectProduct, onNavigate }: ProductDetailScreenProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
   const [isAdded, setIsAdded] = useState(false);
@@ -23,6 +25,13 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
 
   // Size guide trigger modal state
   const [showSizeGuide, setShowSizeGuide] = useState(false);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+    setSelectedSize(product.sizes[0] || 'M');
+    setIsAdded(false);
+    setExpandedSection(null);
+  }, [product.id, product.sizes]);
 
   const relatedProducts = useMemo(() => {
     return getRelatedProducts(product, 3);
@@ -153,7 +162,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
           {product.name}
         </h1>
         <p className="text-[20px] font-bold text-[#111111] mb-4">
-          GH₵{product.price.toFixed(2)}
+          {CURRENCY}{product.price.toFixed(2)}
         </p>
         <p className="text-[14px] leading-relaxed text-[#555555] max-w-prose">
           {product.description}
@@ -324,6 +333,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
                 if (onSelectProduct) {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   onSelectProduct(related);
+                  onNavigate?.('pdp');
                 }
               }}
             >
@@ -336,7 +346,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
                 />
               </div>
               <h4 className="text-[10px] font-bold text-[#111111] truncate">{related.name}</h4>
-              <p className="text-[10px] text-[#555555]">GH₵{related.price.toFixed(2)}</p>
+              <p className="text-[10px] text-[#555555]">{CURRENCY}{related.price.toFixed(2)}</p>
             </div>
           ))}
         </div>
@@ -351,7 +361,7 @@ export default function ProductDetailScreen({ product, wishlist, onToggleWishlis
             : 'bg-[#111111] text-white hover:bg-black'
             }`}
         >
-          {isAdded ? "ADDED TO BAG" : `ADD TO BAG - GH₵${product.price}.00`}
+          {isAdded ? "ADDED TO BAG" : `ADD TO BAG - ${CURRENCY}${product.price.toFixed(2)}`}
         </button>
       </div>
 

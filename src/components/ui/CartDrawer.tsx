@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { CartItem, Screen } from '../../types';
+import { CURRENCY } from '../../constants';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -85,7 +86,7 @@ export default function CartDrawer({
                         {item.product.name}
                       </h3>
                       <span className="text-[14px] font-bold text-[#111111]">
-                        GH₵{item.product.price * item.quantity}
+                        {CURRENCY}{(item.product.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
 
@@ -158,7 +159,7 @@ export default function CartDrawer({
                 Subtotal
               </span>
               <span className="font-serif text-[26px] font-bold text-[#111111] tracking-tighter leading-none">
-                GH₵{subtotal}.00
+                {CURRENCY}{subtotal.toFixed(2)}
               </span>
             </div>
             <button

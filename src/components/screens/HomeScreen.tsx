@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Rotate3d, ArrowRight } from 'lucide-react';
 import { Screen, Category } from '../../types';
 import { img } from '../../utils/imageMap';
+import { CURRENCY } from '../../constants';
 import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../ui/AtelierInteractive';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
 
@@ -180,7 +181,7 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: HomeScreenP
                     {activeShoe.name}
                   </h4>
                   <span className="font-serif text-[18px] font-bold text-[#4A5D23]">
-                    GH₵{activeShoe.price}
+                    {CURRENCY}{activeShoe.price}
                   </span>
                 </div>
                 <p className="text-[11px] text-[#666666] leading-relaxed line-clamp-2 h-8">

@@ -34,6 +34,7 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[0]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [lastOrder, setLastOrder] = useState<CheckoutDetails | null>(null);
+  const [lastOrderId, setLastOrderId] = useState<string | undefined>(undefined);
 
   const { cartItems, addToBag, updateQty, removeItem, clearCart } = useCart();
   const { wishlist, toggleWishlist } = useWishlist();
@@ -56,7 +57,8 @@ export default function App() {
   const handleOrderComplete = useCallback((details: CheckoutDetails) => {
     triggerHaptic('heavy');
     setLastOrder(details);
-    addOrder(details, cartItems);
+    const order = addOrder(details, cartItems);
+    setLastOrderId(order.id);
     clearCart();
     setScreen('success');
   }, [addOrder, cartItems, clearCart]);
@@ -114,6 +116,7 @@ export default function App() {
                   onToggleWishlist={toggleWishlist}
                   onAddtoBag={handleAddtoBag}
                   onSelectProduct={handleSelectProduct}
+                  onNavigate={navigate}
                 />
               )}
 
@@ -127,7 +130,8 @@ export default function App() {
 
               {screen === 'success' && (
                 <SuccessScreen
-                  orderDetails={lastOrder as any}
+                  orderId={lastOrderId}
+                  orderDetails={lastOrder}
                   onContinueShopping={() => navigate('home')}
                 />
               )}
@@ -137,6 +141,7 @@ export default function App() {
                   pastOrders={pastOrders}
                   wishlist={wishlist.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean) as Product[]}
                   onSelectProduct={handleSelectProduct}
+                  onNavigate={navigate}
                 />
               )}
             </Suspense>

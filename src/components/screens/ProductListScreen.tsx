@@ -3,6 +3,7 @@ import { ChevronDown, SlidersHorizontal, Search, X, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Screen, Category } from '../../types';
 import { PRODUCTS } from '../../api/products';
+import { CURRENCY } from '../../constants';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
 
 interface ProductListScreenProps {
@@ -287,7 +288,7 @@ export default function ProductListScreen({
                       <span className="text-[9px] font-bold text-[#8B8B8A] uppercase tracking-wider">{product.brand}</span>
                     )}
                     <h2 className="text-[12px] md:text-[13px] text-[#111111] truncate">{product.name}</h2>
-                    <p className="font-serif text-[15px] font-bold text-[#111111] mt-1">GH₵{product.price.toFixed(2)}</p>
+                    <p className="font-serif text-[15px] font-bold text-[#111111] mt-1">{CURRENCY}{product.price.toFixed(2)}</p>
                   </div>
                 </motion.article>
               ))
@@ -365,7 +366,7 @@ export default function ProductListScreen({
                     </h3>
                   </div>
                   <span className="font-serif text-[18px] font-bold text-[#111111]">
-                    GH₵{quickViewProduct.price.toFixed(2)}
+                    {CURRENCY}{quickViewProduct.price.toFixed(2)}
                   </span>
                 </div>
 

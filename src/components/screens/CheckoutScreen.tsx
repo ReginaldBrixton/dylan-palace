@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, MapPin, Loader2, Compass } from 'lucide-react';
+import { ShieldCheck, Loader2, Compass, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CartItem, Screen, LocationData } from '../../types';
+import { CartItem, Screen, CheckoutDetails } from '../../types';
 import { detectLocation, buildMapUrl } from '../../api/geolocation';
-import { SHIPPING } from '../../constants';
+import { SHIPPING, MOMO_NETWORKS, CURRENCY } from '../../constants';
 import { calculateSubtotal, calculateShipping, calculateTotal } from '../../utils/format';
 
 interface CheckoutScreenProps {
   cartItems: CartItem[];
-  onOrderComplete: (details: {
-    fullName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    zip: string;
-    paymentMethod: 'MOMO' | 'DELIVERY';
-    totalAmount: number;
-  }) => void;
+  onOrderComplete: (details: CheckoutDetails) => void;
   onNavigate: (screen: Screen) => void;
 }
 
@@ -41,7 +32,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
   // Debounced address for map iframe to prevent lag
   const [debouncedAddress, setDebouncedAddress] = useState('Accra Ghana');
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       const query = `${streetAddress} ${city}`.trim();
       setDebouncedAddress(query || 'Accra Ghana');
@@ -86,9 +77,33 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
       city,
       zip,
       paymentMethod,
+      momoNetwork: paymentMethod === 'MOMO' ? momoNetwork : undefined,
+      momoNumber: paymentMethod === 'MOMO' ? momoNumber : undefined,
       totalAmount
     });
   };
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center min-h-[60vh] px-6 text-center animate-fade-in">
+        <div className="w-16 h-16 border-2 border-dashed border-[#E5E5E5] flex items-center justify-center mb-4 text-[#8B8B8A]">
+          <ShoppingBag size={24} />
+        </div>
+        <h2 className="font-serif text-[20px] font-bold text-[#111111] uppercase tracking-tight mb-2">
+          Your bag is empty
+        </h2>
+        <p className="text-[13px] text-[#8B8B8A] max-w-[280px] mb-6 leading-relaxed">
+          Add items to your bag before proceeding to checkout.
+        </p>
+        <button
+          onClick={() => onNavigate('home')}
+          className="px-6 py-3 bg-[#111111] text-white text-[11px] font-semibold uppercase tracking-widest cursor-pointer rounded-lg hover:bg-[#333333] active:scale-95 transition-all shadow-md"
+        >
+          BROWSE PRODUCTS
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div id="checkout-screen" className="w-full flex flex-col pb-40 animate-fade-in">
@@ -109,10 +124,6 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder=" "
                 className="peer w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm"
-              />
-              <label
-                htmlFor="checkout-email"
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A] text-base pointer-events-none transition-all duration-200 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#444748] peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:text-[#444748]"
               />
               <label
                 htmlFor="checkout-email"
@@ -313,9 +324,9 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
                     onChange={(e) => setMomoNetwork(e.target.value)}
                     className="w-full pt-6 pb-2 px-3 border border-[#E5E5E5] focus:border-[#111111] outline-none text-base rounded-lg bg-white transition-all duration-200 shadow-sm appearance-none"
                   >
-                    <option value="MTN">MTN Mobile Money</option>
-                    <option value="Vodafone">Telecel Cash</option>
-                    <option value="AirtelTigo">AT Money</option>
+                    {MOMO_NETWORKS.map(network => (
+                      <option key={network.value} value={network.value}>{network.label}</option>
+                    ))}
                   </select>
                   <label
                     htmlFor="checkout-network"
@@ -369,18 +380,18 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
         <section className="flex flex-col gap-2 border-t border-[#E5E5E5] pt-4 mt-4">
           <div className="flex justify-between items-center text-[13px]">
             <span className="text-[#8B8B8A] uppercase tracking-wider">Subtotal</span>
-            <span className="text-[#111111] font-bold">GH₵{subtotal}.00</span>
+            <span className="text-[#111111] font-bold">{CURRENCY}{subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-center text-[13px]">
             <span className="text-[#8B8B8A] uppercase tracking-wider">Shipping</span>
             <span className="text-[#111111] font-bold">
-              {shippingFee === 0 ? "FREE" : `GH₵${shippingFee}.00`}
+              {shippingFee === 0 ? "FREE" : `${CURRENCY}${shippingFee.toFixed(2)}`}
             </span>
           </div>
           <div className="flex justify-between items-center border-t border-[#E5E5E5] pt-3 mt-1.5">
             <span className="text-[12px] font-bold text-[#111111] uppercase tracking-wider">TOTAL</span>
             <span className="font-serif text-[22px] font-bold text-[#111111] leading-none">
-              GH₵{totalAmount}.00
+              {CURRENCY}{totalAmount.toFixed(2)}
             </span>
           </div>
         </section>
@@ -391,7 +402,7 @@ export default function CheckoutScreen({ cartItems, onOrderComplete, onNavigate 
             type="submit"
             className="w-full bg-[#111111] text-white py-4 font-semibold text-[13px] uppercase tracking-widest hover:bg-black active:scale-[0.98] transition-all duration-300 cursor-pointer rounded-lg shadow-lg"
           >
-            {paymentMethod === 'DELIVERY' ? `CONFIRM ORDER - GH₵${totalAmount}.00` : `PAY GH₵${totalAmount}.00`}
+            {paymentMethod === 'DELIVERY' ? `CONFIRM ORDER - ${CURRENCY}${totalAmount.toFixed(2)}` : `PAY ${CURRENCY}${totalAmount.toFixed(2)}`}
           </button>
         </div>
 

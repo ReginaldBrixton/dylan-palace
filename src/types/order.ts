@@ -5,8 +5,11 @@ export type OrderStatus = 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 export interface OrderDetails {
   fullName: string;
   email: string;
+  phone: string;
   address: string;
   city: string;
+  zip: string;
+  paymentMethod: 'MOMO' | 'DELIVERY';
 }
 
 export interface Order {
@@ -26,6 +29,8 @@ export interface CheckoutDetails {
   city: string;
   zip: string;
   paymentMethod: 'MOMO' | 'DELIVERY';
+  momoNetwork?: string;
+  momoNumber?: string;
   totalAmount: number;
 }
 

@@ -21,8 +21,11 @@ export function useOrders() {
       details: {
         fullName: details.fullName,
         email: details.email,
+        phone: details.phone,
         address: details.address,
         city: details.city,
+        zip: details.zip,
+        paymentMethod: details.paymentMethod,
       },
     };
 

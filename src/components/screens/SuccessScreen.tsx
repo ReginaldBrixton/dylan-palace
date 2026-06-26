@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Calendar, MapPin, Truck, Award, Package, Clock } from 'lucide-react';
-import { Screen } from '../../types';
+import { Check, MapPin, Truck, Award, Package, Clock } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
+import { CURRENCY } from '../../constants';
 
 interface SuccessScreenProps {
+  orderId?: string;
   orderDetails: {
     fullName: string;
     email: string;
@@ -17,8 +18,8 @@ interface SuccessScreenProps {
   onContinueShopping: () => void;
 }
 
-export default function SuccessScreen({ orderDetails, onContinueShopping }: SuccessScreenProps) {
-  const randomOrderNo = Math.floor(100000 + Math.random() * 90000).toString();
+export default function SuccessScreen({ orderId, orderDetails, onContinueShopping }: SuccessScreenProps) {
+  const displayOrderId = orderId || Math.floor(100000 + Math.random() * 90000).toString();
 
   // Simulate order progression for demo purposes
   const [orderState, setOrderState] = useState<number>(1);
@@ -52,7 +53,7 @@ export default function SuccessScreen({ orderDetails, onContinueShopping }: Succ
         ORDER SECURED
       </h1>
       <p className="text-[13px] text-[#8B8B8A] uppercase tracking-widest pl-1 mb-8">
-        Reference: DP-{randomOrderNo}-2026
+        Reference: DP-{displayOrderId}
       </p>
 
       {/* Visual Tracking Component */}
@@ -126,7 +127,7 @@ export default function SuccessScreen({ orderDetails, onContinueShopping }: Succ
             </div>
             <div className="text-right">
               <span className="text-[10px] font-bold text-[#8B8B8A] uppercase tracking-wider block">PRICE</span>
-              <span className="text-[14px] font-bold text-[#4A5D23]">GH₵{orderDetails.totalAmount}.00</span>
+              <span className="text-[14px] font-bold text-[#4A5D23]">{CURRENCY}{orderDetails.totalAmount.toFixed(2)}</span>
             </div>
           </div>
 
