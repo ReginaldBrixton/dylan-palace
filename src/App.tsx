@@ -2,7 +2,9 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppProvider } from './context/AppContext';
+import { SellerAuthProvider } from './context/SellerAuthContext';
 import Layout from './components/common/Layout';
+import ProtectedRoute from './components/seller/ProtectedRoute';
 
 // Code-split screen components for smaller initial bundle
 const Splash = lazy(() => import('./pages/SplashPage'));
@@ -12,6 +14,13 @@ const ProductDetailScreen = lazy(() => import('./pages/ProductDetailPage'));
 const CheckoutScreen = lazy(() => import('./pages/CheckoutPage'));
 const SuccessScreen = lazy(() => import('./pages/SuccessPage'));
 const ProfileScreen = lazy(() => import('./pages/ProfilePage'));
+
+// Seller pages
+const SellerLogin = lazy(() => import('./pages/seller/SellerLoginPage'));
+const SellerDashboard = lazy(() => import('./pages/seller/SellerDashboardPage'));
+const SellerProducts = lazy(() => import('./pages/seller/SellerProductsPage'));
+const SellerOrders = lazy(() => import('./pages/seller/SellerOrdersPage'));
+const SellerUsers = lazy(() => import('./pages/seller/SellerUsersPage'));
 
 function ScreenLoader() {
   return (
@@ -58,6 +67,12 @@ function AnimatedRoutes() {
           <Route path="/checkout" element={<CheckoutScreen />} />
           <Route path="/success" element={<SuccessScreen />} />
           <Route path="/profile" element={<ProfileScreen />} />
+          {/* Seller routes */}
+          <Route path="/seller/login" element={<SellerLogin />} />
+          <Route path="/seller" element={<ProtectedRoute><SellerDashboard /></ProtectedRoute>} />
+          <Route path="/seller/products" element={<ProtectedRoute><SellerProducts /></ProtectedRoute>} />
+          <Route path="/seller/orders" element={<ProtectedRoute><SellerOrders /></ProtectedRoute>} />
+          <Route path="/seller/users" element={<ProtectedRoute><SellerUsers /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </motion.div>
@@ -68,13 +83,15 @@ function AnimatedRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppProvider>
-        <Layout>
-          <Suspense fallback={<ScreenLoader />}>
-            <AnimatedRoutes />
-          </Suspense>
-        </Layout>
-      </AppProvider>
+      <SellerAuthProvider>
+        <AppProvider>
+          <Layout>
+            <Suspense fallback={<ScreenLoader />}>
+              <AnimatedRoutes />
+            </Suspense>
+          </Layout>
+        </AppProvider>
+      </SellerAuthProvider>
     </BrowserRouter>
   );
 }

@@ -18,10 +18,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   } = useApp();
 
   const isSplash = location.pathname === '/';
+  const isSellerRoute = location.pathname.startsWith('/seller');
   const isCheckout = location.pathname === '/checkout';
   const isSuccess = location.pathname === '/success';
 
-  if (isSplash) {
+  if (isSplash || isSellerRoute) {
     return <>{children}</>;
   }
 
