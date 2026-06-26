@@ -15,50 +15,44 @@ interface UploadThingFile {
 }
 
 /**
- * Upload a file to UploadThing via the REST API.
+ * Upload a file to UploadThing via the v7 REST API.
+ * Uses prepareUpload to get a presigned URL, then PUTs the file.
  * Returns the uploaded file URL.
  */
 export async function uploadFile(file: File): Promise<UploadThingFile> {
-  // Step 1: Request upload URL
-  const response = await fetch('https://api.uploadthing.com/v6/uploadFiles', {
+  // Step 1: Request presigned upload URL via v7 prepareUpload
+  const response = await fetch('https://api.uploadthing.com/v7/prepareUpload', {
     method: 'POST',
     headers: {
       'x-uploadthing-api-key': getApiKey(),
-      'x-uploadthing-version': '6.0.0',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      files: [
-        {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-        },
-      ],
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
     }),
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`UploadThing upload URL request failed: ${response.status} ${text}`);
+    throw new Error(`UploadThing prepareUpload failed: ${response.status} ${text}`);
   }
 
   const data = await response.json();
-  const uploadData = data[0];
+  const presignedUrl: string = data.url;
+  const key: string = data.key;
 
-  if (uploadData.error) {
-    throw new Error(`UploadThing error: ${uploadData.error}`);
+  if (!presignedUrl || !key) {
+    throw new Error('UploadThing prepareUpload did not return a valid presigned URL');
   }
 
-  // Step 2: Upload file to the presigned URL
+  // Step 2: PUT the file to the presigned URL using FormData
   const formData = new FormData();
-  for (const [key, value] of Object.entries(uploadData.fields)) {
-    formData.append(key, value as string);
-  }
   formData.append('file', file);
 
-  const uploadResponse = await fetch(uploadData.url, {
-    method: 'POST',
+  const uploadResponse = await fetch(presignedUrl, {
+    method: 'PUT',
     body: formData,
   });
 
@@ -68,15 +62,15 @@ export async function uploadFile(file: File): Promise<UploadThingFile> {
   }
 
   const uploadResult = await uploadResponse.json();
-  const fileData = uploadResult.files?.[0] || uploadResult;
+  const fileUrl: string = uploadResult.url || uploadResult.ufsUrl || `https://utfs.io/f/${key}`;
 
   return {
-    id: fileData.id || uploadData.id,
+    id: key,
     name: file.name,
     size: file.size,
-    url: fileData.ufsUrl || fileData.url || uploadData.fileUrl,
-    key: fileData.key || uploadData.key,
-    fileUrl: fileData.ufsUrl || fileData.url || uploadData.fileUrl,
+    url: fileUrl,
+    key,
+    fileUrl,
   };
 }
 
@@ -96,7 +90,6 @@ export async function deleteFile(fileKey: string): Promise<void> {
     method: 'POST',
     headers: {
       'x-uploadthing-api-key': getApiKey(),
-      'x-uploadthing-version': '6.0.0',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ fileKeys: [fileKey] }),

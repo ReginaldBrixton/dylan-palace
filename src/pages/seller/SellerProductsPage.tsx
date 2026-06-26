@@ -20,7 +20,7 @@ import {
   deleteProduct,
 } from '../../lib/api';
 import { uploadFile, deleteFile } from '../../lib/uploadthing';
-import { analyzeProductImage, type AIProductSuggestion } from '../../lib/ai';
+import { analyzeProductImage, analyzeProductFile, type AIProductSuggestion } from '../../lib/ai';
 import type { Product, ProductCategory } from '../../lib/database.types';
 import { CURRENCY } from '../../constants';
 import { invalidateCache } from '../../lib/product-cache';
@@ -79,9 +79,9 @@ export default function SellerProducts() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ProductForm>(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pendingFiles, setPendingFiles] = useState<{ file: File; previewUrl: string }[]>([]);
 
   const load = useCallback(async () => {
     try {
@@ -107,6 +107,7 @@ export default function SellerProducts() {
   const handleOpenAdd = () => {
     setForm(emptyForm);
     setEditingId(null);
+    setPendingFiles([]);
     setShowModal(true);
   };
 
@@ -126,37 +127,37 @@ export default function SellerProducts() {
       tags: product.tags || [],
     });
     setEditingId(product.id);
+    setPendingFiles([]);
     setShowModal(true);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    setUploading(true);
-    setError('');
-    try {
-      const fileArray: File[] = Array.from(files);
-      const uploaded = await uploadFile(fileArray[0]); // Upload first file
-      const newImages = [...form.images, uploaded.url];
-      setForm((f) => ({ ...f, images: newImages }));
-    } catch (err: any) {
-      setError(`Upload failed: ${err.message}`);
-    } finally {
-      setUploading(false);
-    }
+    const newPending = Array.from(files).map((file: File) => ({
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+    setPendingFiles((prev) => [...prev, ...newPending]);
+    e.target.value = '';
   };
 
   const handleAIAnalyze = async () => {
-    if (form.images.length === 0) {
-      setError('Please upload an image first');
+    if (pendingFiles.length === 0 && form.images.length === 0) {
+      setError('Please add an image first');
       return;
     }
 
     setAiLoading(true);
     setError('');
     try {
-      const suggestion: AIProductSuggestion = await analyzeProductImage(form.images[0]);
+      let suggestion: AIProductSuggestion;
+      if (pendingFiles.length > 0) {
+        suggestion = await analyzeProductFile(pendingFiles[0].file);
+      } else {
+        suggestion = await analyzeProductImage(form.images[0]);
+      }
       setForm((f) => ({
         ...f,
         name: suggestion.name,
@@ -182,13 +183,22 @@ export default function SellerProducts() {
     setSaving(true);
     setError('');
     try {
+      // Upload pending files first
+      const uploadedUrls: string[] = [];
+      for (const pf of pendingFiles) {
+        const result = await uploadFile(pf.file);
+        uploadedUrls.push(result.url);
+        URL.revokeObjectURL(pf.previewUrl);
+      }
+
+      const allImages = [...form.images, ...uploadedUrls];
       const productData = {
         name: form.name,
         brand: form.brand || null,
         category: form.category,
         price: parseFloat(form.price),
         description: form.description || null,
-        images: form.images,
+        images: allImages,
         sizes: form.sizes,
         colors: form.colors,
         in_stock: form.in_stock,
@@ -205,6 +215,7 @@ export default function SellerProducts() {
 
       invalidateCache();
       setShowModal(false);
+      setPendingFiles([]);
       await load();
     } catch (err: any) {
       setError(`Save failed: ${err.message}`);
@@ -237,16 +248,26 @@ export default function SellerProducts() {
   };
 
   const removeImage = (idx: number) => {
-    const imgUrl = form.images[idx];
-    // Try to delete from UploadThing (best-effort)
-    try {
-      const urlParts = imgUrl.split('/');
-      const fileKey = urlParts[urlParts.length - 1].split('.')[0];
-      if (fileKey) deleteFile(fileKey).catch(() => { });
-    } catch {
-      // ignore
+    if (idx < form.images.length) {
+      // Remove an existing uploaded image
+      const imgUrl = form.images[idx];
+      try {
+        const urlParts = imgUrl.split('/');
+        const fileKey = urlParts[urlParts.length - 1].split('.')[0];
+        if (fileKey) deleteFile(fileKey).catch(() => { });
+      } catch {
+        // ignore
+      }
+      setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
+    } else {
+      // Remove a pending file (not yet uploaded)
+      const pendingIdx = idx - form.images.length;
+      setPendingFiles((prev) => {
+        const item = prev[pendingIdx];
+        if (item) URL.revokeObjectURL(item.previewUrl);
+        return prev.filter((_, i) => i !== pendingIdx);
+      });
     }
-    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
   };
 
   return (
@@ -410,7 +431,7 @@ export default function SellerProducts() {
                   </label>
                   <div className="flex gap-3 flex-wrap">
                     {form.images.map((img, idx) => (
-                      <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#E5E5E5]">
+                      <div key={`img-${idx}`} className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#E5E5E5]">
                         <img src={img} alt="" className="w-full h-full object-cover" />
                         <button
                           onClick={() => removeImage(idx)}
@@ -420,24 +441,31 @@ export default function SellerProducts() {
                         </button>
                       </div>
                     ))}
+                    {pendingFiles.map((pf, idx) => (
+                      <div key={`pending-${idx}`} className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#E5E5E5]">
+                        <img src={pf.previewUrl} alt="" className="w-full h-full object-cover" />
+                        <button
+                          onClick={() => removeImage(form.images.length + idx)}
+                          className="absolute top-0 right-0 bg-black/60 text-white p-0.5 rounded-bl-lg cursor-pointer"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
                     <label className="w-20 h-20 rounded-lg border-2 border-dashed border-[#E5E5E5] flex items-center justify-center cursor-pointer hover:border-[#111111] transition-colors">
-                      {uploading ? (
-                        <Loader2 size={18} className="animate-spin text-[#8B8B8A]" />
-                      ) : (
-                        <Upload size={18} className="text-[#8B8B8A]" />
-                      )}
-                      <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                      <Upload size={18} className="text-[#8B8B8A]" />
+                      <input type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
                     </label>
                   </div>
                 </div>
 
                 {/* AI Auto-fill Button */}
-                {form.images.length > 0 && (
+                {(form.images.length > 0 || pendingFiles.length > 0) && (
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={handleAIAnalyze}
-                    disabled={aiLoading}
+                    disabled={aiLoading || saving}
                     className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3.5 rounded-xl text-sm font-semibold uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 shadow-md"
                   >
                     {aiLoading ? (

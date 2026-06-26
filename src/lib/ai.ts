@@ -98,6 +98,44 @@ Analyze the image carefully and provide accurate fashion-specific details.`;
   return suggestion;
 }
 
+export async function analyzeProductFile(file: File): Promise<AIProductSuggestion> {
+  if (GEMINI_KEYS.length === 0) {
+    throw new Error('Missing VITE_GEMINI_API_KEY. Add at least one key to .env.local');
+  }
+
+  const base64 = await blobToBase64(file);
+
+  const prompt = `You are a fashion product analyst. Analyze this product image and provide structured details for an e-commerce listing.
+
+Return ONLY a JSON object with this exact structure:
+{
+  "name": "A concise, appealing product name (max 60 chars)",
+  "description": "A detailed product description (2-3 sentences, highlighting material, style, and key features)",
+  "brand": "Likely brand or 'Unbranded' if unknown",
+  "category": "One of: SHIRTS, TROUSERS, SHOES, BAGS",
+  "tags": ["3-5 relevant tags as an array"],
+  "colors": ["2-4 dominant colors as an array"]
+}
+
+Analyze the image carefully and provide accurate fashion-specific details.`;
+
+  const text = await callGemini(base64, file.type, prompt);
+
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('AI did not return valid JSON: ' + text.slice(0, 200));
+  }
+
+  const suggestion = JSON.parse(jsonMatch[0]) as AIProductSuggestion;
+
+  const validCategories = ['SHIRTS', 'TROUSERS', 'SHOES', 'BAGS'];
+  if (!validCategories.includes(suggestion.category)) {
+    suggestion.category = 'SHIRTS';
+  }
+
+  return suggestion;
+}
+
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
