@@ -1,0 +1,162 @@
+name: Production Readiness Audit
+
+on:
+  push:
+    branches: [chore/production-readiness-audit]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  production-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Prepare audit directory
+        run: mkdir -p production-artifacts/deployment-statuses
+
+      - name: Resolve latest successful production deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          api="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}"
+          auth=(-H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          curl -fsSL "${auth[@]}" "${api}/deployments?per_page=50" \
+            | tee production-artifacts/deployments.json >/dev/null
+
+          production_url=""
+          while read -r deployment_id; do
+            [ -n "${deployment_id}" ] || continue
+            statuses_file="production-artifacts/deployment-statuses/${deployment_id}.json"
+            curl -fsSL "${auth[@]}" "${api}/deployments/${deployment_id}/statuses?per_page=100" \
+              | tee "${statuses_file}" >/dev/null
+
+            candidate=$(jq -r '
+              [ .[]
+                | select(.state == "success")
+                | (.environment_url // .target_url // empty)
+                | select(type == "string" and startswith("https://"))
+                | select(startswith("https://vercel.com/") | not)
+              ][0] // empty
+            ' "${statuses_file}")
+
+            if [ -n "${candidate}" ]; then
+              production_url="${candidate%/}"
+              break
+            fi
+          done < <(jq -r '.[] | select((.environment // "") | ascii_downcase == "production") | .id' production-artifacts/deployments.json)
+
+          if [ -z "${production_url}" ]; then
+            while read -r deployment_id; do
+              [ -n "${deployment_id}" ] || continue
+              statuses_file="production-artifacts/deployment-statuses/${deployment_id}.json"
+              if [ ! -f "${statuses_file}" ]; then
+                curl -fsSL "${auth[@]}" "${api}/deployments/${deployment_id}/statuses?per_page=100" \
+                  | tee "${statuses_file}" >/dev/null
+              fi
+              candidate=$(jq -r '
+                [ .[]
+                  | select(.state == "success")
+                  | (.environment_url // .target_url // empty)
+                  | select(type == "string" and startswith("https://"))
+                  | select(startswith("https://vercel.com/") | not)
+                ][0] // empty
+              ' "${statuses_file}")
+              if [ -n "${candidate}" ]; then
+                production_url="${candidate%/}"
+                break
+              fi
+            done < <(jq -r '.[].id' production-artifacts/deployments.json)
+          fi
+
+          if [ -z "${production_url}" ]; then
+            echo "No successful public production environment URL was found in GitHub deployment records." >&2
+            exit 1
+          fi
+
+          echo "PRODUCTION_URL=${production_url}" >> "${GITHUB_ENV}"
+          printf '%s\n' "${production_url}" | tee production-artifacts/production-url.txt
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium > production-artifacts/playwright-install.log 2>&1
+
+      - name: Production HTTP health checks
+        id: health
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          failed=0
+          : > production-artifacts/http-health.txt
+          for path in / /shirts /trousers /bags /shoes /checkout /seller/login; do
+            result=$(curl -L --retry 2 --retry-delay 1 --connect-timeout 15 --max-time 45 \
+              -sS -o /dev/null -w "%{http_code} %{time_total} %{size_download}" \
+              "${PRODUCTION_URL}${path}") || result="000 0 0"
+            printf '%-16s %s\n' "${path}" "${result}" | tee -a production-artifacts/http-health.txt
+            status=${result%% *}
+            if [ "${status}" != "200" ]; then failed=1; fi
+          done
+          exit "${failed}"
+
+      - name: Production browser smoke tests
+        id: browser
+        continue-on-error: true
+        env:
+          PRODUCTION_URL: ${{ env.PRODUCTION_URL }}
+        run: npx playwright test --config=playwright.production.config.ts
+
+      - name: Lighthouse production audit
+        id: lighthouse
+        continue-on-error: true
+        shell: bash
+        run: |
+          export CHROME_PATH
+          CHROME_PATH=$(node --input-type=module -e "import { chromium } from '@playwright/test'; console.log(chromium.executablePath())")
+          npx --yes lighthouse@12 "${PRODUCTION_URL}" \
+            --quiet \
+            --chrome-flags="--headless --no-sandbox --disable-gpu" \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --output=json \
+            --output-path=production-artifacts/lighthouse.json
+          node scripts/evaluate-lighthouse.mjs production-artifacts/lighthouse.json
+
+      - name: Upload production audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-readiness-audit
+          path: production-artifacts
+          retention-days: 7
+
+      - name: Enforce production readiness
+        if: always()
+        shell: bash
+        run: |
+          failed=0
+          if [ "${{ steps.health.outcome }}" != "success" ]; then
+            echo "HTTP health checks failed." >&2
+            failed=1
+          fi
+          if [ "${{ steps.browser.outcome }}" != "success" ]; then
+            echo "Production browser tests failed." >&2
+            failed=1
+          fi
+          if [ "${{ steps.lighthouse.outcome }}" != "success" ]; then
+            echo "Lighthouse thresholds failed." >&2
+            failed=1
+          fi
+          exit "${failed}"
