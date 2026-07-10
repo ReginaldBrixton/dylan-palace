@@ -1,6 +1,8 @@
 name: Production Readiness Audit
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [chore/production-readiness-audit]
   workflow_dispatch:
