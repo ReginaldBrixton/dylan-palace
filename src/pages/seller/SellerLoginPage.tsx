@@ -50,20 +50,22 @@ export default function SellerLoginPage() {
           <p className="mt-3 text-sm leading-6 text-white/55">Use the email and passcode assigned to a seller account. The passcode is never stored in the application bundle.</p>
 
           <form onSubmit={handleSubmit} className="mt-8 grid gap-5">
-            <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/60">Admin email
-              <span className="relative">
-                <Mail size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" />
-                <input type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} className="h-14 w-full rounded-[var(--radius-sm)] border border-white/15 bg-white/7 pl-12 pr-4 text-base text-white outline-none placeholder:text-white/25 focus:border-white/50" placeholder="admin@example.com" />
-              </span>
-            </label>
+            <div className="grid gap-2">
+              <label htmlFor="seller-email" className="text-xs font-semibold uppercase tracking-[0.14em] text-white/60">Admin email</label>
+              <div className="relative">
+                <Mail size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" aria-hidden="true" />
+                <input id="seller-email" type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} className="h-14 w-full rounded-[var(--radius-sm)] border border-white/15 bg-white/7 pl-12 pr-4 text-base text-white outline-none placeholder:text-white/25 focus:border-white/50" placeholder="admin@example.com" />
+              </div>
+            </div>
 
-            <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/60">Passcode
-              <span className="relative">
-                <LockKeyhole size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" />
-                <input type={showPasscode ? 'text' : 'password'} autoComplete="current-password" required value={passcode} onChange={(event) => setPasscode(event.target.value)} className="h-14 w-full rounded-[var(--radius-sm)] border border-white/15 bg-white/7 pl-12 pr-12 text-base text-white outline-none placeholder:text-white/25 focus:border-white/50" placeholder="Enter your passcode" />
+            <div className="grid gap-2">
+              <label htmlFor="seller-passcode" className="text-xs font-semibold uppercase tracking-[0.14em] text-white/60">Passcode</label>
+              <div className="relative">
+                <LockKeyhole size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" aria-hidden="true" />
+                <input id="seller-passcode" type={showPasscode ? 'text' : 'password'} autoComplete="current-password" required value={passcode} onChange={(event) => setPasscode(event.target.value)} className="h-14 w-full rounded-[var(--radius-sm)] border border-white/15 bg-white/7 pl-12 pr-12 text-base text-white outline-none placeholder:text-white/25 focus:border-white/50" placeholder="Enter your passcode" />
                 <button type="button" onClick={() => setShowPasscode((value) => !value)} className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-white/50 hover:text-white" aria-label={showPasscode ? 'Hide passcode' : 'Show passcode'}>{showPasscode ? <EyeOff size={18} /> : <Eye size={18} />}</button>
-              </span>
-            </label>
+              </div>
+            </div>
 
             {error ? <p role="alert" className="rounded-[var(--radius-sm)] border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-200">{error}</p> : null}
 
