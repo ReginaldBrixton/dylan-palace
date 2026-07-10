@@ -8,27 +8,15 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F9F9F8] animate-pulse select-none">
-        <div className="w-full max-w-6xl mx-auto p-8">
-          <div className="h-8 w-48 bg-[#E5E5E5] rounded-full mb-6" />
-          <div className="h-4 w-32 bg-[#E5E5E5] rounded-full mb-8" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex flex-col gap-3">
-                <div className="aspect-square w-full bg-[#E5E5E5]/50 rounded-xl" />
-                <div className="h-3 w-2/3 bg-[#E5E5E5] rounded-full" />
-                <div className="h-4 w-1/3 bg-[#E5E5E5] rounded-full" />
-              </div>
-            ))}
-          </div>
+      <div className="grid min-h-screen place-items-center bg-[var(--color-canvas)]" aria-label="Verifying seller access">
+        <div className="text-center">
+          <div className="mx-auto size-10 animate-spin rounded-full border-2 border-[var(--color-border)] border-t-[var(--color-ink)]" />
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-muted)]">Verifying access</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/seller/login" state={{ from: location }} replace />;
-  }
-
+  if (!isAuthenticated) return <Navigate to="/seller/login" state={{ from: location }} replace />;
   return <>{children}</>;
 }

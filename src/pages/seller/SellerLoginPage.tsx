@@ -1,138 +1,76 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Lock, ArrowLeft } from 'lucide-react';
+import BrandLogo from '../../components/brand/BrandLogo';
 import { useSellerAuth } from '../../context/SellerAuthContext';
 
-export default function SellerLogin() {
+export default function SellerLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signInWithPin } = useSellerAuth();
-  const [pin, setPin] = useState(['', '', '', '']);
+  const { signIn } = useSellerAuth();
+  const [email, setEmail] = useState('');
+  const [passcode, setPasscode] = useState('');
+  const [showPasscode, setShowPasscode] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/seller';
 
-  const from = (location.state as any)?.from?.pathname || '/seller';
-
-  const handlePinChange = (index: number, value: string) => {
-    if (!/^\d?$/.test(value)) return;
-    const newPin = [...pin];
-    newPin[index] = value;
-    setPin(newPin);
-    setError('');
-
-    if (value && index < 3) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !pin[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
-    if (pasted.length > 0) {
-      const newPin = ['', '', '', ''];
-      for (let i = 0; i < pasted.length; i++) {
-        newPin[i] = pasted[i];
-      }
-      setPin(newPin);
-      inputRefs.current[Math.min(pasted.length, 3)]?.focus();
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const pinCode = pin.join('');
-    if (pinCode.length !== 4) {
-      setError('Enter all 4 digits');
-      return;
-    }
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await signInWithPin(pinCode);
+      await signIn(email, passcode);
       navigate(from, { replace: true });
-    } catch (err: any) {
-      setError(err.message || 'Invalid PIN');
-      setPin(['', '', '', '']);
-      inputRefs.current[0]?.focus();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Unable to sign in.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#111111] px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-sm"
-      >
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-1.5 text-[#8B8B8A] hover:text-white transition-colors mb-8 text-xs uppercase tracking-widest"
-        >
-          <ArrowLeft size={14} /> Back to Store
-        </button>
-
-        <div className="mb-8">
-          <h1 className="font-serif text-3xl font-bold text-white uppercase tracking-tighter mb-1">
-            Seller Portal
-          </h1>
-          <p className="text-sm text-[#8B8B8A]">Dylan's Palace Administration</p>
+    <main className="grid min-h-screen bg-[var(--color-ink)] text-white lg:grid-cols-[minmax(0,1.1fr)_minmax(420px,0.9fr)]">
+      <section className="relative hidden overflow-hidden border-r border-white/10 p-12 lg:flex lg:flex-col lg:justify-between">
+        <BrandLogo variant="wordmark" tone="light" className="h-8 w-auto" />
+        <div className="max-w-xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">Commerce operations</p>
+          <h1 className="mt-5 font-serif text-6xl font-bold leading-[0.95] tracking-[-0.05em]">Run the store from one focused workspace.</h1>
+          <p className="mt-6 max-w-lg text-base leading-7 text-white/58">Manage products, imagery, inventory, orders and customers with seller-authorized access.</p>
         </div>
+        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.15em] text-white/45"><ShieldCheck size={16} /> Protected by Supabase Auth and seller roles</div>
+      </section>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] uppercase tracking-widest font-bold text-[#8B8B8A] flex items-center gap-1.5">
-              <Lock size={12} /> Enter PIN
+      <section className="flex min-h-screen items-center px-5 py-10 sm:px-10 lg:px-14">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mx-auto w-full max-w-md">
+          <button type="button" onClick={() => navigate('/')} className="mb-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white"><ArrowLeft size={15} /> Back to store</button>
+          <BrandLogo variant="monogram" tone="light" className="mb-8 size-14 lg:hidden" />
+          <h2 className="font-serif text-4xl font-bold tracking-[-0.04em]">Admin sign in</h2>
+          <p className="mt-3 text-sm leading-6 text-white/55">Use the email and passcode assigned to a seller account. The passcode is never stored in the application bundle.</p>
+
+          <form onSubmit={handleSubmit} className="mt-8 grid gap-5">
+            <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/60">Admin email
+              <span className="relative">
+                <Mail size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" />
+                <input type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} className="h-14 w-full rounded-[var(--radius-sm)] border border-white/15 bg-white/7 pl-12 pr-4 text-base text-white outline-none placeholder:text-white/25 focus:border-white/50" placeholder="admin@example.com" />
+              </span>
             </label>
-            <div className="flex gap-3 justify-center" onPaste={handlePaste}>
-              {pin.map((digit, i) => (
-                <input
-                  key={i}
-                  ref={(el) => { inputRefs.current[i] = el; }}
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handlePinChange(i, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(i, e)}
-                  autoFocus={i === 0}
-                  className="w-14 h-14 bg-[#1a1a1a] text-white text-center text-2xl font-bold rounded-lg border border-[#333] focus:border-white focus:outline-none transition-colors"
-                />
-              ))}
-            </div>
-          </div>
 
-          {error && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs text-red-400 bg-red-400/10 px-3 py-2 rounded-lg text-center"
-            >
-              {error}
-            </motion.p>
-          )}
+            <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/60">Passcode
+              <span className="relative">
+                <LockKeyhole size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" />
+                <input type={showPasscode ? 'text' : 'password'} autoComplete="current-password" required value={passcode} onChange={(event) => setPasscode(event.target.value)} className="h-14 w-full rounded-[var(--radius-sm)] border border-white/15 bg-white/7 pl-12 pr-12 text-base text-white outline-none placeholder:text-white/25 focus:border-white/50" placeholder="Enter your passcode" />
+                <button type="button" onClick={() => setShowPasscode((value) => !value)} className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-white/50 hover:text-white" aria-label={showPasscode ? 'Hide passcode' : 'Show passcode'}>{showPasscode ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+              </span>
+            </label>
 
-          <motion.button
-            type="submit"
-            disabled={loading || pin.join('').length !== 4}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            className="w-full bg-white text-[#111111] py-3.5 rounded-lg font-semibold text-sm uppercase tracking-widest hover:bg-[#e0e0e0] transition-colors disabled:opacity-30 cursor-pointer"
-          >
-            {loading ? 'Verifying...' : 'Unlock'}
-          </motion.button>
-        </form>
-      </motion.div>
-    </div>
+            {error ? <p role="alert" className="rounded-[var(--radius-sm)] border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-200">{error}</p> : null}
+
+            <button type="submit" disabled={loading} className="mt-2 h-14 rounded-[var(--radius-sm)] bg-white text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-ink)] transition hover:bg-white/90 disabled:cursor-wait disabled:opacity-55">{loading ? 'Verifying access…' : 'Sign in securely'}</button>
+          </form>
+        </motion.div>
+      </section>
+    </main>
   );
 }

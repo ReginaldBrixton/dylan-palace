@@ -1,64 +1,73 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import type { Profile } from '../lib/database.types';
+import { getCurrentSeller, signInSeller, signOutSeller, subscribeToSellerAuth } from '../lib/auth';
 
-const SELLER_PIN = '0506';
-const STORAGE_KEY = 'dylan_seller_auth';
-
-interface SellerAuthContextType {
+interface SellerAuthContextValue {
+  seller: Profile | null;
   isAuthenticated: boolean;
   loading: boolean;
-  signInWithPin: (pin: string) => Promise<void>;
-  signOut: () => void;
+  signIn: (email: string, passcode: string) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
-const SellerAuthContext = createContext<SellerAuthContextType | undefined>(undefined);
+const SellerAuthContext = createContext<SellerAuthContextValue | undefined>(undefined);
 
 export function SellerAuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [seller, setSeller] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+    getCurrentSeller()
+      .then((profile) => { if (active) setSeller(profile); })
+      .catch(() => { if (active) setSeller(null); })
+      .finally(() => { if (active) setLoading(false); });
+
+    const unsubscribe = subscribeToSellerAuth((profile) => {
+      if (!active) return;
+      setSeller(profile);
+      setLoading(false);
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, []);
+
+  const signIn = useCallback(async (email: string, passcode: string) => {
+    setLoading(true);
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'true') {
-        setIsAuthenticated(true);
-      }
-    } catch {
-      // ignore
-    }
-    setLoading(false);
-  }, []);
-
-  const signInWithPin = useCallback(async (pin: string) => {
-    if (pin === SELLER_PIN) {
-      setIsAuthenticated(true);
-      try {
-        localStorage.setItem(STORAGE_KEY, 'true');
-      } catch {
-        // ignore
-      }
-    } else {
-      throw new Error('Invalid PIN');
+      const profile = await signInSeller(email, passcode);
+      setSeller(profile);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  const signOut = useCallback(() => {
-    setIsAuthenticated(false);
+  const signOut = useCallback(async () => {
+    setLoading(true);
     try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
+      await signOutSeller();
+      setSeller(null);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  return (
-    <SellerAuthContext.Provider value={{ isAuthenticated, loading, signInWithPin, signOut }}>
-      {children}
-    </SellerAuthContext.Provider>
-  );
+  const value = useMemo<SellerAuthContextValue>(() => ({
+    seller,
+    isAuthenticated: Boolean(seller),
+    loading,
+    signIn,
+    signOut,
+  }), [seller, loading, signIn, signOut]);
+
+  return <SellerAuthContext.Provider value={value}>{children}</SellerAuthContext.Provider>;
 }
 
 export function useSellerAuth() {
-  const ctx = useContext(SellerAuthContext);
-  if (!ctx) throw new Error('useSellerAuth must be used within SellerAuthProvider');
-  return ctx;
+  const context = useContext(SellerAuthContext);
+  if (!context) throw new Error('useSellerAuth must be used within SellerAuthProvider');
+  return context;
 }
