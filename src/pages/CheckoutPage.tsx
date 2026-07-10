@@ -2,100 +2,42 @@ import React, { useMemo, useState } from 'react';
 import { AlertCircle, Check, Loader2, LockKeyhole, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { CheckoutDetails } from '../types';
-import { CURRENCY, MOMO_NETWORKS, SHIPPING } from '../constants';
+import { CURRENCY, MOMO_NETWORKS } from '../constants';
 import { calculateShipping, calculateSubtotal, calculateTotal } from '../utils/format';
 import { useApp } from '../context/AppContext';
 import { placeOrder } from '../lib/api/commerce';
 import { validateCheckout, type CheckoutErrors } from '../components/checkout/checkoutValidation';
 import OrderSummary from '../components/checkout/OrderSummary';
+import { useStoreSettings } from '../hooks/useStoreSettings';
 
 const fieldClass = 'h-14 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white px-4 text-base outline-none transition focus:border-[var(--color-ink)]';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { cartItems, clearCart } = useApp();
+  const { shipping: shippingSettings } = useStoreSettings();
   const [details, setDetails] = useState<CheckoutDetails>({ fullName: '', email: '', phone: '', address: '', city: '', zip: '', paymentMethod: 'MOMO', momoNetwork: 'MTN', momoNumber: '', totalAmount: 0 });
   const [errors, setErrors] = useState<CheckoutErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   const subtotal = useMemo(() => calculateSubtotal(cartItems), [cartItems]);
-  const shipping = calculateShipping(subtotal, SHIPPING.FREE_THRESHOLD, SHIPPING.BASE_FEE);
+  const shipping = calculateShipping(subtotal, shippingSettings.freeThreshold, shippingSettings.baseFee);
   const total = calculateTotal(subtotal, shipping);
-
-  const update = <K extends keyof CheckoutDetails>(key: K, value: CheckoutDetails[K]) => {
-    setDetails((current) => ({ ...current, [key]: value }));
-    setErrors((current) => ({ ...current, [key]: undefined }));
-  };
+  const update = <K extends keyof CheckoutDetails>(key: K, value: CheckoutDetails[K]) => { setDetails((current) => ({ ...current, [key]: value })); setErrors((current) => ({ ...current, [key]: undefined })); };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const nextDetails = { ...details, totalAmount: total };
     const validation = validateCheckout(nextDetails);
-    if (Object.keys(validation).length > 0) {
-      setErrors(validation);
-      setSubmitError('Review the highlighted information before continuing.');
-      return;
-    }
-
-    setSubmitting(true);
-    setSubmitError('');
-    try {
-      const order = await placeOrder(nextDetails, cartItems, shipping);
-      clearCart();
-      navigate(`/success?order=${encodeURIComponent(order.orderNumber)}`, { replace: true, state: { orderNumber: order.orderNumber, paymentMethod: details.paymentMethod } });
-    } catch (reason) {
-      setSubmitError(reason instanceof Error ? reason.message : 'The order could not be placed. Your bag has not been cleared.');
-    } finally {
-      setSubmitting(false);
-    }
+    if (Object.keys(validation).length > 0) { setErrors(validation); setSubmitError('Review the highlighted information before continuing.'); return; }
+    setSubmitting(true); setSubmitError('');
+    try { const order = await placeOrder(nextDetails, cartItems, shipping); clearCart(); navigate(`/success?order=${encodeURIComponent(order.orderNumber)}`, { replace: true, state: { orderNumber: order.orderNumber, paymentMethod: details.paymentMethod } }); }
+    catch (reason) { setSubmitError(reason instanceof Error ? reason.message : 'The order could not be placed. Your bag has not been cleared.'); }
+    finally { setSubmitting(false); }
   };
 
-  if (cartItems.length === 0) {
-    return <div className="store-container grid min-h-[65vh] place-items-center py-16 text-center"><div><h1 className="font-serif text-4xl font-bold">Your bag is empty</h1><p className="mt-3 text-sm text-[var(--color-ink-soft)]">Add products before starting checkout.</p><button type="button" onClick={() => navigate('/shirts')} className="mt-7 h-12 bg-[var(--color-ink)] px-7 text-xs font-semibold uppercase tracking-[0.15em] text-white">Browse products</button></div></div>;
-  }
+  if (cartItems.length === 0) return <div className="store-container grid min-h-[65vh] place-items-center py-16 text-center"><div><h1 className="font-serif text-4xl font-bold">Your bag is empty</h1><p className="mt-3 text-sm text-[var(--color-ink-soft)]">Add products before starting checkout.</p><button type="button" onClick={() => navigate('/shirts')} className="mt-7 h-12 bg-[var(--color-ink)] px-7 text-xs font-semibold uppercase tracking-[0.15em] text-white">Browse products</button></div></div>;
 
-  return (
-    <div className="bg-[var(--color-canvas)]">
-      <div className="store-container py-7 lg:py-12">
-        <div className="mb-8 flex items-end justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">Secure checkout</p><h1 className="mt-2 font-serif text-4xl font-bold tracking-[-0.04em] lg:text-5xl">Delivery and payment</h1></div><div className="hidden items-center gap-2 text-xs text-[var(--color-muted)] sm:flex"><LockKeyhole size={15} /> Order data is encrypted in transit</div></div>
-
-        <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start">
-          <div className="grid gap-6">
-            <section className="bg-white p-5 sm:p-7">
-              <h2 className="font-serif text-2xl font-bold">Contact</h2>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <label className="grid gap-2 text-sm">Full name<input className={fieldClass} value={details.fullName} onChange={(event) => update('fullName', event.target.value)} />{errors.fullName ? <span className="text-xs text-[var(--color-danger)]">{errors.fullName}</span> : null}</label>
-                <label className="grid gap-2 text-sm">Phone<input inputMode="tel" className={fieldClass} value={details.phone} onChange={(event) => update('phone', event.target.value)} />{errors.phone ? <span className="text-xs text-[var(--color-danger)]">{errors.phone}</span> : null}</label>
-                <label className="grid gap-2 text-sm sm:col-span-2">Email<input type="email" className={fieldClass} value={details.email} onChange={(event) => update('email', event.target.value)} />{errors.email ? <span className="text-xs text-[var(--color-danger)]">{errors.email}</span> : null}</label>
-              </div>
-            </section>
-
-            <section className="bg-white p-5 sm:p-7">
-              <div className="flex items-center gap-3"><MapPin size={20} /><h2 className="font-serif text-2xl font-bold">Delivery</h2></div>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <label className="grid gap-2 text-sm sm:col-span-2">Street address or pickup instruction<input className={fieldClass} value={details.address} onChange={(event) => update('address', event.target.value)} />{errors.address ? <span className="text-xs text-[var(--color-danger)]">{errors.address}</span> : null}</label>
-                <label className="grid gap-2 text-sm">City or town<input className={fieldClass} value={details.city} onChange={(event) => update('city', event.target.value)} />{errors.city ? <span className="text-xs text-[var(--color-danger)]">{errors.city}</span> : null}</label>
-                <label className="grid gap-2 text-sm">Digital address / postcode<input className={fieldClass} value={details.zip} onChange={(event) => update('zip', event.target.value)} placeholder="Optional" /></label>
-              </div>
-            </section>
-
-            <section className="bg-white p-5 sm:p-7">
-              <h2 className="font-serif text-2xl font-bold">Payment preference</h2>
-              <p className="mt-2 text-sm leading-6 text-[var(--color-ink-soft)]">Choosing Mobile Money records your preferred channel. The order remains payment-pending until the store verifies payment.</p>
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                {(['MOMO', 'DELIVERY'] as const).map((method) => <button key={method} type="button" onClick={() => update('paymentMethod', method)} className={`flex min-h-14 items-center justify-center gap-2 border text-xs font-semibold uppercase tracking-[0.13em] ${details.paymentMethod === method ? 'border-[var(--color-ink)] bg-[var(--color-ink)] text-white' : 'border-[var(--color-border)]'}`}>{details.paymentMethod === method ? <Check size={15} /> : null}{method === 'MOMO' ? 'Mobile Money' : 'Pay on delivery'}</button>)}
-              </div>
-              {details.paymentMethod === 'MOMO' ? <div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="grid gap-2 text-sm">Network<select className={fieldClass} value={details.momoNetwork} onChange={(event) => update('momoNetwork', event.target.value)}>{MOMO_NETWORKS.map((network) => <option key={network.value} value={network.value}>{network.label}</option>)}</select>{errors.momoNetwork ? <span className="text-xs text-[var(--color-danger)]">{errors.momoNetwork}</span> : null}</label><label className="grid gap-2 text-sm">Mobile Money number<input inputMode="tel" className={fieldClass} value={details.momoNumber} onChange={(event) => update('momoNumber', event.target.value)} />{errors.momoNumber ? <span className="text-xs text-[var(--color-danger)]">{errors.momoNumber}</span> : null}</label></div> : null}
-            </section>
-
-            {submitError ? <div role="alert" className="flex gap-3 border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle className="mt-0.5 shrink-0" size={18} />{submitError}</div> : null}
-            <button type="submit" disabled={submitting} className="flex h-14 items-center justify-center gap-2 bg-[var(--color-accent)] text-xs font-bold uppercase tracking-[0.15em] text-white hover:bg-[var(--color-accent-strong)] disabled:opacity-60 lg:hidden">{submitting ? <Loader2 size={17} className="animate-spin" /> : null}Place order · {CURRENCY}{total.toFixed(2)}</button>
-          </div>
-
-          <div><OrderSummary items={cartItems} subtotal={subtotal} shipping={shipping} total={total} /><button type="submit" disabled={submitting} className="mt-4 hidden h-14 w-full items-center justify-center gap-2 bg-[var(--color-accent)] text-xs font-bold uppercase tracking-[0.15em] text-white hover:bg-[var(--color-accent-strong)] disabled:opacity-60 lg:flex">{submitting ? <Loader2 size={17} className="animate-spin" /> : null}Place order · {CURRENCY}{total.toFixed(2)}</button></div>
-        </form>
-      </div>
-    </div>
-  );
+  return <div className="bg-[var(--color-canvas)]"><div className="store-container py-7 lg:py-12"><div className="mb-8 flex items-end justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">Secure checkout</p><h1 className="mt-2 font-serif text-4xl font-bold tracking-[-0.04em] lg:text-5xl">Delivery and payment</h1></div><div className="hidden items-center gap-2 text-xs text-[var(--color-muted)] sm:flex"><LockKeyhole size={15}/> Order data is encrypted in transit</div></div><form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start"><div className="grid gap-6"><section className="bg-white p-5 sm:p-7"><h2 className="font-serif text-2xl font-bold">Contact</h2><div className="mt-5 grid gap-4 sm:grid-cols-2"><label className="grid gap-2 text-sm">Full name<input className={fieldClass} value={details.fullName} onChange={(event) => update('fullName', event.target.value)}/>{errors.fullName ? <span className="text-xs text-[var(--color-danger)]">{errors.fullName}</span> : null}</label><label className="grid gap-2 text-sm">Phone<input inputMode="tel" className={fieldClass} value={details.phone} onChange={(event) => update('phone', event.target.value)}/>{errors.phone ? <span className="text-xs text-[var(--color-danger)]">{errors.phone}</span> : null}</label><label className="grid gap-2 text-sm sm:col-span-2">Email<input type="email" className={fieldClass} value={details.email} onChange={(event) => update('email', event.target.value)}/>{errors.email ? <span className="text-xs text-[var(--color-danger)]">{errors.email}</span> : null}</label></div></section><section className="bg-white p-5 sm:p-7"><div className="flex items-center gap-3"><MapPin size={20}/><h2 className="font-serif text-2xl font-bold">Delivery</h2></div><p className="mt-2 text-sm text-[var(--color-muted)]">For pickup, enter “{shippingSettings.pickupLabel}” in the instruction field.</p><div className="mt-5 grid gap-4 sm:grid-cols-2"><label className="grid gap-2 text-sm sm:col-span-2">Street address or pickup instruction<input className={fieldClass} value={details.address} onChange={(event) => update('address', event.target.value)}/>{errors.address ? <span className="text-xs text-[var(--color-danger)]">{errors.address}</span> : null}</label><label className="grid gap-2 text-sm">City or town<input className={fieldClass} value={details.city} onChange={(event) => update('city', event.target.value)}/>{errors.city ? <span className="text-xs text-[var(--color-danger)]">{errors.city}</span> : null}</label><label className="grid gap-2 text-sm">Digital address / postcode<input className={fieldClass} value={details.zip} onChange={(event) => update('zip', event.target.value)} placeholder="Optional"/></label></div></section><section className="bg-white p-5 sm:p-7"><h2 className="font-serif text-2xl font-bold">Payment preference</h2><p className="mt-2 text-sm leading-6 text-[var(--color-ink-soft)]">Choosing Mobile Money records your preferred channel. The order remains payment-pending until the store verifies payment.</p><div className="mt-5 grid grid-cols-2 gap-3">{(['MOMO','DELIVERY'] as const).map((method) => <button key={method} type="button" onClick={() => update('paymentMethod', method)} className={`flex min-h-14 items-center justify-center gap-2 border text-xs font-semibold uppercase tracking-[0.13em] ${details.paymentMethod === method ? 'border-[var(--color-ink)] bg-[var(--color-ink)] text-white' : 'border-[var(--color-border)]'}`}>{details.paymentMethod === method ? <Check size={15}/> : null}{method === 'MOMO' ? 'Mobile Money' : 'Pay on delivery'}</button>)}</div>{details.paymentMethod === 'MOMO' ? <div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="grid gap-2 text-sm">Network<select className={fieldClass} value={details.momoNetwork} onChange={(event) => update('momoNetwork', event.target.value)}>{MOMO_NETWORKS.map((network) => <option key={network.value} value={network.value}>{network.label}</option>)}</select>{errors.momoNetwork ? <span className="text-xs text-[var(--color-danger)]">{errors.momoNetwork}</span> : null}</label><label className="grid gap-2 text-sm">Mobile Money number<input inputMode="tel" className={fieldClass} value={details.momoNumber} onChange={(event) => update('momoNumber', event.target.value)}/>{errors.momoNumber ? <span className="text-xs text-[var(--color-danger)]">{errors.momoNumber}</span> : null}</label></div> : null}</section>{submitError ? <div role="alert" className="flex gap-3 border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle className="mt-0.5 shrink-0" size={18}/>{submitError}</div> : null}<button type="submit" disabled={submitting} className="flex h-14 items-center justify-center gap-2 bg-[var(--color-accent)] text-xs font-bold uppercase tracking-[0.15em] text-white disabled:opacity-60 lg:hidden">{submitting ? <Loader2 size={17} className="animate-spin"/> : null}Place order · {CURRENCY}{total.toFixed(2)}</button></div><div><OrderSummary items={cartItems} subtotal={subtotal} shipping={shipping} total={total}/><button type="submit" disabled={submitting} className="mt-4 hidden h-14 w-full items-center justify-center gap-2 bg-[var(--color-accent)] text-xs font-bold uppercase tracking-[0.15em] text-white disabled:opacity-60 lg:flex">{submitting ? <Loader2 size={17} className="animate-spin"/> : null}Place order · {CURRENCY}{total.toFixed(2)}</button></div></form></div></div>;
 }
