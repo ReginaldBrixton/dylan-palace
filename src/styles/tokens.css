@@ -1,0 +1,50 @@
+:root {
+  color-scheme: light;
+  --color-canvas: #f6f4ef;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #eeece6;
+  --color-ink: #151515;
+  --color-ink-soft: #5d5b56;
+  --color-muted: #86827a;
+  --color-border: #dcd8cf;
+  --color-border-strong: #bcb6aa;
+  --color-accent: #4b5f34;
+  --color-accent-strong: #344423;
+  --color-danger: #a33a32;
+  --color-warning: #a86d18;
+  --color-success: #2f6b42;
+  --shadow-soft: 0 12px 36px rgb(21 21 21 / 0.08);
+  --shadow-drawer: 0 24px 80px rgb(21 21 21 / 0.18);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --space-page: clamp(1rem, 3vw, 2.5rem);
+  --container-store: 90rem;
+  --container-admin: 100rem;
+  --header-mobile: 3.625rem;
+  --header-desktop: 4.75rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 24%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
