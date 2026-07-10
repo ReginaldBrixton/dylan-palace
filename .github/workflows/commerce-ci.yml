@@ -9,7 +9,7 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       SUPABASE_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
     steps:
@@ -27,3 +27,7 @@ jobs:
         run: npx prisma validate
       - name: Build
         run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Responsive browser tests
+        run: npm run test:e2e -- --project=mobile --project=tablet --project=desktop
