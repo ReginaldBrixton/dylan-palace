@@ -1,0 +1,29 @@
+name: Commerce CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feat/dylan-palace-commerce-overhaul]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test:run
+      - name: Validate Prisma schema
+        run: npx prisma validate
+      - name: Build
+        run: npm run build

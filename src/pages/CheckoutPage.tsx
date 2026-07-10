@@ -9,7 +9,7 @@ import { placeOrder } from '../lib/api/commerce';
 import { validateCheckout, type CheckoutErrors } from '../components/checkout/checkoutValidation';
 import OrderSummary from '../components/checkout/OrderSummary';
 
-const fieldClass = 'h-13 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white px-4 text-base outline-none transition focus:border-[var(--color-ink)]';
+const fieldClass = 'h-14 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white px-4 text-base outline-none transition focus:border-[var(--color-ink)]';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -86,17 +86,14 @@ export default function CheckoutPage() {
               <div className="mt-5 grid grid-cols-2 gap-3">
                 {(['MOMO', 'DELIVERY'] as const).map((method) => <button key={method} type="button" onClick={() => update('paymentMethod', method)} className={`flex min-h-14 items-center justify-center gap-2 border text-xs font-semibold uppercase tracking-[0.13em] ${details.paymentMethod === method ? 'border-[var(--color-ink)] bg-[var(--color-ink)] text-white' : 'border-[var(--color-border)]'}`}>{details.paymentMethod === method ? <Check size={15} /> : null}{method === 'MOMO' ? 'Mobile Money' : 'Pay on delivery'}</button>)}
               </div>
-              {details.paymentMethod === 'MOMO' ? <div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="grid gap-2 text-sm">Network<select className={fieldClass} value={details.momoNetwork} onChange={(event) => update('momoNetwork', event.target.value)}>{MOMO_NETWORKS.map((network) => <option key={network} value={network}>{network}</option>)}</select>{errors.momoNetwork ? <span className="text-xs text-[var(--color-danger)]">{errors.momoNetwork}</span> : null}</label><label className="grid gap-2 text-sm">Mobile Money number<input inputMode="tel" className={fieldClass} value={details.momoNumber} onChange={(event) => update('momoNumber', event.target.value)} />{errors.momoNumber ? <span className="text-xs text-[var(--color-danger)]">{errors.momoNumber}</span> : null}</label></div> : null}
+              {details.paymentMethod === 'MOMO' ? <div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="grid gap-2 text-sm">Network<select className={fieldClass} value={details.momoNetwork} onChange={(event) => update('momoNetwork', event.target.value)}>{MOMO_NETWORKS.map((network) => <option key={network.value} value={network.value}>{network.label}</option>)}</select>{errors.momoNetwork ? <span className="text-xs text-[var(--color-danger)]">{errors.momoNetwork}</span> : null}</label><label className="grid gap-2 text-sm">Mobile Money number<input inputMode="tel" className={fieldClass} value={details.momoNumber} onChange={(event) => update('momoNumber', event.target.value)} />{errors.momoNumber ? <span className="text-xs text-[var(--color-danger)]">{errors.momoNumber}</span> : null}</label></div> : null}
             </section>
 
             {submitError ? <div role="alert" className="flex gap-3 border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle className="mt-0.5 shrink-0" size={18} />{submitError}</div> : null}
             <button type="submit" disabled={submitting} className="flex h-14 items-center justify-center gap-2 bg-[var(--color-accent)] text-xs font-bold uppercase tracking-[0.15em] text-white hover:bg-[var(--color-accent-strong)] disabled:opacity-60 lg:hidden">{submitting ? <Loader2 size={17} className="animate-spin" /> : null}Place order · {CURRENCY}{total.toFixed(2)}</button>
           </div>
 
-          <div>
-            <OrderSummary items={cartItems} subtotal={subtotal} shipping={shipping} total={total} />
-            <button type="submit" disabled={submitting} className="mt-4 hidden h-14 w-full items-center justify-center gap-2 bg-[var(--color-accent)] text-xs font-bold uppercase tracking-[0.15em] text-white hover:bg-[var(--color-accent-strong)] disabled:opacity-60 lg:flex">{submitting ? <Loader2 size={17} className="animate-spin" /> : null}Place order · {CURRENCY}{total.toFixed(2)}</button>
-          </div>
+          <div><OrderSummary items={cartItems} subtotal={subtotal} shipping={shipping} total={total} /><button type="submit" disabled={submitting} className="mt-4 hidden h-14 w-full items-center justify-center gap-2 bg-[var(--color-accent)] text-xs font-bold uppercase tracking-[0.15em] text-white hover:bg-[var(--color-accent-strong)] disabled:opacity-60 lg:flex">{submitting ? <Loader2 size={17} className="animate-spin" /> : null}Place order · {CURRENCY}{total.toFixed(2)}</button></div>
         </form>
       </div>
     </div>
