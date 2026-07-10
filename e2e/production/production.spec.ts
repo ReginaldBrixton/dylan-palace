@@ -30,15 +30,9 @@ function attachRuntimeAudit(page: Page, baseUrl: string): RuntimeAudit {
   };
 
   page.on('console', (message) => {
-    if (message.type() === 'error') {
-      audit.consoleErrors.push(message.text());
-    }
+    if (message.type() === 'error') audit.consoleErrors.push(message.text());
   });
-
-  page.on('pageerror', (error) => {
-    audit.pageErrors.push(error.message);
-  });
-
+  page.on('pageerror', (error) => audit.pageErrors.push(error.message));
   page.on('requestfailed', (request) => {
     const failure = request.failure()?.errorText || 'unknown network failure';
     if (failure.includes('ERR_ABORTED')) return;
@@ -46,7 +40,6 @@ function attachRuntimeAudit(page: Page, baseUrl: string): RuntimeAudit {
       audit.failedRequests.push(`${request.method()} ${request.url()} — ${failure}`);
     }
   });
-
   page.on('response', (response) => {
     const request = response.request();
     const trackedTypes = new Set(['document', 'script', 'stylesheet', 'xhr', 'fetch', 'image']);
@@ -60,6 +53,10 @@ function attachRuntimeAudit(page: Page, baseUrl: string): RuntimeAudit {
   });
 
   return audit;
+}
+
+async function stabilize(page: Page) {
+  await page.waitForTimeout(1_500);
 }
 
 async function assertPageIntegrity(page: Page, audit: RuntimeAudit, testInfo: TestInfo) {
@@ -88,10 +85,8 @@ async function openAndAudit(page: Page, path: string, testInfo: TestInfo) {
   const audit = attachRuntimeAudit(page, baseUrl);
   const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
   expect(response?.status(), `${path} should return HTTP 200`).toBe(200);
-  await page.waitForLoadState('networkidle').catch(() => undefined);
-  await page.waitForTimeout(1_000);
+  await stabilize(page);
   await assertPageIntegrity(page, audit, testInfo);
-  return audit;
 }
 
 const categoryRoutes = [
@@ -111,7 +106,7 @@ test('home renders and the primary shopping action responds', async ({ page }, t
   await page.getByRole('button', { name: /shop the collection/i }).click();
   await expect(page).toHaveURL(/\/shirts(?:\?|$)/);
   await expect(page.getByRole('heading', { name: 'Shirts' })).toBeVisible();
-  await page.waitForLoadState('networkidle').catch(() => undefined);
+  await stabilize(page);
   await assertPageIntegrity(page, audit, testInfo);
 });
 
@@ -123,7 +118,7 @@ for (const route of categoryRoutes) {
     expect(response?.status()).toBe(200);
     await expect(page.getByRole('heading', { name: route.heading })).toBeVisible();
     await expect(page.getByPlaceholder(new RegExp(`search ${route.heading}`, 'i'))).toBeVisible();
-    await page.waitForLoadState('networkidle').catch(() => undefined);
+    await stabilize(page);
     await assertPageIntegrity(page, audit, testInfo);
   });
 }
@@ -143,6 +138,7 @@ test('responsive navigation matches the active viewport', async ({ page }, testI
     await expect(page.getByRole('button', { name: 'Open navigation' })).toBeHidden();
   }
 
+  await stabilize(page);
   await assertPageIntegrity(page, audit, testInfo);
 });
 
@@ -153,6 +149,7 @@ test('empty checkout is protected without runtime errors', async ({ page }, test
   const response = await page.goto('/checkout', { waitUntil: 'domcontentloaded' });
   expect(response?.status()).toBe(200);
   await expect(page.getByRole('heading', { name: 'Your bag is empty' })).toBeVisible();
+  await stabilize(page);
   await assertPageIntegrity(page, audit, testInfo);
 });
 
@@ -164,6 +161,7 @@ test('admin sign-in surface is accessible and non-destructive', async ({ page },
   await expect(page.getByRole('heading', { name: 'Admin sign in' })).toBeVisible();
   await expect(page.getByLabel('Admin email', { exact: true })).toBeVisible();
   await expect(page.getByLabel('Passcode', { exact: true })).toBeVisible();
+  await stabilize(page);
   await assertPageIntegrity(page, audit, testInfo);
 });
 
