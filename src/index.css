@@ -1,41 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+@import "./styles/tokens.css";
 
 @theme {
   --font-serif: "Hanken Grotesk", sans-serif;
   --font-sans: "Inter", sans-serif;
-  
-  --color-primary: #111111;
-  --color-background-custom: #F9F9F8;
-  --color-surface-custom: #FFFFFF;
-  --color-text-custom: #111111;
-  --color-muted-custom: #8B8B8A;
-  --color-accent-custom: #4A5D23;
-  --color-border-custom: #E5E5E5;
+  --color-primary: #151515;
+  --color-background-custom: #f6f4ef;
+  --color-surface-custom: #ffffff;
+  --color-text-custom: #151515;
+  --color-muted-custom: #86827a;
+  --color-accent-custom: #4b5f34;
+  --color-border-custom: #dcd8cf;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--color-canvas);
 }
 
 body {
+  min-width: 320px;
+  margin: 0;
   font-family: var(--font-sans);
-  background-color: var(--color-background-custom);
-  color: var(--color-text-custom);
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  text-rendering: optimizeLegibility;
 }
 
-/* Hide scrollbars completely on mobile and tablet touch viewports (<1024px), preserve on desktop */
-@media (max-width: 1024px) {
-  ::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-  * {
-    -ms-overflow-style: none !important;
-    scrollbar-width: none !important;
-  }
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.store-container {
+  width: min(100%, var(--container-store));
+  margin-inline: auto;
+  padding-inline: var(--space-page);
+}
+
+.admin-container {
+  width: min(100%, var(--container-admin));
+  margin-inline: auto;
+  padding-inline: var(--space-page);
 }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -47,10 +73,18 @@ body {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
+  animation: fade-in 0.35s ease-out forwards;
 }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-tap-highlight-color: transparent;
+@media (max-width: 1023px) {
+  ::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

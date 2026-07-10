@@ -1,7 +1,3 @@
-// Dylan's Palace — Prisma Schema
-// Strict, relational schema with separate tables for images, sizes,
-// categories, and sub-categories. Optimized indexes for fast lookups.
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,10 +6,6 @@ datasource db {
   provider = "postgresql"
   url      = env("SUPABASE_DB_URL")
 }
-
-// ============================================
-// ENUMS
-// ============================================
 
 enum UserRole {
   customer
@@ -35,6 +27,13 @@ enum OrderStatus {
   cancelled
 }
 
+enum PaymentStatus {
+  pending
+  verified
+  failed
+  refunded
+}
+
 enum PaymentMethod {
   MOMO
   DELIVERY
@@ -46,9 +45,13 @@ enum Gender {
   UNISEX
 }
 
-// ============================================
-// PROFILES (extends Supabase auth.users)
-// ============================================
+enum InventoryReason {
+  order
+  manual_adjustment
+  restock
+  return
+  cancellation
+}
 
 model Profile {
   id        String   @id @db.Uuid
@@ -59,32 +62,28 @@ model Profile {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  products  Product[]
-  orders    Order[]
-  wishlist  Wishlist[]
+  products           Product[]
+  orders             Order[]
+  wishlist           Wishlist[]
+  inventoryMovements InventoryMovement[]
+  orderStatusEvents  OrderStatusEvent[]
+  auditEvents        AdminAuditEvent[]
+  updatedSettings    StoreSetting[]
 
   @@map("profiles")
 }
 
-// ============================================
-// CATEGORIES (lookup table)
-// ============================================
-
 model Category {
-  id           Int                @id @default(autoincrement())
-  name         ProductCategoryName @unique
-  displayName  String             @map("display_name")
-  slug         String             @unique
+  id          Int                 @id @default(autoincrement())
+  name        ProductCategoryName @unique
+  displayName String              @map("display_name")
+  slug        String              @unique
 
   subCategories SubCategory[]
   products      Product[]
 
   @@map("categories")
 }
-
-// ============================================
-// SUB-CATEGORIES (linked to categories)
-// ============================================
 
 model SubCategory {
   id          Int      @id @default(autoincrement())
@@ -99,10 +98,6 @@ model SubCategory {
   @@index([categoryId])
   @@map("sub_categories")
 }
-
-// ============================================
-// PRODUCTS
-// ============================================
 
 model Product {
   id            String       @id @default(uuid()) @db.Uuid
@@ -127,6 +122,7 @@ model Product {
 
   images     ProductImage[]
   sizes      ProductSize[]
+  variants   ProductVariant[]
   orderItems OrderItem[]
   wishlist   Wishlist[]
 
@@ -137,16 +133,10 @@ model Product {
   @@index([price])
   @@index([name])
   @@index([createdAt])
-  // Composite index for common query: category + in_stock
   @@index([categoryId, inStock])
-  // Composite index for featured products query
   @@index([isFeatured, inStock])
   @@map("products")
 }
-
-// ============================================
-// PRODUCT IMAGES (separate table, ordered)
-// ============================================
 
 model ProductImage {
   id        String   @id @default(uuid()) @db.Uuid
@@ -158,13 +148,9 @@ model ProductImage {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@index([productId])
-  @@index([productId, position])
+  @@unique([productId, position])
   @@map("product_images")
 }
-
-// ============================================
-// PRODUCT SIZES (separate table, per-size stock)
-// ============================================
 
 model ProductSize {
   id        String  @id @default(uuid()) @db.Uuid
@@ -178,9 +164,26 @@ model ProductSize {
   @@map("product_sizes")
 }
 
-// ============================================
-// ORDERS
-// ============================================
+model ProductVariant {
+  id            String   @id @default(uuid()) @db.Uuid
+  productId     String   @map("product_id") @db.Uuid
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku           String   @unique
+  size          String
+  color         String?
+  priceOverride Decimal? @map("price_override") @db.Decimal(10, 2)
+  stockQuantity Int      @default(0) @map("stock_quantity")
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  orderItems         OrderItem[]
+  inventoryMovements InventoryMovement[]
+
+  @@index([productId, active])
+  @@index([stockQuantity])
+  @@map("product_variants")
+}
 
 model Order {
   id             String        @id @default(uuid()) @db.Uuid
@@ -188,63 +191,114 @@ model Order {
   userId         String?       @map("user_id") @db.Uuid
   user           Profile?      @relation(fields: [userId], references: [id])
   status         OrderStatus   @default(pending)
+  paymentStatus  PaymentStatus @default(pending) @map("payment_status")
   totalAmount    Decimal       @db.Decimal(10, 2) @map("total_amount")
   subtotal       Decimal       @db.Decimal(10, 2)
   shippingCost   Decimal       @default(0) @db.Decimal(10, 2) @map("shipping_cost")
-  // Customer snapshot
   fullName       String        @map("full_name")
   email          String
   phone          String
   address        String
   city           String
   zip            String?
-  // Payment
   paymentMethod  PaymentMethod @map("payment_method")
   momoNetwork    String?       @map("momo_network")
   momoNumber     String?       @map("momo_number")
-  // Tracking
   trackingNumber String?       @map("tracking_number")
   notes          String?
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
 
-  items OrderItem[]
+  items        OrderItem[]
+  statusEvents OrderStatusEvent[]
 
   @@index([userId])
   @@index([status])
+  @@index([paymentStatus])
   @@index([createdAt])
   @@index([orderNumber])
-  // Composite: status + created_at for dashboard "pending orders sorted by date"
   @@index([status, createdAt])
   @@map("orders")
 }
 
-// ============================================
-// ORDER ITEMS
-// ============================================
-
 model OrderItem {
-  id           String   @id @default(uuid()) @db.Uuid
-  orderId      String   @map("order_id") @db.Uuid
-  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId    String   @map("product_id") @db.Uuid
-  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productName  String   @map("product_name")
-  productImage String?  @map("product_image")
+  id           String          @id @default(uuid()) @db.Uuid
+  orderId      String          @map("order_id") @db.Uuid
+  order        Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String          @map("product_id") @db.Uuid
+  product      Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variantId    String?         @map("variant_id") @db.Uuid
+  variant      ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productName  String          @map("product_name")
+  productImage String?         @map("product_image")
   size         String?
   quantity     Int
-  unitPrice    Decimal  @db.Decimal(10, 2) @map("unit_price")
-  createdAt    DateTime @default(now()) @map("created_at")
+  unitPrice    Decimal         @db.Decimal(10, 2) @map("unit_price")
+  createdAt    DateTime        @default(now()) @map("created_at")
 
   @@index([orderId])
   @@index([productId])
+  @@index([variantId])
   @@index([orderId, productId])
   @@map("order_items")
 }
 
-// ============================================
-// WISHLIST (many-to-many user-product)
-// ============================================
+model InventoryMovement {
+  id        String          @id @default(uuid()) @db.Uuid
+  variantId String          @map("variant_id") @db.Uuid
+  variant   ProductVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  actorId   String?         @map("actor_id") @db.Uuid
+  actor     Profile?        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  delta     Int
+  reason    InventoryReason
+  note      String?
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  @@index([variantId, createdAt])
+  @@index([actorId])
+  @@map("inventory_movements")
+}
+
+model OrderStatusEvent {
+  id         String       @id @default(uuid()) @db.Uuid
+  orderId    String       @map("order_id") @db.Uuid
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actorId    String?      @map("actor_id") @db.Uuid
+  actor      Profile?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  fromStatus OrderStatus? @map("from_status")
+  toStatus   OrderStatus  @map("to_status")
+  note       String?
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  @@index([orderId, createdAt])
+  @@map("order_status_events")
+}
+
+model AdminAuditEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String?  @map("actor_id") @db.Uuid
+  actor      Profile? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("admin_audit_events")
+}
+
+model StoreSetting {
+  key       String   @id
+  value     Json
+  updatedBy String?  @map("updated_by") @db.Uuid
+  updater   Profile? @relation(fields: [updatedBy], references: [id], onDelete: SetNull)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("store_settings")
+}
 
 model Wishlist {
   id        String   @id @default(uuid()) @db.Uuid

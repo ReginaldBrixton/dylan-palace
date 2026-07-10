@@ -1,9 +1,10 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Header from './Header';
-import BottomNav from './BottomNav';
 import { CartDrawer } from '../ui';
 import { useApp } from '../../context/AppContext';
+import StorefrontHeader from '../storefront/StorefrontHeader';
+import MobileNavigation from '../storefront/MobileNavigation';
+import SiteFooter from '../storefront/SiteFooter';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -22,22 +23,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isCheckout = location.pathname === '/checkout';
   const isSuccess = location.pathname === '/success';
   const isHomePage = location.pathname === '/';
-  const showBottomNav = !isCheckout && !isSuccess && !isHomePage;
+  const showMobileNavigation = !isCheckout && !isSuccess;
+  const showFooter = !isCheckout && !isSuccess;
 
-  if (isSplash || isSellerRoute) {
-    return <>{children}</>;
-  }
+  if (isSplash || isSellerRoute) return <>{children}</>;
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#F9F9F8] text-[#111111] antialiased">
-      <Header
-        cartCount={totalCartUnits}
-        onOpenCart={() => setIsCartOpen(true)}
-      />
+    <div className="relative flex min-h-screen flex-col bg-[var(--color-canvas)] text-[var(--color-ink)] antialiased">
+      <StorefrontHeader cartCount={totalCartUnits} onOpenCart={() => setIsCartOpen(true)} />
 
-      <main className={`flex-grow ${showBottomNav ? 'pb-[120px]' : ''} ${isHomePage ? 'pt-0' : 'pt-[52px]'}`}>
+      <main className={`min-w-0 flex-1 ${isHomePage ? 'pt-0' : 'pt-[var(--header-mobile)] lg:pt-[var(--header-desktop)]'} ${showMobileNavigation ? 'pb-[68px] lg:pb-0' : ''}`}>
         {children}
       </main>
+
+      {showFooter ? <SiteFooter /> : null}
 
       <CartDrawer
         isOpen={isCartOpen}
@@ -51,7 +50,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }}
       />
 
-      {showBottomNav && <BottomNav />}
+      {showMobileNavigation ? <MobileNavigation cartCount={totalCartUnits} onOpenCart={() => setIsCartOpen(true)} /> : null}
     </div>
   );
 }

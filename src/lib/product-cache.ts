@@ -1,161 +1,107 @@
-import { fetchProducts, fetchProductById, fetchFeaturedProducts } from './api';
+import { fetchCatalogueFeaturedProducts, fetchCatalogueProductById, fetchCatalogueProducts } from './api/catalog';
 import type { Product as DBProduct, ProductCategory } from './database.types';
 import type { Product as FrontendProduct } from '../types/product';
 
-const CACHE_KEY = 'dp_products_cache';
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-const STALE_TTL = 30 * 60 * 1000; // 30 minutes — serve stale data while revalidating
+const CACHE_KEY = 'dp_products_cache_v2';
+const CACHE_TTL = 5 * 60 * 1000;
+const STALE_TTL = 30 * 60 * 1000;
 
-interface CacheEntry {
-  timestamp: number;
-  products: FrontendProduct[];
-}
-
+interface CacheEntry { timestamp: number; products: FrontendProduct[]; }
 let memoryCache: CacheEntry | null = null;
 let featuredCache: FrontendProduct[] | null = null;
 let fetchPromise: Promise<FrontendProduct[]> | null = null;
 
 export function adaptProduct(db: DBProduct): FrontendProduct {
-  const images = (db.product_images || [])
-    .sort((a, b) => a.position - b.position)
-    .map((img) => img.url);
-
-  const sizes = (db.product_sizes || []).map((s) => s.size);
-
-  const category = (db.category?.name || 'SHIRTS') as FrontendProduct['category'];
+  const images = [...(db.product_images || [])].sort((a, b) => a.position - b.position).map((image) => image.url);
+  const variants = (db.product_variants || [])
+    .filter((variant) => variant.active)
+    .map((variant) => ({
+      id: variant.id,
+      sku: variant.sku,
+      size: variant.size,
+      color: variant.color || undefined,
+      price: variant.price_override ?? undefined,
+      stockQuantity: variant.stock_quantity,
+      active: variant.active,
+    }));
+  const sizes = variants.length > 0
+    ? Array.from(new Set(variants.filter((variant) => variant.stockQuantity > 0).map((variant) => variant.size)))
+    : (db.product_sizes || []).filter((size) => size.in_stock).map((size) => size.size);
 
   return {
     id: db.id,
     name: db.name,
     price: db.price,
-    category,
-    subCategory: db.sub_category?.name || db.sub_category?.display_name || undefined,
+    category: (db.category?.name || 'SHIRTS') as FrontendProduct['category'],
+    subCategory: db.sub_category?.display_name || db.sub_category?.name || undefined,
     brand: db.brand || undefined,
-    gender: (db.gender as FrontendProduct['gender']) || undefined,
+    gender: db.gender || undefined,
     images,
     description: db.description || '',
     sizes,
+    variants,
     deliversBy: '',
   };
 }
 
-function readLocalStorageCache(): CacheEntry | null {
+function readCache(): CacheEntry | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as CacheEntry;
-    return parsed;
-  } catch {
-    return null;
-  }
+    return raw ? JSON.parse(raw) as CacheEntry : null;
+  } catch { return null; }
 }
 
-function writeLocalStorageCache(entry: CacheEntry) {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(entry));
-  } catch {
-    // ignore
-  }
+function writeCache(entry: CacheEntry) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(entry)); } catch { /* ignore unavailable storage */ }
 }
 
-function isFresh(entry: CacheEntry | null): boolean {
-  return !!entry && Date.now() - entry.timestamp < CACHE_TTL;
+const isFresh = (entry: CacheEntry | null) => Boolean(entry && Date.now() - entry.timestamp < CACHE_TTL);
+const isUsable = (entry: CacheEntry | null) => Boolean(entry && Date.now() - entry.timestamp < STALE_TTL);
+
+async function fetchAll(): Promise<FrontendProduct[]> {
+  const products = (await fetchCatalogueProducts()).map(adaptProduct);
+  const entry = { timestamp: Date.now(), products };
+  memoryCache = entry;
+  writeCache(entry);
+  return products;
 }
 
-function isStaleButUsable(entry: CacheEntry | null): boolean {
-  return !!entry && Date.now() - entry.timestamp < STALE_TTL;
-}
-
-/**
- * Stale-while-revalidate: returns cached data immediately if fresh,
- * returns stale data and triggers background refresh if stale,
- * or fetches fresh if no cache exists.
- */
 export async function getCachedProducts(): Promise<FrontendProduct[]> {
-  // 1. Check memory cache (fresh)
-  if (isFresh(memoryCache)) {
+  if (isFresh(memoryCache)) return memoryCache!.products;
+  const local = readCache();
+  if (local) memoryCache = local;
+  if (isFresh(local)) return local!.products;
+  if (isUsable(memoryCache)) {
+    if (!fetchPromise) fetchPromise = fetchAll().finally(() => { fetchPromise = null; });
     return memoryCache!.products;
   }
-
-  // 2. Check localStorage (fresh)
-  const local = readLocalStorageCache();
-  if (local) {
-    memoryCache = local;
-    if (isFresh(local)) {
-      return local.products;
-    }
-  }
-
-  // 3. If stale but usable, return immediately + revalidate in background
-  if (isStaleButUsable(memoryCache)) {
-    // Trigger background refresh (non-blocking)
-    if (!fetchPromise) {
-      fetchPromise = fetchAllProducts().finally(() => { fetchPromise = null; });
-    }
-    return memoryCache!.products;
-  }
-
-  // 4. No usable cache — fetch (deduplicated)
-  if (fetchPromise) {
-    return fetchPromise;
-  }
-
-  fetchPromise = fetchAllProducts().finally(() => { fetchPromise = null; });
+  if (!fetchPromise) fetchPromise = fetchAll().finally(() => { fetchPromise = null; });
   return fetchPromise;
 }
 
-async function fetchAllProducts(): Promise<FrontendProduct[]> {
-  const dbProducts = await fetchProducts();
-  const adapted = dbProducts.map(adaptProduct);
-  const entry: CacheEntry = { timestamp: Date.now(), products: adapted };
-  memoryCache = entry;
-  writeLocalStorageCache(entry);
-  return adapted;
-}
-
 export async function getCachedProductsByCategory(category: ProductCategory): Promise<FrontendProduct[]> {
-  const all = await getCachedProducts();
-  return all.filter((p) => p.category === category);
+  return (await getCachedProducts()).filter((product) => product.category === category);
 }
 
 export async function getCachedProductById(id: string): Promise<FrontendProduct | null> {
-  // Try cache first
-  const cached = await getCachedProducts();
-  const found = cached.find((p) => p.id === id);
-  if (found) return found;
-
-  // Fallback to direct fetch
-  const dbProduct = await fetchProductById(id);
-  if (!dbProduct) return null;
-  return adaptProduct(dbProduct);
+  const cached = (await getCachedProducts()).find((product) => product.id === id);
+  if (cached) return cached;
+  const product = await fetchCatalogueProductById(id);
+  return product ? adaptProduct(product) : null;
 }
 
 export async function getCachedFeaturedProducts(limit?: number): Promise<FrontendProduct[]> {
-  // Return from memory cache if available
-  if (featuredCache) {
-    return limit ? featuredCache.slice(0, limit) : featuredCache;
-  }
-
-  const dbProducts = await fetchFeaturedProducts();
-  const adapted = dbProducts.map(adaptProduct);
-  featuredCache = adapted;
-  return limit ? adapted.slice(0, limit) : adapted;
+  if (!featuredCache) featuredCache = (await fetchCatalogueFeaturedProducts()).map(adaptProduct);
+  return limit ? featuredCache.slice(0, limit) : featuredCache;
 }
 
-export async function getRelatedProducts(product: FrontendProduct, limit: number = 3): Promise<FrontendProduct[]> {
-  const all = await getCachedProducts();
-  return all
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, limit);
+export async function getRelatedProducts(product: FrontendProduct, limit = 4): Promise<FrontendProduct[]> {
+  return (await getCachedProducts()).filter((candidate) => candidate.category === product.category && candidate.id !== product.id).slice(0, limit);
 }
 
 export function invalidateCache() {
   memoryCache = null;
   featuredCache = null;
   fetchPromise = null;
-  try {
-    localStorage.removeItem(CACHE_KEY);
-  } catch {
-    // ignore
-  }
+  try { localStorage.removeItem(CACHE_KEY); } catch { /* ignore */ }
 }

@@ -1,367 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
-import { Rotate3d, ArrowRight } from 'lucide-react';
-import { CURRENCY } from '../constants';
-import { TrousersInteractive, BagsInteractive, ShoesInteractive } from '../components/ui';
-import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
-import { useScrollReveal } from '../hooks/useScrollReveal';
-import { getCachedFeaturedProducts, getCachedProducts } from '../lib/product-cache';
 import type { Product } from '../types';
+import { getCachedFeaturedProducts, getCachedProducts } from '../lib/product-cache';
+import { useApp } from '../context/AppContext';
+import HeroCampaign from '../components/storefront/HeroCampaign';
+import ProductRail from '../components/storefront/ProductRail';
+import CategoryShowcase from '../components/storefront/CategoryShowcase';
+import AtelierDiagram from '../components/storefront/AtelierDiagram';
+import ServiceStrip from '../components/storefront/ServiceStrip';
 
-const FALLBACK_IMAGE = `data:image/svg+xml,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500">' +
-  '<rect width="400" height="500" fill="#F4F4F3"/>' +
-  '<text x="200" y="250" font-family="sans-serif" font-size="14" fill="#8B8B8A" text-anchor="middle" dominant-baseline="middle">' +
-  'Dylan\'s Palace' +
-  '</text>' +
-  '</svg>'
-)}`;
+const fallback = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900"><rect width="100%" height="100%" fill="#151515"/><text x="50%" y="50%" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="48">Dylan\'s Palace</text></svg>')}`;
 
-export default function HomeScreen() {
+export default function HomePage() {
   const navigate = useNavigate();
-  const [activeShoeIndex, setActiveShoeIndex] = useState(0);
-  const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
-  const [spinCount, setSpinCount] = useState(0);
-  const [showcaseShoes, setShowcaseShoes] = useState<Product[]>([]);
-  const [heroImage, setHeroImage] = useState(FALLBACK_IMAGE);
-  const [trousersImage, setTrousersImage] = useState(FALLBACK_IMAGE);
-  const [bagsImage, setBagsImage] = useState(FALLBACK_IMAGE);
-  const [shoesImage, setShoesImage] = useState(FALLBACK_IMAGE);
-
-  const [trousersRef, trousersVisible] = useScrollReveal<HTMLDivElement>();
-  const [bagsRef, bagsVisible] = useScrollReveal<HTMLDivElement>();
-  const [shoesRef, shoesVisible] = useScrollReveal<HTMLDivElement>();
-  const [labRef, labVisible] = useScrollReveal<HTMLDivElement>();
+  const { wishlist, toggleWishlist, handleAddtoBag } = useApp();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [featured, setFeatured] = useState<Product[]>([]);
 
   useEffect(() => {
-    getCachedProducts().then((all) => {
-      if (all.length === 0) return;
-      const first = all[0];
-      if (first.images[0]) setHeroImage(first.images[0]);
-
-      const trousers = all.find(p => p.category === 'TROUSERS');
-      if (trousers?.images[0]) setTrousersImage(trousers.images[0]);
-
-      const bags = all.find(p => p.category === 'BAGS');
-      if (bags?.images[0]) setBagsImage(bags.images[0]);
-
-      const shoes = all.find(p => p.category === 'SHOES');
-      if (shoes?.images[0]) setShoesImage(shoes.images[0]);
+    Promise.all([getCachedProducts(), getCachedFeaturedProducts(8)]).then(([all, selected]) => {
+      setProducts(all);
+      setFeatured(selected.length > 0 ? selected : all.slice(0, 8));
     });
-    getCachedFeaturedProducts(3).then(setShowcaseShoes);
   }, []);
 
-  const activeShoe = showcaseShoes[activeShoeIndex] || showcaseShoes[0];
-
-  const handleShopCategory = (cat: 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS') => {
-    navigate(`/${cat.toLowerCase()}`);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5; // range: -0.5 to 0.5
-    const y = (e.clientY - rect.top) / rect.height - 0.5; // range: -0.5 to 0.5
-    setTilt({ x, y, active: true });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0, active: false });
-  };
-
-  const trigger3dSpin = () => {
-    setSpinCount(prev => prev + 1);
-  };
+  const heroImage = featured[0]?.images[0] || products[0]?.images[0] || fallback;
+  const categoryCards = useMemo(() => [
+    { title: 'Shirts', description: 'Relaxed tailoring, knit polos and expressive resort pieces.', href: '/shirts', image: products.find((product) => product.category === 'SHIRTS')?.images[0] || heroImage },
+    { title: 'Trousers', description: 'Structured silhouettes built for movement and everyday polish.', href: '/trousers', image: products.find((product) => product.category === 'TROUSERS')?.images[0] || heroImage },
+    { title: 'Shoes', description: 'Clean leather, considered soles and modern proportions.', href: '/shoes', image: products.find((product) => product.category === 'SHOES')?.images[0] || heroImage },
+    { title: 'Bags', description: 'Practical forms with refined hardware and useful volume.', href: '/bags', image: products.find((product) => product.category === 'BAGS')?.images[0] || heroImage },
+  ], [products, heroImage]);
 
   return (
-    <div id="home-screen" className="w-full flex flex-col pb-32 animate-fade-in">
+    <div className="bg-[var(--color-canvas)]">
+      <HeroCampaign image={heroImage} />
+      <ServiceStrip />
 
-      {/* Editorial Hero Banner */}
-      <section className="relative w-full h-[70vh] min-h-[500px] border-b border-[#E5E5E5] overflow-hidden">
-        <ImageWithSkeleton
-          className="absolute inset-0 w-full h-full"
-          imgClassName="w-full h-full object-cover select-none pointer-events-none"
-          alt="A striking, high-contrast fashion editorial shot of a person wearing a crisp, minimalist white linen shirt."
-          src={heroImage}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/70 via-[#111111]/20 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 p-6 w-full flex flex-col items-start z-10">
-          <h2 className="font-serif text-[32px] md:text-[40px] text-[#FFFFFF] mb-4 uppercase tracking-tighter leading-tight">
-            THE SUMMER SHIFT
-          </h2>
-          <motion.button
-            id="hero-cta"
-            onClick={() => handleShopCategory('SHIRTS')}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            className="bg-[#111111] text-[#FFFFFF] text-[13px] font-semibold uppercase tracking-[0.1em] px-8 py-3.5 w-full sm:w-auto hover:bg-[#FFFFFF] hover:text-[#111111] border border-[#111111] transition-colors duration-300 cursor-pointer rounded-lg"
-          >
-            SHOP SHIRTS
-          </motion.button>
+      <ProductRail title="New arrivals" description="The latest pieces added to the Dylan’s Palace edit." products={products.slice(0, 4)} href="/shirts" wishlist={wishlist} onToggleWishlist={toggleWishlist} onQuickAdd={(product) => handleAddtoBag(product, product.sizes[0] || 'OS')} />
+
+      <section className="store-container pb-12 sm:pb-16 lg:pb-20">
+        <div className="mb-7"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">Shop by category</p><h2 className="mt-2 font-serif text-4xl font-bold tracking-[-0.045em] lg:text-5xl">Build the full look.</h2></div>
+        <div className="grid gap-4 md:grid-cols-2">{categoryCards.map((category, index) => <CategoryShowcase key={category.href} {...category} index={`0${index + 1}`} />)}</div>
+      </section>
+
+      <section className="grid bg-[var(--color-surface)] lg:grid-cols-2">
+        <div className="min-h-[480px] lg:min-h-[620px]"><AtelierDiagram /></div>
+        <div className="flex items-center px-[var(--space-page)] py-12 lg:px-16 lg:py-20">
+          <div className="max-w-xl"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">The fitting room</p><h2 className="mt-4 font-serif text-4xl font-bold leading-tight tracking-[-0.045em] sm:text-5xl">Details that make clothes easier to live in.</h2><p className="mt-6 text-sm leading-7 text-[var(--color-ink-soft)]">The collection balances strong shape with practical wear. Clear sizing, multiple product views and live inventory make it easier to choose with confidence.</p><button type="button" onClick={() => navigate('/trousers')} className="mt-8 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em]">Explore tailored pieces <ArrowRight size={15}/></button></div>
         </div>
       </section>
 
-      {/* 3D Interactive Lab Area */}
-      <section ref={labRef} className="w-full py-12 px-4 bg-[#F2F2F1] border-b border-[#E5E5E5]">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={labVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-md mx-auto flex flex-col gap-6"
-        >
-          <div className="text-center">
-            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#8B8B8A] block mb-1">
-              Interactive 3D Preview
-            </span>
-            <h2 className="font-serif text-[28px] font-bold text-[#111111] tracking-tighter uppercase leading-none">
-              FOOTWEAR LAB
-            </h2>
-            <p className="text-[12px] text-[#555555] max-w-xs mx-auto mt-2 tracking-wide">
-              Move cursor over the footwear container to tilt and preview leather specs under dynamic lighting.
-            </p>
-          </div>
-
-          {/* Interactive 3D Perspective Card Container */}
-          <div
-            className="relative w-full h-[360px] cursor-grab active:cursor-grabbing select-none"
-            style={{ perspective: 1000 }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            onClick={trigger3dSpin}
-          >
-            <motion.div
-              className="absolute inset-0 bg-white border border-[#E5E5E5] rounded-2xl shadow-xl overflow-hidden flex flex-col p-6 transition-colors duration-500 ease-out"
-              animate={{
-                rotateY: spinCount * 360 + (tilt.active ? tilt.x * 28 : 0),
-                rotateX: tilt.active ? tilt.y * -28 : 0,
-                scale: tilt.active ? 1.02 : 1
-              }}
-              transition={{ type: "spring", stiffness: 100, damping: 18 }}
-            >
-              {/* Dynamic light refraction flare overlay effect */}
-              {tilt.active && (
-                <div
-                  className="absolute inset-0 pointer-events-none mix-blend-soft-light transition-opacity duration-300 z-10"
-                  style={{
-                    background: `radial-gradient(circle 140px at ${50 + tilt.x * 100}% ${50 + tilt.y * 100}%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 80%)`
-                  }}
-                />
-              )}
-
-              {/* Top lab parameters */}
-              <div className="flex justify-between items-start w-full z-10">
-                <div className="flex flex-col">
-                  <span className="font-mono text-[9px] text-[#8B8B8A] uppercase tracking-wider">
-                    SPEC_ {activeShoe?.id || '...'}
-                  </span>
-                  <span className="text-[11px] font-extrabold uppercase text-[#111111] tracking-tight mt-0.5">
-                    {activeShoe?.brand || 'Premium'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-[#F9F9F8] border border-[#E5E5E5]/60 rounded-full">
-                  <Rotate3d size={12} className="text-[#111111] animate-spin" style={{ animationDuration: '4s' }} />
-                  <span className="font-mono text-[9px] text-[#444748] tracking-widest uppercase">
-                    3D_SENSE
-                  </span>
-                </div>
-              </div>
-
-              {/* Centered Image display block with dynamic floating zoom */}
-              <div className="flex-grow flex items-center justify-center relative w-full h-1/2 overflow-hidden py-4">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeShoe?.id || 'empty'}
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.85 }}
-                    transition={{ duration: 0.4 }}
-                    className="w-full h-full flex items-center justify-center relative"
-                  >
-                    <ImageWithSkeleton
-                      className="w-full h-full"
-                      imgClassName="w-full h-full max-h-[160px] object-contain rounded-lg drop-shadow-2xl transition-transform duration-500 hover:scale-105 pointer-events-none"
-                      alt={activeShoe?.name || ''}
-                      src={activeShoe?.images?.[0] || FALLBACK_IMAGE}
-                      loading="eager"
-                    />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              {/* Footwear metadata cards details row */}
-              <div className="flex flex-col w-full z-10 pt-2 gap-1.5">
-                <div className="flex justify-between items-baseline">
-                  <h4 className="font-serif text-[20px] font-bold text-[#111111] uppercase tracking-tight">
-                    {activeShoe?.name || 'Loading...'}
-                  </h4>
-                  <span className="font-serif text-[18px] font-bold text-[#4A5D23]">
-                    {CURRENCY}{activeShoe?.price?.toFixed(2) || '0.00'}
-                  </span>
-                </div>
-                <p className="text-[11px] text-[#666666] leading-relaxed line-clamp-2 h-8">
-                  {activeShoe?.description || ''}
-                </p>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleShopCategory('SHOES');
-                  }}
-                  className="w-full mt-2 h-11 bg-[#111111] text-white rounded-lg flex items-center justify-center text-[11px] font-bold uppercase tracking-widest gap-2 hover:bg-[#333333] active:scale-95 transition-all shadow-md cursor-pointer"
-                >
-                  ACQUIRE Footwear <ArrowRight size={12} />
-                </button>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Interactive Footwear Index controller bars selector */}
-          <div className="flex justify-center items-center gap-3 mt-1 select-none">
-            {showcaseShoes.map((shoe, idx) => (
-              <button
-                key={shoe.id}
-                onClick={() => {
-                  setActiveShoeIndex(idx);
-                  trigger3dSpin();
-                }}
-                className={`py-1.5 px-3 rounded-full border text-[9px] font-extrabold uppercase tracking-widest transition-all duration-300 active:scale-90 cursor-pointer ${activeShoeIndex === idx
-                  ? 'bg-[#111111] text-white border-[#111111] scale-105 shadow-sm'
-                  : 'bg-white text-[#555555] border-[#E5E5E5] opacity-75'
-                  }`}
-              >
-                {shoe.name.split(' ')[0]}
-              </button>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-      <section className="w-full flex flex-col gap-0">
-
-        {/* TROUSERS SECTION */}
-        <div ref={trousersRef} className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={trousersVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
-          >
-            {/* Left Column: Image cover (Clickable, redirects to plp) */}
-            <div
-              id="cat-preview-trousers"
-              onClick={() => handleShopCategory('TROUSERS')}
-              className="relative w-full h-[360px] rounded-2xl overflow-hidden shadow-lg group cursor-pointer"
-            >
-              <ImageWithSkeleton
-                className="absolute inset-0 w-full h-full"
-                imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
-                alt="Wide-leg pleated trousers."
-                src={trousersImage}
-              />
-              <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
-              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#C9C9C7] mb-1">
-                  Atelier Apparel
-                </span>
-                <h4 className="font-serif text-[32px] md:text-[38px] text-white uppercase tracking-tighter font-extrabold mb-4 leading-none">
-                  TROUSERS
-                </h4>
-                <span className="inline-flex items-center gap-1.5 text-xs text-white uppercase font-bold tracking-widest border-b border-white pb-0.5 self-start group-hover:gap-3 transition-all">
-                  DISCOVER SLATE <ArrowRight size={14} />
-                </span>
-              </div>
-            </div>
-
-            {/* Right Column: Mini Interactive Tailoring Lab */}
-            <div className="w-full h-[360px]">
-              <TrousersInteractive />
-            </div>
-          </motion.div>
-        </div>
-
-        {/* BAGS SECTION */}
-        <div ref={bagsRef} className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={bagsVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
-          >
-            {/* Left Column: 3D hardware & opening clasp mechanism */}
-            <div className="w-full h-[360px] order-2 md:order-1">
-              <BagsInteractive />
-            </div>
-
-            {/* Right Column: Campaign card */}
-            <div
-              id="cat-preview-bags"
-              onClick={() => handleShopCategory('BAGS')}
-              className="relative w-full h-[360px] rounded-2xl overflow-hidden shadow-lg group cursor-pointer order-1 md:order-2"
-            >
-              <ImageWithSkeleton
-                className="absolute inset-0 w-full h-full"
-                imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
-                alt="Minimalist structured black leather bag on pedestal."
-                src={bagsImage}
-              />
-              <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
-              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#C9C9C7] mb-1">
-                  Grained Leather
-                </span>
-                <h4 className="font-serif text-[32px] md:text-[38px] text-white uppercase tracking-tighter font-extrabold mb-4 leading-none">
-                  BAGS
-                </h4>
-                <span className="inline-flex items-center gap-1.5 text-xs text-white uppercase font-bold tracking-widest border-b border-white pb-0.5 self-start group-hover:gap-3 transition-all">
-                  EXPLORE HARDWARE <ArrowRight size={14} />
-                </span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* SHOES SECTION */}
-        <div ref={shoesRef} className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] py-12 px-4 sm:px-6 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={shoesVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
-          >
-            {/* Left Column: Campaign card */}
-            <div
-              id="cat-preview-shoes"
-              onClick={() => handleShopCategory('SHOES')}
-              className="relative w-full h-[360px] rounded-2xl overflow-hidden shadow-lg group cursor-pointer"
-            >
-              <ImageWithSkeleton
-                className="absolute inset-0 w-full h-full"
-                imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none pointer-events-none"
-                alt="Avant-garde black leather shoes."
-                src={shoesImage}
-              />
-              <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-300"></div>
-              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#C9C9C7] mb-1">
-                  Bespoke Soles
-                </span>
-                <h4 className="font-serif text-[32px] md:text-[38px] text-white uppercase tracking-tighter font-extrabold mb-4 leading-none">
-                  SHOES
-                </h4>
-                <span className="inline-flex items-center gap-1.5 text-xs text-white uppercase font-bold tracking-widest border-b border-white pb-0.5 self-start group-hover:gap-3 transition-all">
-                  TEST WEAVING <ArrowRight size={14} />
-                </span>
-              </div>
-            </div>
-
-            {/* Right Column: ShoesInteractive tension control */}
-            <div className="w-full h-[360px]">
-              <ShoesInteractive />
-            </div>
-          </motion.div>
-        </div>
-
-      </section>
-
+      <ProductRail title="Selected for you" description="Featured pieces from across the current catalogue." products={featured.slice(0, 4)} href="/shoes" wishlist={wishlist} onToggleWishlist={toggleWishlist} onQuickAdd={(product) => handleAddtoBag(product, product.sizes[0] || 'OS')} />
     </div>
   );
 }

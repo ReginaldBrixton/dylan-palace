@@ -1,5 +1,15 @@
 export type ProductCategory = 'SHIRTS' | 'TROUSERS' | 'SHOES' | 'BAGS';
 
+export interface ProductVariant {
+  id: string;
+  sku: string;
+  size: string;
+  color?: string;
+  price?: number;
+  stockQuantity: number;
+  active: boolean;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -11,6 +21,7 @@ export interface Product {
   images: string[];
   description: string;
   sizes: string[];
+  variants?: ProductVariant[];
   deliversBy: string;
 }
 
@@ -18,5 +29,6 @@ export interface CartItem {
   id: string;
   product: Product;
   selectedSize: string;
+  selectedVariantId?: string;
   quantity: number;
 }
