@@ -1,153 +1,29 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { Users as UsersIcon, ArrowLeft, Search, Mail, Phone, Shield, User } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Mail, Phone, Search, Shield, User } from 'lucide-react';
+import AdminShell from '../../components/admin/AdminShell';
+import StatusBadge from '../../components/admin/StatusBadge';
 import { fetchProfiles } from '../../lib/api';
 import type { Profile } from '../../lib/database.types';
 
-export default function SellerUsers() {
-  const navigate = useNavigate();
+export default function SellerUsersPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const load = useCallback(async () => { setLoading(true); try { setProfiles(await fetchProfiles()); } finally { setLoading(false); } }, []);
+  useEffect(() => { load(); }, [load]);
 
-  const load = useCallback(async () => {
-    try {
-      const data = await fetchProfiles();
-      setProfiles(data);
-    } catch (err) {
-      console.error('Failed to load profiles:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const filtered = profiles.filter((p) =>
-    p.email.toLowerCase().includes(search.toLowerCase()) ||
-    (p.full_name || '').toLowerCase().includes(search.toLowerCase())
-  );
-
-  const customers = filtered.filter((p) => p.role === 'customer');
-  const sellers = filtered.filter((p) => p.role === 'seller');
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return profiles;
+    return profiles.filter((profile) => [profile.full_name, profile.email, profile.phone, profile.role].filter(Boolean).join(' ').toLowerCase().includes(query));
+  }, [profiles, search]);
+  const customerCount = profiles.filter((profile) => profile.role === 'customer').length;
+  const sellerCount = profiles.filter((profile) => profile.role === 'seller').length;
 
   return (
-    <div className="min-h-screen bg-[#F9F9F8] flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-[#111111] text-white flex flex-col shrink-0">
-        <div className="p-6 border-b border-[#333]">
-          <h1 className="font-serif text-xl font-bold uppercase tracking-tighter">Dylan's Palace</h1>
-          <p className="text-[10px] uppercase tracking-widest text-[#8B8B8A] mt-0.5">Seller Portal</p>
-        </div>
-        <nav className="flex-1 p-4 flex flex-col gap-1">
-          {[
-            { label: 'Dashboard', path: '/seller', icon: ArrowLeft },
-            { label: 'Users', path: '/seller/users', icon: UsersIcon },
-          ].map((item) => (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-[#ccc] hover:bg-[#1a1a1a] hover:text-white transition-all cursor-pointer"
-            >
-              <item.icon size={18} />
-              {item.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main */}
-      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6">
-            <h2 className="font-serif text-2xl font-bold text-[#111111] uppercase tracking-tighter mb-1">
-              Users
-            </h2>
-            <p className="text-sm text-[#8B8B8A]">
-              {customers.length} customers • {sellers.length} sellers
-            </p>
-          </div>
-
-          {/* Search */}
-          <div className="relative mb-6">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8B8A]" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search users by name or email..."
-              className="w-full bg-white border border-[#E5E5E5] rounded-xl pl-10 pr-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111] transition-all"
-            />
-          </div>
-
-          {loading ? (
-            <div className="flex flex-col gap-3 animate-pulse">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#E5E5E5]/50 rounded-full" />
-                  <div className="flex-1 flex flex-col gap-2">
-                    <div className="h-3 w-1/3 bg-[#E5E5E5] rounded-full" />
-                    <div className="h-3 w-1/4 bg-[#E5E5E5] rounded-full" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="text-center py-12">
-              <UsersIcon size={32} className="text-[#E5E5E5] mx-auto mb-3" />
-              <p className="text-sm text-[#8B8B8A]">No users found.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filtered.map((profile, i) => (
-                <motion.div
-                  key={profile.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="bg-white rounded-xl border border-[#E5E5E5] p-5"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${profile.role === 'seller' ? 'bg-purple-100' : 'bg-blue-100'
-                      }`}>
-                      {profile.role === 'seller' ? (
-                        <Shield size={18} className="text-purple-600" />
-                      ) : (
-                        <User size={18} className="text-blue-600" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-[#111111] truncate">
-                        {profile.full_name || 'Unnamed'}
-                      </p>
-                      <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block mt-0.5 ${profile.role === 'seller' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
-                        }`}>
-                        {profile.role}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1.5 text-xs text-[#8B8B8A]">
-                    <p className="flex items-center gap-1.5">
-                      <Mail size={12} /> {profile.email}
-                    </p>
-                    {profile.phone && (
-                      <p className="flex items-center gap-1.5">
-                        <Phone size={12} /> {profile.phone}
-                      </p>
-                    )}
-                    <p className="text-[10px] mt-1">
-                      Joined: {new Date(profile.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
+    <AdminShell title="Customers" description={`${customerCount} customer profiles and ${sellerCount} seller accounts.`}>
+      <label className="relative mb-5 block max-w-xl"><span className="sr-only">Search profiles</span><Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-muted)]"/><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, email, phone or role" className="h-12 w-full border border-[var(--color-border)] bg-white pl-11 pr-4 text-sm outline-none focus:border-[var(--color-ink)]"/></label>
+      {loading ? <div className="grid gap-3">{Array.from({ length: 6 }).map((_, index) => <div key={index} className="h-20 animate-pulse bg-white"/>)}</div> : filtered.length === 0 ? <div className="border border-dashed border-[var(--color-border-strong)] bg-white p-12 text-center text-sm text-[var(--color-muted)]">No matching profiles.</div> : <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{filtered.map((profile) => <article key={profile.id} className="border border-[var(--color-border)] bg-white p-5"><div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-full bg-[var(--color-surface-subtle)]">{profile.role === 'seller' ? <Shield size={18}/> : <User size={18}/>}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{profile.full_name || 'Unnamed profile'}</p><div className="mt-1"><StatusBadge status={profile.role}/></div></div></div><div className="mt-5 grid gap-2 text-xs text-[var(--color-ink-soft)]"><p className="flex items-center gap-2 truncate"><Mail size={14} className="shrink-0"/>{profile.email}</p>{profile.phone ? <p className="flex items-center gap-2"><Phone size={14}/>{profile.phone}</p> : null}<p className="mt-2 text-[var(--color-muted)]">Joined {new Date(profile.created_at).toLocaleDateString()}</p></div></article>)}</div>}
+    </AdminShell>
   );
 }
