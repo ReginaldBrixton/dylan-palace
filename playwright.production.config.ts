@@ -8,11 +8,11 @@ if (!productionUrl) {
 
 export default defineConfig({
   testDir: './e2e/production',
-  timeout: 45_000,
-  expect: { timeout: 10_000 },
+  timeout: 20_000,
+  expect: { timeout: 6_000 },
   fullyParallel: false,
   workers: 1,
-  retries: process.env.CI ? 1 : 0,
+  retries: 0,
   reporter: [
     ['line'],
     ['json', { outputFile: 'production-artifacts/playwright-results.json' }],
@@ -21,8 +21,8 @@ export default defineConfig({
   use: {
     baseURL: productionUrl,
     browserName: 'chromium',
-    actionTimeout: 12_000,
-    navigationTimeout: 30_000,
+    actionTimeout: 8_000,
+    navigationTimeout: 20_000,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
