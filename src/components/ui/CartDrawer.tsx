@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
-import { X } from 'lucide-react';
-import { CartItem } from '../../types';
-import CartItemRow from './cart/CartItemRow';
-import CartEmptyState from './cart/CartEmptyState';
-import CartFooter from './cart/CartFooter';
+import React, { useEffect, useMemo } from 'react';
+import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
+import type { CartItem } from '../../types';
+import { CURRENCY, SHIPPING } from '../../constants';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -14,91 +12,59 @@ interface CartDrawerProps {
   onProceedToCheckout: () => void;
 }
 
-export default function CartDrawer({
-  isOpen,
-  onClose,
-  cartItems,
-  onUpdateQty,
-  onRemoveItem,
-  onProceedToCheckout
-}: CartDrawerProps) {
+const itemPrice = (item: CartItem) => item.product.variants?.find((variant) => variant.id === item.selectedVariantId)?.price ?? item.product.price;
+
+export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQty, onRemoveItem, onProceedToCheckout }: CartDrawerProps) {
   useEffect(() => {
     if (!isOpen) return;
-    const prev = document.body.style.overflow;
+    const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener('keydown', onKey);
-    };
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => { document.body.style.overflow = overflow; window.removeEventListener('keydown', closeOnEscape); };
   }, [isOpen, onClose]);
+
+  const subtotal = useMemo(() => cartItems.reduce((sum, item) => sum + itemPrice(item) * item.quantity, 0), [cartItems]);
+  const remaining = Math.max(0, SHIPPING.FREE_THRESHOLD - subtotal);
+  const units = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   if (!isOpen) return null;
 
-  const totalItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
-
   return (
-    <div className="fixed inset-0 z-[100] overflow-hidden select-none">
-      {/* Background dark modal overlay backdrop with blur */}
-      <div
-        id="cart-backdrop"
-        onClick={onClose}
-        className="absolute inset-0 bg-[#111111]/45 backdrop-blur-xs transition-opacity animate-fade-in"
-      />
+    <div className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="Shopping bag">
+      <button type="button" className="absolute inset-0 h-full w-full bg-black/45 backdrop-blur-sm" onClick={onClose} aria-label="Close shopping bag" />
+      <section className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-[var(--radius-lg)] bg-white shadow-[var(--shadow-drawer)] sm:left-auto sm:top-0 sm:h-full sm:max-h-none sm:w-[min(460px,100%)] sm:rounded-none">
+        <header className="flex min-h-16 items-center justify-between border-b border-[var(--color-border)] px-5">
+          <div><p className="font-serif text-xl font-bold">Your bag</p><p className="text-xs text-[var(--color-muted)]">{units} {units === 1 ? 'item' : 'items'}</p></div>
+          <button type="button" onClick={onClose} className="grid size-10 place-items-center rounded-full bg-[var(--color-surface-subtle)]" aria-label="Close"><X size={19} /></button>
+        </header>
 
-      {/* Cart Container bottom-sheet sheet */}
-      <div
-        id="cart-bottom-sheet"
-        className="absolute bottom-0 inset-x-0 h-[75vh] sm:h-[80vh] w-full flex flex-col bg-white/70 backdrop-blur-2xl backdrop-saturate-[180%] border-t border-[#E5E5E5]/50 transition-transform duration-300 transform translate-y-0 rounded-t-[24px]"
-      >
+        {cartItems.length === 0 ? (
+          <div className="grid flex-1 place-items-center px-6 py-14 text-center"><div><ShoppingBag size={42} className="mx-auto text-[var(--color-muted)]" /><h2 className="mt-5 font-serif text-2xl font-bold">Your bag is empty</h2><p className="mt-2 text-sm text-[var(--color-ink-soft)]">Add a piece from any collection to begin.</p><button type="button" onClick={onClose} className="mt-6 h-11 bg-[var(--color-ink)] px-6 text-xs font-semibold uppercase tracking-[0.14em] text-white">Continue shopping</button></div></div>
+        ) : (
+          <>
+            <div className="flex-1 overflow-y-auto px-5 py-2">
+              {cartItems.map((item) => (
+                <article key={item.id} className="grid grid-cols-[80px_minmax(0,1fr)] gap-4 border-b border-[var(--color-border)] py-5">
+                  <img src={item.product.images[0]} alt="" className="aspect-[4/5] h-[100px] w-20 bg-[var(--color-surface-subtle)] object-cover" />
+                  <div className="min-w-0">
+                    <div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="truncate text-sm font-semibold">{item.product.name}</h3><p className="mt-1 text-xs text-[var(--color-muted)]">Size {item.selectedSize}</p></div><button type="button" onClick={() => onRemoveItem(item.id)} className="grid size-8 shrink-0 place-items-center text-[var(--color-muted)] hover:text-[var(--color-danger)]" aria-label={`Remove ${item.product.name}`}><Trash2 size={16} /></button></div>
+                    <div className="mt-5 flex items-center justify-between"><div className="flex h-9 items-center border border-[var(--color-border)]"><button type="button" onClick={() => onUpdateQty(item.id, -1)} className="grid size-9 place-items-center" aria-label={`Decrease ${item.product.name} quantity`}><Minus size={14} /></button><span className="grid w-8 place-items-center text-sm">{item.quantity}</span><button type="button" onClick={() => onUpdateQty(item.id, 1)} className="grid size-9 place-items-center" aria-label={`Increase ${item.product.name} quantity`}><Plus size={14} /></button></div><p className="text-sm font-bold">{CURRENCY}{(itemPrice(item) * item.quantity).toFixed(2)}</p></div>
+                  </div>
+                </article>
+              ))}
+            </div>
 
-        {/* Grab Handle */}
-        <div className="w-full flex justify-center pt-3 pb-1.5 rounded-t-[24px]">
-          <div className="w-10 h-1.5 bg-[#E5E5E5] rounded-full"></div>
-        </div>
-
-        {/* Header container */}
-        <div className="h-[44px] min-h-[44px] flex items-center justify-between px-5 border-b border-[#E5E5E5]/50">
-          <h2 className="font-serif text-[18px] sm:text-[22px] font-bold text-[#111111] uppercase tracking-tighter">
-            Your Bag ({totalItemCount})
-          </h2>
-          <button
-            id="close-cart-btn"
-            onClick={onClose}
-            aria-label="Close modal"
-            className="w-8 h-8 flex items-center justify-end text-[#111111] hover:opacity-70 transition-opacity cursor-pointer"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Scrollable Products List area */}
-        <div className="flex-grow overflow-y-auto px-5 py-4 flex flex-col gap-3 no-scrollbar">
-          {cartItems.length > 0 ? (
-            cartItems.map((item) => (
-              <div key={item.id} className="flex flex-col gap-4">
-                <CartItemRow
-                  item={item}
-                  onUpdateQty={onUpdateQty}
-                  onRemoveItem={onRemoveItem}
-                />
-              </div>
-            ))
-          ) : (
-            <CartEmptyState onClose={onClose} />
-          )}
-        </div>
-
-        {/* Total Calculations & Proceed CTA button */}
-        {cartItems.length > 0 && (
-          <CartFooter subtotal={subtotal} onProceedToCheckout={onProceedToCheckout} />
+            <footer className="border-t border-[var(--color-border)] p-5">
+              <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-[var(--color-surface-subtle)]"><div className="h-full bg-[var(--color-accent)] transition-all" style={{ width: `${Math.min(100, (subtotal / SHIPPING.FREE_THRESHOLD) * 100)}%` }} /></div>
+              <p className="text-xs text-[var(--color-ink-soft)]">{remaining > 0 ? `${CURRENCY}${remaining.toFixed(2)} more for free delivery.` : 'You qualify for free delivery.'}</p>
+              <div className="mt-5 flex items-center justify-between text-lg font-bold"><span>Subtotal</span><span>{CURRENCY}{subtotal.toFixed(2)}</span></div>
+              <p className="mt-1 text-xs text-[var(--color-muted)]">Delivery and final stock are confirmed at checkout.</p>
+              <button type="button" onClick={onProceedToCheckout} className="mt-5 h-13 w-full bg-[var(--color-accent)] text-xs font-bold uppercase tracking-[0.16em] text-white hover:bg-[var(--color-accent-strong)]">Proceed to checkout</button>
+            </footer>
+          </>
         )}
-
-      </div>
+      </section>
     </div>
   );
 }
