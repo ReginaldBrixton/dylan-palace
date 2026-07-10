@@ -61,8 +61,8 @@ test('catalogue provides explicit search, filters and product actions', async ({
 test('seller login requires an email and passcode', async ({ page }) => {
   await page.goto('/seller/login');
   await expect(page.getByRole('heading', { name: 'Admin sign in' })).toBeVisible();
-  await expect(page.getByLabel('Admin email')).toBeVisible();
-  await expect(page.getByLabel('Passcode')).toBeVisible();
+  await expect(page.getByLabel('Admin email', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('Passcode', { exact: true })).toBeVisible();
 });
 
 test('checkout protects the empty-cart route', async ({ page }) => {

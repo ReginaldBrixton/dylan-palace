@@ -9,8 +9,9 @@ test('mobile navigation opens a compact category menu', async ({ page }, testInf
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-only navigation check');
   await page.goto('/');
   await page.getByRole('button', { name: 'Open navigation' }).click();
-  await expect(page.getByRole('navigation', { name: 'Mobile navigation' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Shirts' })).toBeVisible();
+  const mobileNavigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+  await expect(mobileNavigation).toBeVisible();
+  await expect(mobileNavigation.getByRole('link', { name: 'Shirts', exact: true })).toBeVisible();
 });
 
 test('desktop exposes category navigation without the mobile menu', async ({ page }, testInfo) => {
