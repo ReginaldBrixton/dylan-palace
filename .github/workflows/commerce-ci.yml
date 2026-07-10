@@ -28,6 +28,12 @@ jobs:
       - name: Build
         run: npm run build
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
       - name: Responsive browser tests
-        run: npm run test:e2e -- --project=mobile --project=tablet --project=desktop
+        shell: bash
+        run: |
+          set +e
+          npm run test:e2e -- --project=mobile --project=tablet --project=desktop --reporter=line > playwright-output.txt 2>&1
+          status=$?
+          cat playwright-output.txt
+          exit $status
